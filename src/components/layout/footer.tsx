@@ -8,7 +8,7 @@ export function Footer() {
           <p className="font-mono text-sm font-bold text-foreground">
             IAM<span className="text-cyan">.</span>
           </p>
-          <p className="mt-2 text-xs text-subtle">
+          <p className="mt-2 text-xs text-foreground/50">
             Proof of Humanity on Solana
           </p>
         </div>
