@@ -9,7 +9,7 @@ export function verifyReducer(
   switch (action.type) {
     case "START_CHALLENGE":
       if (state.step !== "idle") return state;
-      return { step: "challenge", timeRemaining: 7 };
+      return { step: "challenge", timeRemaining: 21 };
 
     case "TICK":
       if (state.step !== "challenge") return state;
@@ -25,7 +25,7 @@ export function verifyReducer(
 
     case "SIGN_COMPLETE":
       if (state.step !== "signing") return state;
-      return { step: "signing" };
+      return { step: "verified", commitment: "", txSignature: action.txSignature };
 
     case "VERIFICATION_SUCCESS":
       if (

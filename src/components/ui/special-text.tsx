@@ -131,6 +131,19 @@ export function SpecialText({
     return clearTimers;
   }, [clearTimers]);
 
+  // Once animation is done, render plain text — no absolute positioning
+  // that can break on tab switch or visibility change.
+  if (done) {
+    return (
+      <span
+        ref={containerRef}
+        className={`inline-flex font-mono font-medium ${className}`}
+      >
+        {children}
+      </span>
+    );
+  }
+
   return (
     <span
       ref={containerRef}
@@ -142,7 +155,7 @@ export function SpecialText({
       </span>
       {/* Animated text positioned on top */}
       <span className="absolute inset-0">
-        {done ? children : displayText}
+        {displayText}
       </span>
     </span>
   );

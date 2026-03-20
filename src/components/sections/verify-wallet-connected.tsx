@@ -1,6 +1,8 @@
 "use client";
 
+import { useRef } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { useConnection } from "@solana/wallet-adapter-react";
 import type { VerifyState, VerifyAction } from "@/components/verify/types";
 import { PulseChallenge } from "@/components/verify/pulse-challenge";
 import {
@@ -11,11 +13,17 @@ import {
 } from "@/components/verify/step-views";
 import { WalletConnectButton } from "@/components/ui/wallet-connect-button";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
-import {
-  generateMockCommitment,
-  generateMockTxSignature,
-} from "@/components/verify/mock-utils";
+import { usePulse } from "@/components/providers/pulse-provider";
 import { Wallet } from "lucide-react";
+
+function commitmentToHex(bytes: Uint8Array): string {
+  return (
+    "0x" +
+    Array.from(bytes)
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("")
+  );
+}
 
 export function VerifyWalletConnected({
   state,
@@ -24,24 +32,84 @@ export function VerifyWalletConnected({
   state: VerifyState;
   dispatch: React.ActionDispatch<[action: VerifyAction]>;
 }) {
-  const { connected } = useWallet();
+  const { connected, wallet } = useWallet();
+  const { connection } = useConnection();
+  const pulse = usePulse();
+  const touchRef = useRef<HTMLDivElement>(null);
+  const pendingResultRef = useRef<{
+    type: "success";
+    commitment: string;
+    txSignature?: string;
+  } | {
+    type: "failure";
+    error: string;
+  } | null>(null);
+  const timerDoneRef = useRef(false);
+  const sdkDoneRef = useRef(false);
+
+  function maybeDispatchResult() {
+    if (!timerDoneRef.current || !sdkDoneRef.current) return;
+    const result = pendingResultRef.current;
+    if (!result) return;
+    if (result.type === "success") {
+      dispatch({
+        type: "VERIFICATION_SUCCESS",
+        commitment: result.commitment,
+        txSignature: result.txSignature,
+      });
+    } else {
+      dispatch({
+        type: "VERIFICATION_FAILED",
+        error: result.error,
+      });
+    }
+  }
 
   function handleStart() {
+    pendingResultRef.current = null;
+    timerDoneRef.current = false;
+    sdkDoneRef.current = false;
     dispatch({ type: "START_CHALLENGE" });
+
+    pulse
+      .verify(touchRef.current ?? undefined, wallet?.adapter, connection)
+      .then((result) => {
+        sdkDoneRef.current = true;
+        if (result.success) {
+          pendingResultRef.current = {
+            type: "success",
+            commitment: commitmentToHex(result.commitment),
+            txSignature: result.txSignature,
+          };
+        } else {
+          pendingResultRef.current = {
+            type: "failure",
+            error: result.error ?? "Verification failed",
+          };
+        }
+        maybeDispatchResult();
+      })
+      .catch((err: Error) => {
+        sdkDoneRef.current = true;
+        pendingResultRef.current = {
+          type: "failure",
+          error: err.message ?? "Unexpected error",
+        };
+        maybeDispatchResult();
+      });
   }
 
   function handleChallengeComplete() {
-    dispatch({ type: "CHALLENGE_COMPLETE" });
-    setTimeout(() => {
-      dispatch({ type: "PROOF_COMPLETE" });
+    timerDoneRef.current = true;
+    if (sdkDoneRef.current) {
+      maybeDispatchResult();
+    } else {
+      // Timer done but SDK still working — show signing state
+      dispatch({ type: "CHALLENGE_COMPLETE" });
       setTimeout(() => {
-        dispatch({
-          type: "VERIFICATION_SUCCESS",
-          commitment: generateMockCommitment(),
-          txSignature: generateMockTxSignature(),
-        });
-      }, 1000);
-    }, 1500);
+        dispatch({ type: "PROOF_COMPLETE" });
+      }, 2000);
+    }
   }
 
   function handleTick(remaining: number) {
@@ -49,6 +117,9 @@ export function VerifyWalletConnected({
   }
 
   function handleReset() {
+    pendingResultRef.current = null;
+    timerDoneRef.current = false;
+    sdkDoneRef.current = false;
     dispatch({ type: "RESET" });
   }
 
@@ -88,6 +159,7 @@ export function VerifyWalletConnected({
         timeRemaining={state.timeRemaining}
         onComplete={handleChallengeComplete}
         onTick={handleTick}
+        touchRef={touchRef}
       />
     );
   }
