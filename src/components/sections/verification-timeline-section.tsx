@@ -40,7 +40,7 @@ export function VerificationTimelineSection() {
         </TextShimmer>
 
         <h2 className="mt-6 font-sans text-2xl font-semibold text-foreground md:text-3xl">
-          7 seconds, 7 steps.
+          Three stages, seven steps.
         </h2>
         <p className="mt-3 text-muted whitespace-pre-line">
           {"From behavioral challenge to on-chain proof.\nNo biometric data leaves your device at any point in this pipeline."}

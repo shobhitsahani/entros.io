@@ -6,7 +6,7 @@ export const verificationSteps: VerificationStep[] = [
     description:
       "User speaks a phonetically-balanced nonsense phrase and traces a gesture on screen.",
     detail:
-      "The phrase is randomly generated and non-sensical (e.g., 'Oro rura lamo ree see') to prevent dictionary-based deepfake attacks. The gesture is a continuous 2D curve. Together they form a 7-second Liveness Interlock that captures involuntary behavioral signals.",
+      "The phrase is randomly generated and non-sensical (e.g., 'Oro rura lamo ree see') to prevent dictionary-based deepfake attacks. The gesture is a continuous 2D curve. Together they form a Liveness Interlock that captures involuntary behavioral signals.",
     icon: "mic",
   },
   {
@@ -14,7 +14,7 @@ export const verificationSteps: VerificationStep[] = [
     description:
       "Three sensor streams record simultaneously: audio at 16kHz, motion (IMU) at 100Hz, touch at 120Hz.",
     detail:
-      "The Pulse SDK accesses the device microphone, accelerometer, gyroscope, and touch digitizer. All three streams run in parallel for 7 seconds. The raw data stays in memory on the device and never touches a network interface.",
+      "The Pulse SDK accesses the device microphone, accelerometer, gyroscope, and touch digitizer. All three streams capture data during the session. The raw data stays in memory on the device and never touches a network interface.",
     icon: "activity",
   },
   {

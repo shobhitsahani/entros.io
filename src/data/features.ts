@@ -5,7 +5,7 @@ export const features: Feature[] = [
     icon: "pulse",
     title: "The Pulse",
     description:
-      "7 seconds of voice, motion, and touch. Hashed on-device, then destroyed.",
+      "Voice, motion, and touch. Hashed on-device, then destroyed.",
     benefit:
       "Deepfake-resistant liveness without storing biometrics.",
   },
