@@ -1,0 +1,188 @@
+@import "tailwindcss";
+
+/* ----------------------------------------------------------------
+   Theme-aware colours: light by default, .dark class overrides.
+   next-themes toggles .dark on <html>.
+   ---------------------------------------------------------------- */
+
+:root {
+  --color-background: #FAFAF8;
+  --color-surface: #F0F0EC;
+  --color-surface-hover: #E6E6E0;
+  --color-foreground: #1A1A1F;
+  --color-muted: #6B6B7B;
+  --color-subtle: #B0B0BA;
+  --color-cyan: #0AADBC;
+  --color-solana-purple: #7C3AED;
+  --color-solana-green: #059669;
+  --color-warning: #D97706;
+  --color-danger: #DC2626;
+  --color-code-bg: #F1F5F9;
+  --color-border: rgba(0, 0, 0, 0.08);
+  --color-border-hover: rgba(0, 196, 212, 0.3);
+  --color-effect: rgba(0, 160, 180, 0.6);
+}
+
+.dark {
+  --color-background: #0A0A0F;
+  --color-surface: #12121A;
+  --color-surface-hover: #1A1A25;
+  --color-foreground: #E8E6E0;
+  --color-muted: #6B6B7B;
+  --color-subtle: #3A3A48;
+  --color-cyan: #22D3E6;
+  --color-solana-purple: #9945FF;
+  --color-solana-green: #14F195;
+  --color-warning: #FFB800;
+  --color-danger: #FF3B3B;
+  --color-code-bg: #1E293B;
+  --color-border: rgba(255, 255, 255, 0.06);
+  --color-border-hover: rgba(0, 240, 255, 0.2);
+  --color-effect: rgba(0, 240, 255, 0.6);
+}
+
+/* ----------------------------------------------------------------
+   Tailwind v4 theme: @theme inline creates utility classes
+   without generating duplicate CSS variable declarations.
+   ---------------------------------------------------------------- */
+
+@theme inline {
+  --color-background: var(--color-background);
+  --color-surface: var(--color-surface);
+  --color-surface-hover: var(--color-surface-hover);
+  --color-foreground: var(--color-foreground);
+  --color-muted: var(--color-muted);
+  --color-subtle: var(--color-subtle);
+  --color-cyan: var(--color-cyan);
+  --color-solana-purple: var(--color-solana-purple);
+  --color-solana-green: var(--color-solana-green);
+  --color-warning: var(--color-warning);
+  --color-danger: var(--color-danger);
+  --color-code-bg: var(--color-code-bg);
+  --color-border: var(--color-border);
+  --color-border-hover: var(--color-border-hover);
+  --color-effect: var(--color-effect);
+}
+
+/* ----------------------------------------------------------------
+   Static tokens (same in both themes)
+   ---------------------------------------------------------------- */
+
+@theme {
+  /* Font families */
+  --font-sans: var(--font-inter), "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), "JetBrains Mono", ui-monospace, monospace;
+
+  /* Animation keyframes */
+  --animate-shimmer-slide: shimmer-slide var(--speed) ease-in-out infinite alternate;
+  --animate-spin-around: spin-around calc(var(--speed) * 2) infinite linear;
+
+  @keyframes shimmer-slide {
+    to {
+      transform: translate(calc(100cqw - 100%), 0);
+    }
+  }
+
+  @keyframes spin-around {
+    0% {
+      transform: translateZ(0) rotate(0);
+    }
+    15%, 35% {
+      transform: translateZ(0) rotate(90deg);
+    }
+    65%, 85% {
+      transform: translateZ(0) rotate(270deg);
+    }
+    100% {
+      transform: translateZ(0) rotate(360deg);
+    }
+  }
+
+  @keyframes cursor-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.text-glow-cyan {
+  text-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+}
+
+.dark .text-glow-cyan {
+  text-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+}
+
+:root .text-glow-cyan {
+  text-shadow: 0 0 20px rgba(0, 196, 212, 0.1);
+}
+
+.grid-background {
+  background-image: radial-gradient(var(--color-border) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+::selection {
+  background: rgba(0, 240, 255, 0.2);
+  color: var(--color-foreground);
+}
+
+/* ----------------------------------------------------------------
+   Solana wallet adapter dark theme overrides
+   ---------------------------------------------------------------- */
+
+.wallet-adapter-button {
+  background-color: var(--color-surface) !important;
+  color: var(--color-foreground) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 9999px !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.875rem !important;
+  height: auto !important;
+  padding: 0.5rem 1.25rem !important;
+}
+
+.wallet-adapter-button:hover {
+  background-color: var(--color-surface-hover) !important;
+  border-color: var(--color-border-hover) !important;
+}
+
+.wallet-adapter-modal-wrapper {
+  background-color: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 1rem !important;
+}
+
+.wallet-adapter-modal-title {
+  color: var(--color-foreground) !important;
+  font-family: var(--font-mono) !important;
+}
+
+.wallet-adapter-modal-list .wallet-adapter-button {
+  border-radius: 0.75rem !important;
+}
+
+.wallet-adapter-modal-overlay {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+.wallet-adapter-dropdown-list {
+  background-color: var(--color-surface) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 0.75rem !important;
+}
+
+.wallet-adapter-dropdown-list-item {
+  color: var(--color-foreground) !important;
+  font-family: var(--font-mono) !important;
+}
+
+.wallet-adapter-dropdown-list-item:hover {
+  background-color: var(--color-surface-hover) !important;
+}

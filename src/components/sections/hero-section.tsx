@@ -1,0 +1,55 @@
+import Link from "next/link";
+import { SpecialText } from "@/components/ui/special-text";
+import { ShimmerButton } from "@/components/ui/shimmer-button";
+import { FallingPattern } from "@/components/ui/falling-pattern";
+import { GlassPanel } from "@/components/ui/glass-panel";
+
+export function HeroSection() {
+  return (
+    <section className="relative flex min-h-[90vh] flex-col items-center justify-center px-6 pt-24 pb-20">
+      <div className="pointer-events-none absolute inset-0 bottom-[-40%] overflow-hidden">
+        <FallingPattern
+          duration={120}
+          density={1}
+          blurIntensity="0.3em"
+          className="h-full [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_70%)]"
+        />
+      </div>
+      <div className="relative z-10 mx-auto max-w-4xl text-center">
+        <h1 className="text-glow-cyan font-mono text-4xl font-bold tracking-[0.02em] md:text-6xl lg:text-7xl overflow-hidden">
+          <SpecialText inView speed={30} className="text-4xl md:text-6xl lg:text-7xl">
+            PROVE YOU&apos;RE HUMAN,
+          </SpecialText>
+          <br />
+          <SpecialText inView speed={30} delay={1.5} className="text-4xl md:text-6xl lg:text-7xl">
+            NOT WHO YOU ARE.
+          </SpecialText>
+        </h1>
+
+        <GlassPanel className="mx-auto mt-10 max-w-2xl rounded-2xl px-8 py-6">
+          <p className="text-base text-foreground/80 leading-relaxed md:text-lg">
+            Seven seconds of voice, motion, and touch. Hashed into a ZK
+            proof on your device. Nothing stored. Nothing transmitted.
+            Verified on Solana in under a second.
+          </p>
+          <div className="mt-6 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+            <Link href="/verify">
+              <ShimmerButton className="text-sm font-medium lg:text-base">
+                <span className="flex items-center gap-2">
+                  Try the Demo
+                  <span aria-hidden="true">→</span>
+                </span>
+              </ShimmerButton>
+            </Link>
+            <a
+              href="/technology"
+              className="rounded-full border border-foreground/20 px-6 py-3 text-sm text-foreground/70 transition-all duration-200 hover:border-foreground/40 hover:text-foreground"
+            >
+              Read the Paper
+            </a>
+          </div>
+        </GlassPanel>
+      </div>
+    </section>
+  );
+}

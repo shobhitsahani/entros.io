@@ -1,0 +1,57 @@
+import Link from "next/link";
+
+export function Footer() {
+  return (
+    <footer className="border-t border-border bg-background">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-6 py-12 md:grid-cols-3">
+        <div>
+          <p className="font-mono text-sm font-bold text-foreground">
+            IAM<span className="text-cyan">.</span>
+          </p>
+          <p className="mt-2 text-xs text-foreground/50">
+            Proof of Humanity on Solana
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-2 text-sm text-muted">
+          <Link href="/technology" className="transition-colors hover:text-foreground">
+            Technology
+          </Link>
+          <Link href="/solutions" className="transition-colors hover:text-foreground">
+            Solutions
+          </Link>
+          <Link href="/verify" className="transition-colors hover:text-foreground">
+            Verify
+          </Link>
+        </div>
+
+        <div className="flex flex-col gap-2 text-sm text-muted">
+          <a
+            href="https://github.com/iam-protocol"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition-colors hover:text-foreground"
+          >
+            GitHub
+          </a>
+          <a
+            href="https://twitter.com/iam_protocol"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition-colors hover:text-foreground"
+          >
+            Twitter
+          </a>
+          <a
+            href="https://discord.gg/iam-protocol"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition-colors hover:text-foreground"
+          >
+            Discord
+          </a>
+        </div>
+      </div>
+    </footer>
+  );
+}
