@@ -31,3 +31,47 @@ export interface DeveloperSnippet {
   code: string;
   installCommand: string;
 }
+
+export interface VerificationStep {
+  title: string;
+  description: string;
+  detail: string;
+  icon: string;
+}
+
+export interface ProtocolComponent {
+  icon: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  highlights: string[];
+}
+
+export interface PrivacyGuarantee {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+export interface SolutionCase {
+  icon: string;
+  title: string;
+  category: string;
+  problem: string;
+  solution: string;
+  example: string;
+}
+
+export interface IntegrationPartner {
+  name: string;
+  category: string;
+  description: string;
+  icon: string;
+}
+
+export interface IntegrationSnippet {
+  mode: "walletless" | "wallet-connected";
+  title: string;
+  description: string;
+  code: string;
+}
