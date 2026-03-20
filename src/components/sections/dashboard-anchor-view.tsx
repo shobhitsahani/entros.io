@@ -1,22 +1,25 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { useConnection } from "@solana/wallet-adapter-react";
+import { fetchIdentityState, type IdentityState } from "@iam-protocol/pulse-sdk";
 import { WalletConnectButton } from "@/components/ui/wallet-connect-button";
 import { GlowCard } from "@/components/ui/glow-card";
-import { mockAnchor } from "@/data/mock-anchor";
-import { ArrowRight, Wallet } from "lucide-react";
+import { commitmentBytesToHex } from "@/lib/on-chain";
+import { ArrowRight, Wallet, Loader2, ShieldAlert } from "lucide-react";
 
-function formatRelativeTime(isoDate: string): string {
-  const diff = Date.now() - new Date(isoDate).getTime();
+function formatRelativeTime(unixSeconds: number): string {
+  const diff = Date.now() - unixSeconds * 1000;
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
   if (days === 0) return "today";
   if (days === 1) return "1 day ago";
   return `${days} days ago`;
 }
 
-function formatDate(isoDate: string): string {
-  return new Date(isoDate).toLocaleDateString("en-US", {
+function formatDate(unixSeconds: number): string {
+  return new Date(unixSeconds * 1000).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -24,7 +27,24 @@ function formatDate(isoDate: string): string {
 }
 
 export function DashboardAnchorView() {
-  const { connected } = useWallet();
+  const { publicKey, connected } = useWallet();
+  const { connection } = useConnection();
+  const [identity, setIdentity] = useState<IdentityState | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!publicKey || !connected) {
+      setIdentity(null);
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    fetchIdentityState(publicKey.toBase58(), connection)
+      .then((state) => setIdentity(state))
+      .catch(() => setError("Failed to fetch identity state"))
+      .finally(() => setLoading(false));
+  }, [publicKey, connected, connection]);
 
   if (!connected) {
     return (
@@ -43,6 +63,45 @@ export function DashboardAnchorView() {
     );
   }
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Loader2 className="h-8 w-8 text-cyan animate-spin" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="mx-auto max-w-md text-center space-y-4 py-12">
+        <ShieldAlert className="mx-auto h-10 w-10 text-danger" strokeWidth={1.5} />
+        <p className="text-sm text-muted">{error}</p>
+      </div>
+    );
+  }
+
+  if (!identity) {
+    return (
+      <div className="mx-auto max-w-md text-center space-y-6 py-12">
+        <ShieldAlert className="mx-auto h-12 w-12 text-muted" strokeWidth={1.5} />
+        <div>
+          <p className="font-sans text-xl font-semibold text-foreground">
+            No IAM Anchor found
+          </p>
+          <p className="mt-2 text-sm text-muted">
+            Complete your first verification to mint your IAM Anchor identity.
+          </p>
+        </div>
+        <Link
+          href="/verify"
+          className="inline-flex items-center gap-2 text-sm text-cyan hover:text-foreground transition-colors"
+        >
+          Verify now <ArrowRight className="h-4 w-4" />
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
       <GlowCard className="lg:col-span-1">
@@ -51,16 +110,16 @@ export function DashboardAnchorView() {
             Trust Score
           </p>
           <p className="mt-3 text-6xl font-mono font-bold text-foreground">
-            {mockAnchor.trustScore}
+            {identity.trustScore}
           </p>
           <div className="mt-4 h-2 w-full max-w-[200px] rounded-full bg-surface overflow-hidden">
             <div
               className="h-full rounded-full bg-cyan"
-              style={{ width: `${mockAnchor.trustScore}%` }}
+              style={{ width: `${Math.min(identity.trustScore, 100)}%` }}
             />
           </div>
           <p className="mt-2 text-xs text-muted">
-            {mockAnchor.status === "active" ? "Active" : "Expired"}
+            {identity.trustScore > 0 ? "Active" : "Pending"}
           </p>
         </div>
       </GlowCard>
@@ -72,7 +131,7 @@ export function DashboardAnchorView() {
               Verifications
             </p>
             <p className="mt-1 text-2xl font-mono font-bold text-foreground">
-              {mockAnchor.verificationCount}
+              {identity.verificationCount}
             </p>
           </div>
           <div>
@@ -80,7 +139,9 @@ export function DashboardAnchorView() {
               Last verified
             </p>
             <p className="mt-1 text-2xl font-mono font-bold text-foreground">
-              {formatRelativeTime(mockAnchor.lastVerification)}
+              {identity.lastVerificationTimestamp > 0
+                ? formatRelativeTime(identity.lastVerificationTimestamp)
+                : "Never"}
             </p>
           </div>
           <div>
@@ -88,7 +149,7 @@ export function DashboardAnchorView() {
               Anchor created
             </p>
             <p className="mt-1 text-sm text-foreground/70">
-              {formatDate(mockAnchor.createdAt)}
+              {formatDate(identity.creationTimestamp)}
             </p>
           </div>
           <div>
@@ -96,7 +157,7 @@ export function DashboardAnchorView() {
               Commitment
             </p>
             <p className="mt-1 text-sm font-mono text-foreground/70 truncate">
-              {mockAnchor.currentCommitment}
+              {commitmentBytesToHex(identity.currentCommitment)}
             </p>
           </div>
         </div>
