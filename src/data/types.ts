@@ -67,6 +67,7 @@ export interface IntegrationPartner {
   category: string;
   description: string;
   icon: string;
+  logoUrl?: string;
 }
 
 export interface IntegrationSnippet {

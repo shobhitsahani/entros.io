@@ -9,15 +9,17 @@ export function VerificationTimelineSection() {
   const timelineData = verificationSteps.map((step) => {
     const Icon = getIcon(step.icon);
     return {
-      title: step.title,
+      title: (
+        <span className="inline-flex items-baseline gap-3">
+          {step.title}
+          <Icon className="h-7 w-7 shrink-0 text-foreground/30 self-center" strokeWidth={1.5} />
+        </span>
+      ),
       content: (
         <div>
-          <div className="mb-4 flex items-center gap-3">
-            <Icon className="h-6 w-6 text-foreground/50" strokeWidth={1.5} />
-            <p className="text-lg font-semibold text-foreground">
-              {step.description}
-            </p>
-          </div>
+          <p className="mb-4 text-lg font-semibold text-foreground">
+            {step.description}
+          </p>
           <p className="text-sm leading-relaxed text-foreground/60 max-w-xl">
             {step.detail}
           </p>
@@ -28,23 +30,24 @@ export function VerificationTimelineSection() {
 
   return (
     <section className="mx-auto max-w-7xl px-6 py-20">
-      <TextShimmer
-        as="span"
-        className="font-mono text-sm tracking-widest uppercase"
-        duration={3}
-      >
-        {"// VERIFICATION FLOW"}
-      </TextShimmer>
+      <div className="mx-auto max-w-2xl text-center">
+        <TextShimmer
+          as="span"
+          className="font-mono text-sm tracking-widest uppercase"
+          duration={3}
+        >
+          {"// VERIFICATION FLOW"}
+        </TextShimmer>
 
-      <h2 className="mt-6 font-sans text-2xl font-semibold text-foreground md:text-3xl">
-        Seven seconds, seven steps
-      </h2>
-      <p className="mt-3 text-muted max-w-2xl">
-        From behavioral challenge to on-chain proof. No biometric data leaves
-        your device at any point in this pipeline.
-      </p>
+        <h2 className="mt-6 font-sans text-2xl font-semibold text-foreground md:text-3xl">
+          7 seconds, 7 steps.
+        </h2>
+        <p className="mt-3 text-muted whitespace-pre-line">
+          {"From behavioral challenge to on-chain proof.\nNo biometric data leaves your device at any point in this pipeline."}
+        </p>
+      </div>
 
-      <div className="mt-12">
+      <div className="mt-16">
         <Timeline data={timelineData} />
       </div>
     </section>

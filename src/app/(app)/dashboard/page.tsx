@@ -1,10 +1,25 @@
-import { PageWrapper } from "@/components/layout/page-wrapper";
+import type { Metadata } from "next";
+import { SubpageHero } from "@/components/sections/subpage-hero";
+import { DashboardAnchorView } from "@/components/sections/dashboard-anchor-view";
+import { DashboardHistory } from "@/components/sections/dashboard-history";
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+  description:
+    "Your IAM Anchor details, Trust Score, and verification history.",
+};
 
 export default function Dashboard() {
   return (
-    <PageWrapper>
-      <h1 className="font-mono text-4xl font-bold">Dashboard</h1>
-      <p className="mt-4 text-muted">Your IAM Anchor — Trust Score, verification history, protocol stats.</p>
-    </PageWrapper>
+    <>
+      <SubpageHero
+        title="Your IAM Anchor"
+        subtitle="Trust Score, verification history, and on-chain identity status."
+      />
+      <section className="mx-auto max-w-7xl px-6 pb-24">
+        <DashboardAnchorView />
+        <DashboardHistory />
+      </section>
+    </>
   );
 }

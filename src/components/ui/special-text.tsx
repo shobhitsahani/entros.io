@@ -34,6 +34,7 @@ export function SpecialText({
   const isInView = useInView(containerRef, { once, margin: "-100px" });
   const shouldAnimate = inView ? isInView : true;
   const [displayText, setDisplayText] = useState<string>(" ".repeat(children.length));
+  const [done, setDone] = useState(false);
 
   const textRef = useRef(children);
   const phaseRef = useRef<"idle" | "phase1" | "phase2">("idle");
@@ -98,6 +99,7 @@ export function SpecialText({
 
       if (stepRef.current >= text.length * 2) {
         setDisplayText(text);
+        setDone(true);
         clearTimers();
       }
     }
@@ -132,9 +134,16 @@ export function SpecialText({
   return (
     <span
       ref={containerRef}
-      className={`inline-flex font-mono font-medium ${className}`}
+      className={`relative inline-flex font-mono font-medium ${className}`}
     >
-      {displayText}
+      {/* Invisible placeholder reserves the final text dimensions */}
+      <span className="invisible" aria-hidden="true">
+        {children}
+      </span>
+      {/* Animated text positioned on top */}
+      <span className="absolute inset-0">
+        {done ? children : displayText}
+      </span>
     </span>
   );
 }

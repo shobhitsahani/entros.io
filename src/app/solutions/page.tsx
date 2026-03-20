@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { SubpageHero } from "@/components/sections/subpage-hero";
 import { SolutionCasesSection } from "@/components/sections/solution-cases-section";
 import { IntegrationSection } from "@/components/sections/integration-section";
 import { PartnersSection } from "@/components/sections/partners-section";
+import { ShimmerButton } from "@/components/ui/shimmer-button";
 
 export const metadata: Metadata = {
   title: "Solutions",
@@ -17,7 +17,7 @@ export default function Solutions() {
     <>
       <SubpageHero
         title="Solutions"
-        subtitle="Proof-of-Humanity for protocols that need to know their users are real, without learning who they are."
+        subtitle={"Proof-of-Humanity for protocols that need to know their users are real,\nwithout learning who they are."}
       />
       <SolutionCasesSection />
       <IntegrationSection />
@@ -27,13 +27,14 @@ export default function Solutions() {
         <p className="font-mono text-xl tracking-[0.02em] text-foreground md:text-2xl">
           Ready to integrate?
         </p>
-        <div className="mt-8">
-          <Link
-            href="/integrate"
-            className="inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-sm text-muted transition-all duration-200 hover:border-border-hover hover:text-foreground"
-          >
-            Start integrating
-            <ArrowRight className="h-4 w-4" />
+        <div className="mt-8 flex justify-center">
+          <Link href="/integrate">
+            <ShimmerButton className="text-sm font-medium lg:text-base">
+              <span className="flex items-center gap-2">
+                Start Integrating
+                <span aria-hidden="true">→</span>
+              </span>
+            </ShimmerButton>
           </Link>
         </div>
       </section>

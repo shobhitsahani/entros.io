@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { TextShimmer } from "@/components/ui/text-shimmer";
 import { integrationPartners } from "@/data/integration-partners";
 import { getIcon } from "@/lib/icons";
@@ -25,13 +26,26 @@ export function PartnersSection() {
               key={partner.name}
               className="rounded-xl border border-border bg-surface/30 p-6 transition-colors hover:border-border-hover"
             >
-              <Icon
-                className="mb-3 h-5 w-5 text-foreground/50"
-                strokeWidth={1.5}
-              />
-              <h3 className="font-sans text-base font-semibold text-foreground">
-                {partner.name}
-              </h3>
+              <div className="mb-3 flex items-center gap-3">
+                {partner.logoUrl ? (
+                  <Image
+                    src={partner.logoUrl}
+                    alt={`${partner.name} logo`}
+                    width={28}
+                    height={28}
+                    className="rounded-full"
+                    unoptimized
+                  />
+                ) : (
+                  <Icon
+                    className="h-7 w-7 text-foreground/50"
+                    strokeWidth={1.5}
+                  />
+                )}
+                <h3 className="font-sans text-base font-semibold text-foreground">
+                  {partner.name}
+                </h3>
+              </div>
               <span className="text-xs font-mono uppercase tracking-widest text-cyan">
                 {partner.category}
               </span>

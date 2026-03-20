@@ -6,7 +6,7 @@ import { GlassPanel } from "@/components/ui/glass-panel";
 
 export function HeroSection() {
   return (
-    <section className="relative flex min-h-[90vh] flex-col items-center justify-center px-6 pt-24 pb-20">
+    <section className="relative flex min-h-[90vh] flex-col items-center justify-center px-6 overflow-x-hidden">
       <div className="pointer-events-none absolute inset-0 bottom-[-40%] overflow-hidden">
         <FallingPattern
           duration={120}
@@ -15,8 +15,8 @@ export function HeroSection() {
           className="h-full [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_70%)]"
         />
       </div>
-      <div className="relative z-10 mx-auto max-w-4xl text-center">
-        <h1 className="text-glow-cyan font-mono text-4xl font-bold tracking-[0.02em] md:text-6xl lg:text-7xl">
+      <div className="relative z-10 mx-auto max-w-4xl text-center mt-16">
+        <h1 className="text-glow-cyan font-mono text-4xl font-bold tracking-[0.02em] md:text-6xl lg:text-7xl overflow-hidden">
           <SpecialText inView speed={30} className="text-4xl md:text-6xl lg:text-7xl">
             PROVE YOU&apos;RE HUMAN,
           </SpecialText>

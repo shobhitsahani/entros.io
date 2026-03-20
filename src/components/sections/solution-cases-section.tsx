@@ -1,22 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { TextShimmer } from "@/components/ui/text-shimmer";
-import { ExpandableTabs } from "@/components/ui/expandable-tabs";
 import { solutionCases } from "@/data/solution-cases";
 import { getIcon } from "@/lib/icons";
 import { cn } from "@/lib/utils";
+import { ChevronDown } from "lucide-react";
 
 export function SolutionCasesSection() {
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-
-  const tabs = solutionCases.map((c) => ({
-    title: c.title,
-    icon: getIcon(c.icon),
-  }));
-
-  const selected =
-    selectedIndex !== null ? solutionCases[selectedIndex] : undefined;
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
 
   return (
     <section className="mx-auto max-w-7xl px-6 py-20">
@@ -32,77 +25,92 @@ export function SolutionCasesSection() {
         Where IAM fits
       </h2>
 
-      <div className="mt-10 flex justify-center">
-        <ExpandableTabs tabs={tabs} onChange={setSelectedIndex} />
-      </div>
+      <div className="mt-10 space-y-2">
+        {solutionCases.map((c, i) => {
+          const Icon = getIcon(c.icon);
+          const isExpanded = expandedIndex === i;
 
-      {selected ? (
-        <div className="mx-auto mt-10 max-w-3xl rounded-2xl border border-border bg-surface/50 p-8 backdrop-blur-[12px]">
-          <span className="font-mono text-xs tracking-widest uppercase text-cyan">
-            {selected.category}
-          </span>
-          <h3 className="mt-2 font-sans text-xl font-semibold text-foreground">
-            {selected.title}
-          </h3>
-
-          <div className="mt-6 space-y-4">
-            <div>
-              <p className="text-xs font-mono uppercase tracking-widest text-muted mb-1">
-                Problem
-              </p>
-              <p className="text-sm leading-relaxed text-foreground/70">
-                {selected.problem}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs font-mono uppercase tracking-widest text-muted mb-1">
-                Solution
-              </p>
-              <p className="text-sm leading-relaxed text-foreground/70">
-                {selected.solution}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs font-mono uppercase tracking-widest text-muted mb-1">
-                Example
-              </p>
-              <p className="text-sm leading-relaxed text-foreground/70">
-                {selected.example}
-              </p>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {solutionCases.map((c, i) => {
-            const Icon = getIcon(c.icon);
-            return (
-              <button
-                key={c.title}
-                onClick={() => setSelectedIndex(i)}
-                className={cn(
-                  "rounded-xl border border-border bg-surface/30 p-6 text-left",
-                  "transition-colors hover:border-border-hover"
-                )}
-              >
+          return (
+            <motion.div
+              key={c.title}
+              layout
+              onHoverStart={() => setExpandedIndex(i)}
+              onHoverEnd={() => setExpandedIndex(null)}
+              onClick={() => setExpandedIndex(isExpanded ? null : i)}
+              className={cn(
+                "cursor-pointer rounded-xl border bg-surface/30 transition-colors",
+                isExpanded
+                  ? "border-border-hover"
+                  : "border-border hover:border-border-hover"
+              )}
+            >
+              <div className="flex items-center gap-4 px-6 py-5">
                 <Icon
-                  className="mb-3 h-5 w-5 text-foreground/50"
+                  className={cn(
+                    "h-5 w-5 shrink-0 transition-colors",
+                    isExpanded ? "text-cyan" : "text-foreground/40"
+                  )}
                   strokeWidth={1.5}
                 />
-                <span className="block text-xs font-mono uppercase tracking-widest text-cyan">
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-sans text-base font-semibold text-foreground">
+                    {c.title}
+                  </h3>
+                </div>
+                <span className="hidden sm:block text-xs font-mono uppercase tracking-widest text-cyan shrink-0">
                   {c.category}
                 </span>
-                <h3 className="mt-1 font-sans text-base font-semibold text-foreground">
-                  {c.title}
-                </h3>
-                <p className="mt-2 text-sm text-foreground/60 line-clamp-2">
-                  {c.solution}
-                </p>
-              </button>
-            );
-          })}
-        </div>
-      )}
+                <ChevronDown
+                  className={cn(
+                    "h-4 w-4 shrink-0 text-foreground/30 transition-transform duration-200",
+                    isExpanded && "rotate-180 text-cyan"
+                  )}
+                  strokeWidth={1.5}
+                />
+              </div>
+
+              <AnimatePresence initial={false}>
+                {isExpanded && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25, ease: "easeInOut" }}
+                    className="overflow-hidden"
+                  >
+                    <div className="grid grid-cols-1 gap-6 border-t border-border px-6 py-6 md:grid-cols-3">
+                      <div>
+                        <p className="text-xs font-mono uppercase tracking-widest text-muted mb-2">
+                          Problem
+                        </p>
+                        <p className="text-sm leading-relaxed text-foreground/70">
+                          {c.problem}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-mono uppercase tracking-widest text-muted mb-2">
+                          Solution
+                        </p>
+                        <p className="text-sm leading-relaxed text-foreground/70">
+                          {c.solution}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs font-mono uppercase tracking-widest text-muted mb-2">
+                          Example
+                        </p>
+                        <p className="text-sm leading-relaxed text-foreground/70">
+                          {c.example}
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          );
+        })}
+      </div>
     </section>
   );
 }

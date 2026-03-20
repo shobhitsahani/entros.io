@@ -1,8 +1,11 @@
+"use client";
+
+import { WalletProvider } from "@/components/providers/wallet-provider";
+
 export default function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // WalletProvider will wrap children here in a future branch.
-  return <>{children}</>;
+  return <WalletProvider>{children}</WalletProvider>;
 }

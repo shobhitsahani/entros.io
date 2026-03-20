@@ -56,13 +56,13 @@ const BentoCard = ({
       <h3 className="text-lg font-semibold text-foreground">{name}</h3>
       <p className="max-w-lg text-sm text-foreground/60">{description}</p>
       {detail && (
-        <p className="mt-1 max-w-lg text-sm leading-relaxed text-foreground/45 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+        <p className="mt-1 max-w-lg text-sm leading-relaxed text-foreground/45 opacity-100 lg:opacity-0 transition-opacity duration-300 lg:group-hover:opacity-100">
           {detail}
         </p>
       )}
     </div>
 
-    <div className="flex w-full items-center border-t border-border px-6 py-3 opacity-60 transition-opacity duration-200 group-hover:opacity-100">
+    <div className="flex w-full items-center border-t border-border px-6 py-3 opacity-100 lg:opacity-60 transition-opacity duration-200 lg:group-hover:opacity-100">
       <a href={href} className="inline-flex items-center text-sm text-foreground/70 transition-colors hover:text-foreground">
         {cta}
         <ArrowRight className="ml-2 h-4 w-4" />
