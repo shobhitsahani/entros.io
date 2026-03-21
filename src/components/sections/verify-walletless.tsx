@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import type { PulseSession } from "@iam-protocol/pulse-sdk";
 import type { VerifyState, VerifyAction } from "@/components/verify/types";
 import { PulseChallenge } from "@/components/verify/pulse-challenge";
@@ -28,12 +28,13 @@ export function VerifyWalletless({
   const pulse = usePulse();
   const touchRef = useRef<HTMLDivElement>(null);
   const sessionRef = useRef<PulseSession | null>(null);
+  const [audioLevel, setAudioLevel] = useState(0);
 
   function handleStart() {
     const session = pulse.createSession(touchRef.current ?? undefined);
     sessionRef.current = session;
     dispatch({ type: "START_AUDIO" });
-    session.startAudio().catch(() => session.skipAudio());
+    session.startAudio((rms) => setAudioLevel(rms)).catch(() => session.skipAudio());
   }
 
   async function handleNext() {
@@ -104,6 +105,7 @@ export function VerifyWalletless({
         stage={state.stage}
         onNext={handleNext}
         touchRef={touchRef}
+        audioLevel={audioLevel}
       />
     );
   }

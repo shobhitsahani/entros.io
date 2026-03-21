@@ -15,15 +15,23 @@ const STAGE_LABELS: Record<CaptureStage, { index: number; label: string; color: 
 };
 
 const MIN_STAGE_MS = 2000;
+const AUDIO_BAR_COUNT = 12;
+
+// Generate stable per-bar offsets so each bar responds slightly differently
+const BAR_OFFSETS = Array.from({ length: AUDIO_BAR_COUNT }, (_, i) =>
+  0.6 + 0.4 * Math.sin(i * 1.3)
+);
 
 export function PulseChallenge({
   stage,
   onNext,
   touchRef,
+  audioLevel = 0,
 }: {
   stage: CaptureStage;
   onNext: () => void;
   touchRef?: React.RefObject<HTMLDivElement | null>;
+  audioLevel?: number;
 }) {
   const phraseRef = useRef(generatePhrase(5));
   const [canAdvance, setCanAdvance] = useState(false);
@@ -46,7 +54,6 @@ export function PulseChallenge({
     );
   }, [lissajousPoints]);
 
-  // Reset the minimum-time guard when stage changes
   useEffect(() => {
     setCanAdvance(false);
     timerRef.current = setTimeout(() => setCanAdvance(true), MIN_STAGE_MS);
@@ -57,6 +64,10 @@ export function PulseChallenge({
 
   const info = STAGE_LABELS[stage];
   const isLast = stage === "touch";
+
+  // Normalize audio level for visual scaling (speech RMS is typically 0.01-0.3)
+  const normalizedLevel = Math.min(audioLevel * 5, 1);
+  const isVoiceActive = stage === "audio" && audioLevel > 0.01;
 
   return (
     <div className="space-y-6">
@@ -98,7 +109,17 @@ export function PulseChallenge({
         <p className="text-sm font-mono uppercase tracking-widest text-cyan mb-2">
           Speak this phrase
         </p>
-        <p className="text-2xl font-mono font-bold text-foreground">
+        <p
+          className="text-2xl font-mono font-bold transition-all duration-150"
+          style={{
+            color: isVoiceActive
+              ? "var(--color-foreground)"
+              : "var(--color-muted)",
+            textShadow: isVoiceActive
+              ? `0 0 ${10 + normalizedLevel * 20}px rgba(0, 240, 255, ${0.15 + normalizedLevel * 0.3})`
+              : "none",
+          }}
+        >
           &ldquo;{phraseRef.current}&rdquo;
         </p>
       </div>
@@ -165,6 +186,7 @@ export function PulseChallenge({
 
       {/* Sensor indicators */}
       <div className="grid grid-cols-3 gap-4 text-center">
+        {/* Audio indicator — driven by real RMS level */}
         <div
           className={`rounded-lg border bg-surface/50 p-3 transition-all duration-500 ${
             stage === "audio"
@@ -174,14 +196,16 @@ export function PulseChallenge({
         >
           <div className="h-8 flex items-center justify-center">
             <div className="flex gap-[2px] items-end">
-              {Array.from({ length: 12 }).map((_, i) => (
+              {BAR_OFFSETS.map((offset, i) => (
                 <div
                   key={i}
-                  className="w-1 bg-cyan/60 rounded-full animate-pulse"
+                  className="w-1 bg-cyan/60 rounded-full"
                   style={{
-                    height: `${8 + Math.random() * 20}px`,
-                    animationDelay: `${i * 0.1}s`,
-                    animationPlayState: stage === "audio" ? "running" : "paused",
+                    height:
+                      stage === "audio"
+                        ? `${4 + normalizedLevel * 26 * offset}px`
+                        : "4px",
+                    transition: "height 100ms ease",
                   }}
                 />
               ))}
@@ -190,6 +214,7 @@ export function PulseChallenge({
           <p className="mt-2 text-xs text-muted font-mono">Audio 16kHz</p>
         </div>
 
+        {/* Motion indicator — decorative */}
         <div
           className={`rounded-lg border bg-surface/50 p-3 transition-all duration-500 ${
             stage === "motion"
@@ -215,6 +240,7 @@ export function PulseChallenge({
           <p className="mt-2 text-xs text-muted font-mono">IMU 100Hz</p>
         </div>
 
+        {/* Touch indicator — decorative */}
         <div
           className={`rounded-lg border bg-surface/50 p-3 transition-all duration-500 ${
             stage === "touch"
