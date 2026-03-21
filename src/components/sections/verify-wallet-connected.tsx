@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useConnection } from "@solana/wallet-adapter-react";
+import type { PulseSession } from "@iam-protocol/pulse-sdk";
 import type { VerifyState, VerifyAction } from "@/components/verify/types";
 import { PulseChallenge } from "@/components/verify/pulse-challenge";
 import {
@@ -36,90 +37,62 @@ export function VerifyWalletConnected({
   const { connection } = useConnection();
   const pulse = usePulse();
   const touchRef = useRef<HTMLDivElement>(null);
-  const pendingResultRef = useRef<{
-    type: "success";
-    commitment: string;
-    txSignature?: string;
-  } | {
-    type: "failure";
-    error: string;
-  } | null>(null);
-  const timerDoneRef = useRef(false);
-  const sdkDoneRef = useRef(false);
-
-  function maybeDispatchResult() {
-    if (!timerDoneRef.current || !sdkDoneRef.current) return;
-    const result = pendingResultRef.current;
-    if (!result) return;
-    if (result.type === "success") {
-      dispatch({
-        type: "VERIFICATION_SUCCESS",
-        commitment: result.commitment,
-        txSignature: result.txSignature,
-      });
-    } else {
-      dispatch({
-        type: "VERIFICATION_FAILED",
-        error: result.error,
-      });
-    }
-  }
+  const sessionRef = useRef<PulseSession | null>(null);
 
   function handleStart() {
-    pendingResultRef.current = null;
-    timerDoneRef.current = false;
-    sdkDoneRef.current = false;
-    dispatch({ type: "START_CHALLENGE" });
-
-    pulse
-      .verify(touchRef.current ?? undefined, wallet?.adapter, connection)
-      .then((result) => {
-        sdkDoneRef.current = true;
-        if (result.success) {
-          pendingResultRef.current = {
-            type: "success",
-            commitment: commitmentToHex(result.commitment),
-            txSignature: result.txSignature,
-          };
-        } else {
-          pendingResultRef.current = {
-            type: "failure",
-            error: result.error ?? "Verification failed",
-          };
-        }
-        maybeDispatchResult();
-      })
-      .catch((err: Error) => {
-        sdkDoneRef.current = true;
-        pendingResultRef.current = {
-          type: "failure",
-          error: err.message ?? "Unexpected error",
-        };
-        maybeDispatchResult();
-      });
+    const session = pulse.createSession(touchRef.current ?? undefined);
+    sessionRef.current = session;
+    dispatch({ type: "START_AUDIO" });
+    session.startAudio().catch(() => session.skipAudio());
   }
 
-  function handleChallengeComplete() {
-    timerDoneRef.current = true;
-    if (sdkDoneRef.current) {
-      maybeDispatchResult();
-    } else {
-      // Timer done but SDK still working — show signing state
-      dispatch({ type: "CHALLENGE_COMPLETE" });
+  async function handleNext() {
+    const session = sessionRef.current;
+    if (!session || state.step !== "capturing") return;
+
+    if (state.stage === "audio") {
+      await session.stopAudio();
+      dispatch({ type: "NEXT_STAGE" });
+      session.startMotion().catch(() => session.skipMotion());
+    } else if (state.stage === "motion") {
+      await session.stopMotion();
+      dispatch({ type: "NEXT_STAGE" });
+      session.startTouch().catch(() => session.skipTouch());
+    } else if (state.stage === "touch") {
+      await session.stopTouch();
+      dispatch({ type: "CAPTURE_DONE" });
+
       setTimeout(() => {
         dispatch({ type: "PROOF_COMPLETE" });
       }, 2000);
+
+      session
+        .complete(wallet?.adapter, connection)
+        .then((result) => {
+          if (result.success) {
+            dispatch({
+              type: "VERIFICATION_SUCCESS",
+              commitment: commitmentToHex(result.commitment),
+              txSignature: result.txSignature,
+            });
+          } else {
+            dispatch({
+              type: "VERIFICATION_FAILED",
+              error: result.error ?? "Verification failed",
+            });
+          }
+        })
+        .catch((err: Error) => {
+          dispatch({
+            type: "VERIFICATION_FAILED",
+            error: err.message ?? "Unexpected error",
+          });
+        });
     }
   }
 
-  function handleTick(remaining: number) {
-    dispatch({ type: "TICK", timeRemaining: remaining });
-  }
-
   function handleReset() {
-    pendingResultRef.current = null;
-    timerDoneRef.current = false;
-    sdkDoneRef.current = false;
+    sessionRef.current = null;
     dispatch({ type: "RESET" });
   }
 
@@ -153,18 +126,17 @@ export function VerifyWalletConnected({
     );
   }
 
-  if (state.step === "challenge") {
+  if (state.step === "capturing") {
     return (
       <PulseChallenge
-        timeRemaining={state.timeRemaining}
-        onComplete={handleChallengeComplete}
-        onTick={handleTick}
+        stage={state.stage}
+        onNext={handleNext}
         touchRef={touchRef}
       />
     );
   }
 
-  if (state.step === "proving") return <ProvingView />;
+  if (state.step === "processing") return <ProvingView />;
   if (state.step === "signing") return <SigningView />;
 
   if (state.step === "verified") {

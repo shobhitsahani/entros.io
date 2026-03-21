@@ -7,32 +7,26 @@ export function verifyReducer(
   action: VerifyAction
 ): VerifyState {
   switch (action.type) {
-    case "START_CHALLENGE":
+    case "START_AUDIO":
       if (state.step !== "idle") return state;
-      return { step: "challenge", timeRemaining: 21 };
+      return { step: "capturing", stage: "audio" };
 
-    case "TICK":
-      if (state.step !== "challenge") return state;
-      return { step: "challenge", timeRemaining: action.timeRemaining };
+    case "NEXT_STAGE":
+      if (state.step !== "capturing") return state;
+      if (state.stage === "audio") return { step: "capturing", stage: "motion" };
+      if (state.stage === "motion") return { step: "capturing", stage: "touch" };
+      return state;
 
-    case "CHALLENGE_COMPLETE":
-      if (state.step !== "challenge") return state;
-      return { step: "proving" };
+    case "CAPTURE_DONE":
+      if (state.step !== "capturing" || state.stage !== "touch") return state;
+      return { step: "processing" };
 
     case "PROOF_COMPLETE":
-      if (state.step !== "proving") return state;
+      if (state.step !== "processing") return state;
       return { step: "signing" };
 
-    case "SIGN_COMPLETE":
-      if (state.step !== "signing") return state;
-      return { step: "verified", commitment: "", txSignature: action.txSignature };
-
     case "VERIFICATION_SUCCESS":
-      if (
-        state.step !== "proving" &&
-        state.step !== "signing"
-      )
-        return state;
+      if (state.step !== "processing" && state.step !== "signing") return state;
       return {
         step: "verified",
         commitment: action.commitment,

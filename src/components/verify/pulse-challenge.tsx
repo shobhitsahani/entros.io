@@ -1,44 +1,33 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   generatePhrase,
   randomLissajousParams,
   generateLissajousPoints,
 } from "@iam-protocol/pulse-sdk";
+import type { CaptureStage } from "./types";
 
-const TOTAL_DURATION = 21;
-const STAGE_DURATION = 7;
+const STAGE_LABELS: Record<CaptureStage, { index: number; label: string; color: string }> = {
+  audio: { index: 0, label: "Audio", color: "cyan" },
+  motion: { index: 1, label: "Motion", color: "solana-purple" },
+  touch: { index: 2, label: "Touch", color: "solana-green" },
+};
 
-type Stage = "audio" | "motion" | "touch";
-
-function getActiveStage(timeRemaining: number): Stage {
-  const elapsed = TOTAL_DURATION - timeRemaining;
-  if (elapsed < STAGE_DURATION) return "audio";
-  if (elapsed < STAGE_DURATION * 2) return "motion";
-  return "touch";
-}
-
-function getStageTimeRemaining(timeRemaining: number): number {
-  const elapsed = TOTAL_DURATION - timeRemaining;
-  const stageElapsed = elapsed % STAGE_DURATION;
-  return STAGE_DURATION - stageElapsed;
-}
+const MIN_STAGE_MS = 2000;
 
 export function PulseChallenge({
-  timeRemaining,
-  onComplete,
-  onTick,
+  stage,
+  onNext,
   touchRef,
 }: {
-  timeRemaining: number;
-  onComplete: () => void;
-  onTick: (remaining: number) => void;
+  stage: CaptureStage;
+  onNext: () => void;
   touchRef?: React.RefObject<HTMLDivElement | null>;
 }) {
   const phraseRef = useRef(generatePhrase(5));
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const remainingRef = useRef(timeRemaining);
+  const [canAdvance, setCanAdvance] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const lissajousPoints = useMemo(() => {
     const params = randomLissajousParams();
@@ -57,52 +46,29 @@ export function PulseChallenge({
     );
   }, [lissajousPoints]);
 
+  // Reset the minimum-time guard when stage changes
   useEffect(() => {
-    remainingRef.current = timeRemaining;
-
-    if (timeRemaining <= 0) {
-      onComplete();
-      return;
-    }
-
-    if (intervalRef.current) return;
-
-    intervalRef.current = setInterval(() => {
-      remainingRef.current -= 1;
-      if (remainingRef.current <= 0) {
-        if (intervalRef.current) clearInterval(intervalRef.current);
-        intervalRef.current = null;
-        onComplete();
-      } else {
-        onTick(remainingRef.current);
-      }
-    }, 1000);
-
+    setCanAdvance(false);
+    timerRef.current = setTimeout(() => setCanAdvance(true), MIN_STAGE_MS);
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
+      if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [stage]);
 
-  const activeStage = getActiveStage(timeRemaining);
-  const stageSeconds = getStageTimeRemaining(timeRemaining);
-  const overallProgress = ((TOTAL_DURATION - timeRemaining) / TOTAL_DURATION) * 100;
-
-  const stageIndex = activeStage === "audio" ? 0 : activeStage === "motion" ? 1 : 2;
+  const info = STAGE_LABELS[stage];
+  const isLast = stage === "touch";
 
   return (
     <div className="space-y-6">
       {/* Stage indicator dots */}
       <div className="flex items-center justify-center gap-3">
-        {(["audio", "motion", "touch"] as const).map((stage, i) => (
-          <div key={stage} className="flex items-center gap-3">
+        {(["audio", "motion", "touch"] as const).map((s, i) => (
+          <div key={s} className="flex items-center gap-3">
             <div
               className={`h-2.5 w-2.5 rounded-full transition-all duration-500 ${
-                stage === activeStage
+                s === stage
                   ? "bg-cyan scale-125 shadow-[0_0_8px_rgba(0,240,255,0.5)]"
-                  : i < stageIndex
+                  : i < info.index
                     ? "bg-cyan/40"
                     : "bg-surface"
               }`}
@@ -110,7 +76,7 @@ export function PulseChallenge({
             {i < 2 && (
               <div
                 className={`h-px w-8 transition-colors duration-500 ${
-                  i < stageIndex ? "bg-cyan/40" : "bg-surface"
+                  i < info.index ? "bg-cyan/40" : "bg-surface"
                 }`}
               />
             )}
@@ -120,13 +86,13 @@ export function PulseChallenge({
 
       {/* Stage label */}
       <p className="text-center text-xs font-mono uppercase tracking-widest text-cyan">
-        Stage {stageIndex + 1} of 3 — {stageSeconds}s
+        Stage {info.index + 1} of 3
       </p>
 
       {/* Audio stage */}
       <div
         className={`text-center transition-all duration-500 ${
-          activeStage === "audio" ? "opacity-100" : "opacity-25 scale-95"
+          stage === "audio" ? "opacity-100" : "opacity-25 scale-95"
         }`}
       >
         <p className="text-sm font-mono uppercase tracking-widest text-cyan mb-2">
@@ -140,7 +106,7 @@ export function PulseChallenge({
       {/* Motion stage */}
       <div
         className={`text-center transition-all duration-500 ${
-          activeStage === "motion" ? "opacity-100" : "opacity-25 scale-95"
+          stage === "motion" ? "opacity-100" : "opacity-25 scale-95"
         }`}
       >
         <p className="text-sm font-mono uppercase tracking-widest text-solana-purple mb-2">
@@ -154,7 +120,7 @@ export function PulseChallenge({
       {/* Touch stage */}
       <div
         className={`transition-all duration-500 ${
-          activeStage === "touch" ? "opacity-100" : "opacity-25 scale-95"
+          stage === "touch" ? "opacity-100" : "opacity-25 scale-95"
         }`}
       >
         <p className="text-center text-sm font-mono uppercase tracking-widest text-solana-green mb-3">
@@ -163,7 +129,7 @@ export function PulseChallenge({
         <div
           ref={touchRef}
           className={`mx-auto h-[160px] w-[160px] rounded-xl border bg-surface/30 flex items-center justify-center touch-none transition-colors duration-500 ${
-            activeStage === "touch" ? "border-solana-green/50" : "border-border"
+            stage === "touch" ? "border-solana-green/50" : "border-border"
           }`}
         >
           <svg viewBox="0 0 200 200" className="h-full w-full">
@@ -171,32 +137,37 @@ export function PulseChallenge({
               d={svgPath}
               fill="none"
               stroke={
-                activeStage === "touch"
+                stage === "touch"
                   ? "var(--color-solana-green)"
                   : "var(--color-subtle)"
               }
               strokeWidth="1.5"
-              strokeOpacity={activeStage === "touch" ? 0.7 : 0.2}
+              strokeOpacity={stage === "touch" ? 0.7 : 0.2}
             />
           </svg>
         </div>
       </div>
 
-      {/* Overall progress */}
-      <div className="space-y-2">
-        <div className="h-1.5 rounded-full bg-surface overflow-hidden">
-          <div
-            className="h-full rounded-full bg-cyan transition-all duration-1000 ease-linear"
-            style={{ width: `${overallProgress}%` }}
-          />
-        </div>
+      {/* Next / Done button */}
+      <div className="flex justify-center">
+        <button
+          onClick={onNext}
+          disabled={!canAdvance}
+          className={`rounded-full border px-8 py-3 text-sm font-mono transition-all duration-200 ${
+            canAdvance
+              ? "border-cyan/50 text-cyan hover:bg-cyan/10 hover:border-cyan cursor-pointer"
+              : "border-border text-muted cursor-not-allowed opacity-50"
+          }`}
+        >
+          {isLast ? "Done" : "Next"} →
+        </button>
       </div>
 
       {/* Sensor indicators */}
       <div className="grid grid-cols-3 gap-4 text-center">
         <div
           className={`rounded-lg border bg-surface/50 p-3 transition-all duration-500 ${
-            activeStage === "audio"
+            stage === "audio"
               ? "border-cyan/40 shadow-[0_0_12px_rgba(0,240,255,0.08)]"
               : "border-border opacity-40"
           }`}
@@ -210,8 +181,7 @@ export function PulseChallenge({
                   style={{
                     height: `${8 + Math.random() * 20}px`,
                     animationDelay: `${i * 0.1}s`,
-                    animationPlayState:
-                      activeStage === "audio" ? "running" : "paused",
+                    animationPlayState: stage === "audio" ? "running" : "paused",
                   }}
                 />
               ))}
@@ -222,7 +192,7 @@ export function PulseChallenge({
 
         <div
           className={`rounded-lg border bg-surface/50 p-3 transition-all duration-500 ${
-            activeStage === "motion"
+            stage === "motion"
               ? "border-solana-purple/40 shadow-[0_0_12px_rgba(153,69,255,0.08)]"
               : "border-border opacity-40"
           }`}
@@ -236,8 +206,7 @@ export function PulseChallenge({
                   style={{
                     height: `${6 + Math.random() * 18}px`,
                     animationDelay: `${i * 0.15}s`,
-                    animationPlayState:
-                      activeStage === "motion" ? "running" : "paused",
+                    animationPlayState: stage === "motion" ? "running" : "paused",
                   }}
                 />
               ))}
@@ -248,7 +217,7 @@ export function PulseChallenge({
 
         <div
           className={`rounded-lg border bg-surface/50 p-3 transition-all duration-500 ${
-            activeStage === "touch"
+            stage === "touch"
               ? "border-solana-green/40 shadow-[0_0_12px_rgba(20,241,149,0.08)]"
               : "border-border opacity-40"
           }`}
@@ -262,8 +231,7 @@ export function PulseChallenge({
                   style={{
                     height: `${5 + Math.random() * 22}px`,
                     animationDelay: `${i * 0.12}s`,
-                    animationPlayState:
-                      activeStage === "touch" ? "running" : "paused",
+                    animationPlayState: stage === "touch" ? "running" : "paused",
                   }}
                 />
               ))}
