@@ -51,15 +51,15 @@ export function VerifyWalletConnected({
     if (!session || state.step !== "capturing") return;
 
     if (state.stage === "audio") {
-      await session.stopAudio();
+      try { await session.stopAudio(); } catch { /* skipped */ }
       dispatch({ type: "NEXT_STAGE" });
       session.startMotion().catch(() => session.skipMotion());
     } else if (state.stage === "motion") {
-      await session.stopMotion();
+      try { await session.stopMotion(); } catch { /* skipped */ }
       dispatch({ type: "NEXT_STAGE" });
       session.startTouch().catch(() => session.skipTouch());
     } else if (state.stage === "touch") {
-      await session.stopTouch();
+      try { await session.stopTouch(); } catch { /* skipped */ }
       dispatch({ type: "CAPTURE_DONE" });
 
       setTimeout(() => {
