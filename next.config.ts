@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  transpilePackages: ["@iam-protocol/pulse-sdk"],
   turbopack: {
     resolveAlias: {
       fs: { browser: "./src/lib/empty-module.ts" },
