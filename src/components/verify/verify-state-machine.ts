@@ -7,18 +7,12 @@ export function verifyReducer(
   action: VerifyAction
 ): VerifyState {
   switch (action.type) {
-    case "START_AUDIO":
+    case "START_CAPTURE":
       if (state.step !== "idle") return state;
-      return { step: "capturing", stage: "audio" };
-
-    case "NEXT_STAGE":
-      if (state.step !== "capturing") return state;
-      if (state.stage === "audio") return { step: "capturing", stage: "motion" };
-      if (state.stage === "motion") return { step: "capturing", stage: "touch" };
-      return state;
+      return { step: "capturing" };
 
     case "CAPTURE_DONE":
-      if (state.step !== "capturing" || state.stage !== "touch") return state;
+      if (state.step !== "capturing") return state;
       return { step: "processing" };
 
     case "PROOF_COMPLETE":
