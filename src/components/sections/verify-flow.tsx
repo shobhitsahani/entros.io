@@ -28,7 +28,7 @@ export function VerifyFlow() {
         <VerifyModeToggle mode={mode} onChange={handleModeChange} />
       </div>
 
-      <GlassPanel className="mx-auto max-w-xl rounded-2xl px-8 py-8">
+      <GlassPanel className="mx-auto max-w-xl rounded-2xl px-8 py-8 min-h-[460px] flex flex-col justify-center">
         {mode === "walletless" ? (
           <VerifyWalletless state={state} dispatch={dispatch} />
         ) : (
