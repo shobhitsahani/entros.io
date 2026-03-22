@@ -108,7 +108,6 @@ body {
   background: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-sans);
-  transition: background-color 0.3s, color 0.3s;
 }
 
 /* Minimal scrollbars for code blocks and overflow containers */
@@ -168,6 +167,69 @@ body {
 ::selection {
   background: rgba(0, 240, 255, 0.2);
   color: var(--color-foreground);
+}
+
+/* ----------------------------------------------------------------
+   Glass panel effect — frosted glass with specular highlights
+   and inner-shadow depth. Theme-aware via CSS variables.
+   ---------------------------------------------------------------- */
+
+:root {
+  --glass-tint: rgba(250, 250, 248, 0.05);
+  --glass-specular: linear-gradient(to bottom, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.03) 40%, transparent 100%);
+  --glass-shadow:
+    0 8px 32px rgba(0,0,0,0.06),
+    0 2px 8px rgba(0,0,0,0.04),
+    inset 0 1px 0 rgba(255,255,255,0.35),
+    inset 0 -1px 0 rgba(0,0,0,0.05),
+    inset 1px 0 0 rgba(255,255,255,0.12),
+    inset -1px 0 0 rgba(255,255,255,0.12);
+}
+
+.dark {
+  --glass-tint: rgba(10, 10, 15, 0.08);
+  --glass-specular: linear-gradient(to bottom, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.02) 40%, transparent 100%);
+  --glass-shadow:
+    0 8px 32px rgba(0,0,0,0.3),
+    0 2px 8px rgba(0,0,0,0.2),
+    inset 0 1px 0 rgba(255,255,255,0.12),
+    inset 0 -1px 0 rgba(0,0,0,0.2),
+    inset 1px 0 0 rgba(255,255,255,0.06),
+    inset -1px 0 0 rgba(255,255,255,0.06);
+}
+
+.glass-panel {
+  position: relative;
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  overflow: hidden;
+  backdrop-filter: blur(8px) saturate(1.8) brightness(1.05);
+  -webkit-backdrop-filter: blur(8px) saturate(1.8) brightness(1.05);
+  background-color: var(--glass-tint);
+  background-image: var(--glass-specular);
+}
+
+/* ----------------------------------------------------------------
+   Hero background — static dot grid with depth gradient.
+   Pure CSS, zero JS, zero repaints.
+   ---------------------------------------------------------------- */
+
+.hero-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 40%, var(--color-effect), transparent 55%);
+  opacity: 0.15;
+}
+
+.dark .hero-glow {
+  opacity: 0.25;
 }
 
 /* ----------------------------------------------------------------
