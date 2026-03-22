@@ -7,27 +7,32 @@ const DEFENSES = [
   {
     title: "Minimum Distance Constraint",
     description:
-      "The ZK circuit enforces a minimum Hamming distance between consecutive fingerprints. Perfect replay (identical data submitted twice) is rejected at the proof level. Bots that generate the same synthetic data every session cannot pass.",
+      "The ZK circuit enforces a minimum Hamming distance between consecutive fingerprints. Perfect replay is rejected at the proof level. A bot submitting identical synthetic data twice gets blocked before reaching the chain.",
   },
   {
     title: "Behavioral Entropy Scoring",
     description:
-      "The feature extraction pipeline computes Shannon entropy and jitter variance for each sensor stream. Real human data has moderate, fluctuating entropy. Synthetic data produced by TTS engines or scripted inputs is too uniform and gets detected before it reaches the hash stage.",
+      "The feature extraction pipeline measures Shannon entropy and jitter variance across each sensor stream. Real human data has moderate, fluctuating entropy. Synthetic data from TTS engines or scripted inputs is too uniform and gets flagged before hashing.",
   },
   {
     title: "Progressive Trust Score",
     description:
-      "Trust Score grows with consistent verification over weeks and months, not raw count. 100 verifications in one day scores less than weekly verifications over 3 months. Recency weighting, regularity bonuses, and diminishing age returns make bot farming slow and expensive at scale.",
+      "Trust Score rewards consistency over time, not volume. 100 verifications in one day scores lower than weekly verifications over 3 months. Recency weighting and regularity bonuses make bot farming slow and expensive.",
   },
   {
-    title: "Dynamic Challenges",
+    title: "Per-Session Randomness",
     description:
-      "Phrases and curves change mid-session. A bot that pre-generates synthetic audio for one phrase cannot adapt when the prompt switches. Each session is a unique, unpredictable sequence that forces real-time behavioral adaptation.",
+      "Each verification generates a unique random phrase and Lissajous curve. No two sessions share the same challenge. The challenge elicits involuntary behavioral patterns (voice prosody, hand tremor, touch pressure) that are harder to synthesize than the words themselves.",
+  },
+  {
+    title: "Multi-Modal Capture",
+    description:
+      "Three independent sensor streams record in parallel: microphone, accelerometer, and touch digitizer. A bot needs to fake realistic voice, tremor, and touch pressure simultaneously. Spoofing one modality is feasible. Spoofing all three with consistent behavioral entropy is not.",
   },
   {
     title: "Economic Disincentives",
     description:
-      "Each verification costs ~$0.01 on-chain. Each wallet needs SOL. Maintaining thousands of fake identities over months — each re-verifying regularly to build trust — costs real money. The attack becomes more expensive than the value it extracts.",
+      "Each verification costs ~$0.01 on-chain. Each wallet requires SOL. Maintaining thousands of fake identities over months, re-verifying regularly to build trust, costs real money. The attack costs more than the value it extracts.",
   },
 ];
 

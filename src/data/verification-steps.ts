@@ -4,17 +4,17 @@ export const verificationSteps: VerificationStep[] = [
   {
     title: "01 — Challenge",
     description:
-      "Dynamic phrases and curves generated per session. Challenges switch mid-capture to force real-time adaptation.",
+      "A random nonsense phrase and Lissajous curve generated fresh for each session. No two sessions share the same challenge.",
     detail:
-      "Each session generates multiple nonsense phrases from different syllable subsets, switching every few seconds. The Lissajous tracing curve also changes mid-session. This prevents pre-computed responses — a bot would need to generate matching behavioral data for an unpredictable challenge in real time.",
+      "Each session generates a unique phrase from phonetic syllables and a unique Lissajous curve from random mathematical parameters. The user speaks the phrase while tracing the curve for 12 seconds. The challenge elicits natural behavioral data (voice prosody, hand tremor, touch pressure) rather than testing memory or speed.",
     icon: "mic",
   },
   {
     title: "02 — Capture",
     description:
-      "Three sensor streams: audio, motion, and touch. Each stage captured independently under user control.",
+      "Three sensor streams record in parallel: voice, touch, and motion. 12 seconds of simultaneous behavioral data.",
     detail:
-      "The Pulse SDK accesses the device microphone, accelerometer, gyroscope, and touch digitizer. Each sensor captures until the user signals completion. Raw data stays in device memory and never touches a network interface. On desktop, motion falls back to cursor tracking.",
+      "The Pulse SDK accesses the device microphone, accelerometer, gyroscope, and touch digitizer. All sensors record in parallel for 12 seconds. Raw data stays in device memory and never reaches a network interface. On desktop, motion is skipped. Audio and mouse-based touch capture provide sufficient behavioral signal.",
     icon: "activity",
   },
   {

@@ -52,7 +52,7 @@ export const solutionCases: SolutionCase[] = [
     problem:
       "Referral platforms and decentralized networks are overrun by bot accounts farming rewards and inflating metrics.",
     solution:
-      "Require IAM verification at account creation or reward claim. Dynamic mid-session challenges force real-time behavioral adaptation that scripted bots cannot handle. Walletless mode works as a drop-in captcha replacement for web platforms.",
+      "Require IAM verification at account creation or reward claim. Entropy scoring and minimum Hamming distance constraints detect the synthetic inputs that scripted bots produce. Walletless mode works as a drop-in captcha replacement for web platforms.",
     example:
       "DRiP gates referral rewards on IAM Anchors. Helium requires hotspot operators to prove unique humanity, preventing one entity from running thousands of nodes.",
   },

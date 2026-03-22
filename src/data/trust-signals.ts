@@ -21,7 +21,7 @@ export const trustSignals: TrustSignal[] = [
   {
     icon: "github",
     name: "Open Source",
-    description: "Verify the code yourself.",
+    description: "Every line is public.",
     detail: "MIT licensed. 3 Anchor programs, 1 Circom circuit, 1 TypeScript SDK. All on GitHub.",
     href: "https://github.com/iam-protocol",
     cta: "View on GitHub",
