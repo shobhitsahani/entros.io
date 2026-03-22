@@ -22,6 +22,14 @@ function getRandomChar(prevChar?: string): string {
   return char;
 }
 
+function scrambleString(text: string): string {
+  const chars: string[] = [];
+  for (let i = 0; i < text.length; i++) {
+    chars.push(text[i] === " " ? " " : getRandomChar());
+  }
+  return chars.join("");
+}
+
 export function SpecialText({
   children,
   speed = 20,
@@ -37,7 +45,8 @@ export function SpecialText({
   const [done, setDone] = useState(false);
 
   const textRef = useRef(children);
-  const phaseRef = useRef<"idle" | "phase1" | "phase2">("idle");
+  const phaseRef = useRef<"idle" | "scramble" | "decrypt">("idle");
+  const revealedRef = useRef(0);
   const stepRef = useRef(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -59,45 +68,32 @@ export function SpecialText({
 
   const tick = useCallback(() => {
     const text = textRef.current;
+    const revealed = revealedRef.current;
+    const chars: string[] = [];
 
-    if (phaseRef.current === "phase1") {
-      const maxSteps = text.length * 2;
-      const currentLength = Math.min(stepRef.current + 1, text.length);
-      const chars: string[] = [];
-
-      for (let i = 0; i < currentLength; i++) {
-        const prev = i > 0 ? chars[i - 1] : undefined;
-        chars.push(getRandomChar(prev));
-      }
-      for (let i = currentLength; i < text.length; i++) {
-        chars.push("\u00A0");
-      }
-
-      setDisplayText(chars.join(""));
-      stepRef.current++;
-
-      if (stepRef.current >= maxSteps) {
-        phaseRef.current = "phase2";
-        stepRef.current = 0;
-      }
-    } else if (phaseRef.current === "phase2") {
-      const revealedCount = Math.floor(stepRef.current / 2);
-      const chars: string[] = [];
-
-      for (let i = 0; i < revealedCount && i < text.length; i++) {
+    for (let i = 0; i < text.length; i++) {
+      if (i < revealed) {
+        // Already decrypted
         chars.push(text[i]!);
-      }
-      if (revealedCount < text.length) {
-        chars.push(stepRef.current % 2 === 0 ? "_" : getRandomChar());
-      }
-      for (let i = chars.length; i < text.length; i++) {
+      } else if (text[i] === " ") {
+        // Preserve spaces
+        chars.push(" ");
+      } else {
+        // Still garbled — keep randomizing
         chars.push(getRandomChar());
       }
+    }
 
-      setDisplayText(chars.join(""));
+    setDisplayText(chars.join(""));
+
+    // Advance decrypt cursor during decrypt phase
+    if (phaseRef.current === "decrypt") {
       stepRef.current++;
+      if (stepRef.current % 2 === 0) {
+        revealedRef.current++;
+      }
 
-      if (stepRef.current >= text.length * 2) {
+      if (revealedRef.current >= text.length) {
         setDisplayText(text);
         setDone(true);
         clearTimers();
@@ -106,33 +102,35 @@ export function SpecialText({
   }, [clearTimers]);
 
   const startAnimation = useCallback(() => {
-    phaseRef.current = "phase1";
+    phaseRef.current = "scramble";
+    revealedRef.current = 0;
     stepRef.current = 0;
-    setDisplayText(" ".repeat(textRef.current.length));
+
+    // Immediately show garbled text
+    setDisplayText(scrambleString(textRef.current));
 
     if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = setInterval(tick, speed);
-  }, [tick, speed]);
+
+    // Begin decrypting after delay (minimum short scramble period)
+    const decryptDelay = delay > 0 ? delay * 1000 : speed * 8;
+    timeoutRef.current = setTimeout(() => {
+      phaseRef.current = "decrypt";
+    }, decryptDelay);
+  }, [tick, speed, delay]);
 
   useEffect(() => {
     if (!shouldAnimate || phaseRef.current !== "idle") return;
 
-    if (delay <= 0) {
-      // Use microtask to avoid synchronous setState in effect
-      timeoutRef.current = setTimeout(startAnimation, 0);
-    } else {
-      timeoutRef.current = setTimeout(startAnimation, delay * 1000);
-    }
+    timeoutRef.current = setTimeout(startAnimation, 0);
 
     return clearTimers;
-  }, [shouldAnimate, delay, startAnimation, clearTimers]);
+  }, [shouldAnimate, startAnimation, clearTimers]);
 
   useEffect(() => {
     return clearTimers;
   }, [clearTimers]);
 
-  // Once animation is done, render plain text — no absolute positioning
-  // that can break on tab switch or visibility change.
   if (done) {
     return (
       <span
@@ -149,11 +147,9 @@ export function SpecialText({
       ref={containerRef}
       className={`relative inline-flex font-mono font-medium ${className}`}
     >
-      {/* Invisible placeholder reserves the final text dimensions */}
       <span className="invisible" aria-hidden="true">
         {children}
       </span>
-      {/* Animated text positioned on top */}
       <span className="absolute inset-0">
         {displayText}
       </span>
