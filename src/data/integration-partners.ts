@@ -48,6 +48,7 @@ export const integrationPartners: IntegrationPartner[] = [
     category: "Social",
     description: "Referral reward gating to eliminate bot farming.",
     icon: "bot",
+    logoUrl: "/logos/drip.webp",
   },
   {
     name: "Helium",

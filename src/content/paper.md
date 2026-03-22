@@ -229,6 +229,6 @@ The v2.1 update adds four layers of bot resistance:
 
 - **Progressive Trust Score**: The Trust Score formula uses recency-weighted verification count (30-day decay half-life), regularity bonuses (consistent weekly verification scores higher than 100 verifications in one day), and diminishing-returns age bonus (sqrt scaling). The Anchor stores the last 10 verification timestamps for rolling computation.
 
-- **Dynamic mid-session challenges**: Phrases and Lissajous curves change during a single capture session. Each phrase draws from a different syllable subset. This forces real-time behavioral adaptation that pre-computed or scripted responses cannot handle.
+- **Per-session randomness**: Each verification generates a unique random phrase and Lissajous curve. No two sessions share the same challenge. The challenge elicits involuntary behavioral signatures (voice prosody, hand tremor, touch dynamics) rather than testing cognitive ability. A bot cannot precompute responses for an unknown prompt, and the behavioral entropy layers detect synthetic data regardless of challenge content.
 
 These defenses do not claim cryptographic proof of humanness. They make Sybil attacks economically irrational by increasing the cost and time required to build and maintain fake identities at scale.
