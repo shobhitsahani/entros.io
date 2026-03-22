@@ -32,7 +32,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
   return (
     <button
       className={cn(
-        "flex h-8 w-16 cursor-pointer items-center rounded-full p-1 transition-all duration-300",
+        "flex h-8 w-16 cursor-pointer items-center rounded-full p-1 transition-colors duration-300",
         isDark
           ? "border border-white/10 bg-surface"
           : "border border-zinc-300 bg-white",
