@@ -20,9 +20,9 @@ export const verificationSteps: VerificationStep[] = [
   {
     title: "03 — Extract + Score",
     description:
-      "MFCC, jerk, fractal dimension, statistical condensing. Plus entropy scoring to detect synthetic data.",
+      "Speaker features (F0, jitter, shimmer, HNR, formants), jerk analysis, statistical condensing. Plus entropy scoring to detect synthetic data.",
     detail:
-      "Audio features: 13 MFCC coefficients plus delta and delta-delta, with per-coefficient entropy to detect TTS artifacts. Motion and touch: jerk and jounce analysis with jitter variance scoring — real human tremor fluctuates over time, synthetic data stays constant. Features that look too clean are flagged.",
+      "Audio: fundamental frequency, vocal jitter, shimmer, harmonics-to-noise ratio, and formant ratios. Per-feature entropy detects TTS artifacts. Motion and touch: jerk and jounce analysis with jitter variance scoring. Real human tremor fluctuates over time, synthetic data stays constant. On desktop, mouse dynamics replace motion sensor data.",
     icon: "scan",
   },
   {

@@ -49,7 +49,7 @@ export function VerifyWalletConnected({
   async function handleStart() {
     voicedFramesRef.current = 0;
 
-    const session = pulse.createSession(touchRef.current ?? undefined);
+    const session = pulse.createSession(touchRef.current ?? document.body);
     sessionRef.current = session;
 
     // Request audio first (mandatory) — must complete before other permissions

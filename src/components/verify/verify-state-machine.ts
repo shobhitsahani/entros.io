@@ -28,6 +28,7 @@ export function verifyReducer(
       };
 
     case "VERIFICATION_FAILED":
+      if (state.step === "verified" || state.step === "idle") return state;
       return { step: "failed", error: action.error };
 
     case "RESET":

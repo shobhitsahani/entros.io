@@ -55,13 +55,13 @@ The novelty and patentability of the TBH lie in this specific multi-stage pipeli
 The raw time-series data is distilled into a concise feature vector (`V_features`) by applying specialized mathematical transformations.
 
 * **Audio Processing (`S_audio` -> `V_audio`):**
-    1.  **Mel-Frequency Cepstral Coefficients (MFCCs):** The audio signal is windowed into 25ms frames, and for each frame, 13 MFCCs are computed to represent the vocal tract's shape.
-    2.  **Delta and Delta-Delta Coefficients:** The first and second derivatives of the MFCC time-series are computed to capture the *dynamics* of speech—how vocalization changes over time.
-    3.  **Statistical Condensing:** The mean, variance, skewness, and kurtosis of the MFCCs and their deltas are computed over the capture period. This condenses the temporal data into a fixed-size vector `V_audio` representing the overall "texture" of the user's voice.
+    1.  **Speaker Feature Extraction:** The audio signal is analyzed for fundamental frequency (F0), jitter (pitch perturbation), shimmer (amplitude perturbation), and harmonics-to-noise ratio (HNR). These capture the physiological characteristics of the vocal tract and laryngeal control.
+    2.  **Formant Ratios and Spectral Shape:** Formant frequency ratios (F1/F2, F2/F3) and Long-Term Average Spectrum (LTAS) statistics capture vocal tract resonance geometry. These features are stable within a speaker but vary across individuals.
+    3.  **Statistical Condensing:** F0 contour statistics, jitter and shimmer measures, and per-feature entropy are computed over the capture period. This condenses the temporal data into a fixed-size vector `V_audio` representing the speaker's vocal signature.
 
 * **Motion & Touch Processing (`S_motion`, `S_touch` -> `V_kinematic`):**
     1.  **Jerk and Jounce Analysis:** We compute the third (jerk) and fourth (jounce) derivatives of the motion and touch-coordinate data. Involuntary human movements have a unique, high-frequency jerk signature that is difficult for algorithms to replicate.
-    2.  **Fractal Dimension Calculation:** The path traced is treated as a fractal object. We use the Higuchi fractal dimension algorithm to calculate the fractal dimension of the time series, capturing the "complexity" of the user's motion.
+    2.  **Mouse Dynamics (Desktop):** On devices without motion sensors, mouse movement patterns replace IMU data. Path curvature, directional entropy, speed distribution, and micro-correction frequency capture habitual motor control patterns unique to each user.
     3.  **Statistical Condensing:** Similar to audio, we compute statistical moments of these kinematic features to produce a fixed-size vector `V_kinematic`.
 
 **Step 2: Feature Fusion and Hashing (The "Amalgamation")**
@@ -225,10 +225,14 @@ The v2.1 update adds four layers of bot resistance:
 
 - **Minimum Hamming distance constraint**: The ZK circuit now enforces `min_distance <= HammingDistance(F_T_new, F_T_prev) < threshold`. Perfect replay (distance 0) and near-replay (distance 1-2) are rejected at the proof level. Real human behavioral drift produces 5-20 bits of natural variation between sessions.
 
-- **Behavioral entropy scoring**: The feature extraction pipeline computes Shannon entropy per MFCC coefficient and jitter variance (variance of windowed jerk variance) for motion and touch axes. Real human data has moderate, fluctuating entropy. Synthetic data from TTS engines or scripted inputs produces suspiciously uniform distributions that shift the SimHash fingerprint away from the baseline.
+- **Behavioral entropy scoring**: The feature extraction pipeline computes Shannon entropy per speaker feature (F0, HNR, amplitude) and jitter variance (variance of windowed jerk variance) for motion and touch axes. Real human data has moderate, fluctuating entropy. Synthetic data from TTS engines or scripted inputs produces suspiciously uniform distributions that shift the SimHash fingerprint away from the baseline.
 
 - **Progressive Trust Score**: The Trust Score formula uses recency-weighted verification count (30-day decay half-life), regularity bonuses (consistent weekly verification scores higher than 100 verifications in one day), and diminishing-returns age bonus (sqrt scaling). The Anchor stores the last 10 verification timestamps for rolling computation.
 
 - **Per-session randomness**: Each verification generates a unique random phrase and Lissajous curve. No two sessions share the same challenge. The challenge elicits involuntary behavioral signatures (voice prosody, hand tremor, touch dynamics) rather than testing cognitive ability. A bot cannot precompute responses for an unknown prompt, and the behavioral entropy layers detect synthetic data regardless of challenge content.
+
+- **Speaker feature resistance to synthesis**: Each audio feature presents a distinct challenge to synthetic replication. F0 (fundamental frequency) is trivial to match with text-to-speech engines. Formant ratios are harder because they encode vocal tract geometry specific to each individual. Jitter and shimmer are the strongest defenses: they measure involuntary micro-perturbations in pitch period and amplitude that TTS engines produce with unnaturally low or uniform values. HNR (harmonics-to-noise ratio) catches synthetic audio because TTS produces unnaturally clean signals without the breath noise present in real human speech. A generic bot fails on jitter, shimmer, and HNR. A sophisticated bot that models a specific person's vocal characteristics needs the target's F0, formant geometry, and realistic perturbation patterns simultaneously.
+
+- **Multi-modal fusion**: A bot must fake voice, motion (or mouse dynamics), and touch pressure in parallel. Spoofing one modality is feasible. Spoofing all three with consistent behavioral entropy across 12 seconds of simultaneous capture is not. The 134-dimensional feature vector (44 speaker + 54 motion/mouse + 36 touch) projects through SimHash into a 256-bit fingerprint where each bit depends on all modalities combined.
 
 These defenses do not claim cryptographic proof of humanness. They make Sybil attacks economically irrational by increasing the cost and time required to build and maintain fake identities at scale.

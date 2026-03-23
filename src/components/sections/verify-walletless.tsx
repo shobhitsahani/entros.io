@@ -29,7 +29,6 @@ export function VerifyWalletless({
   const touchRef = useRef<HTMLDivElement>(null);
   const sessionRef = useRef<PulseSession | null>(null);
   const [audioLevel, setAudioLevel] = useState(0);
-  const [preparing, setPreparing] = useState(false);
   const [hasMotion, setHasMotion] = useState(false);
   const voicedFramesRef = useRef(0);
 
@@ -40,7 +39,7 @@ export function VerifyWalletless({
   async function handleStart() {
     voicedFramesRef.current = 0;
 
-    const session = pulse.createSession(touchRef.current ?? undefined);
+    const session = pulse.createSession(touchRef.current ?? document.body);
     sessionRef.current = session;
 
     // Request audio first (mandatory) — must complete before other permissions
@@ -50,8 +49,14 @@ export function VerifyWalletless({
       if (rms > 0.015) voicedFramesRef.current++;
     }).catch(() => session.skipAudio());
 
-    session.startMotion().catch(() => session.skipMotion());
-    session.startTouch().catch(() => session.skipTouch());
+    session.startMotion().catch((e) => {
+      console.warn("[IAM] Motion start failed:", e?.message ?? e);
+      session.skipMotion();
+    });
+    session.startTouch().catch((e) => {
+      console.warn("[IAM] Touch start failed:", e?.message ?? e);
+      session.skipTouch();
+    });
 
     dispatch({ type: "START_CAPTURE" });
   }
@@ -126,8 +131,8 @@ export function VerifyWalletless({
           )}
         </div>
         <div className="flex justify-center">
-          <ShimmerButton className="text-sm font-medium" onClick={handleStart} disabled={preparing}>
-            {preparing ? "Preparing..." : "Start Verification"}
+          <ShimmerButton className="text-sm font-medium" onClick={handleStart}>
+            Start Verification
           </ShimmerButton>
         </div>
         <p className="text-center text-xs text-muted">
