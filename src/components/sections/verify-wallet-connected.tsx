@@ -52,12 +52,22 @@ export function VerifyWalletConnected({
     const session = pulse.createSession(touchRef.current ?? document.body);
     sessionRef.current = session;
 
-    // Request audio first (mandatory) — must complete before other permissions
+    // Audio is mandatory — must complete before other permissions
     // to avoid iOS gesture context collision with DeviceMotion permission dialog
-    await session.startAudio((rms) => {
-      setAudioLevel(rms);
-      if (rms > 0.015) voicedFramesRef.current++;
-    }).catch(() => session.skipAudio());
+    try {
+      let audioFrameCount = 0;
+      await session.startAudio((rms) => {
+        if (rms > 0.015) voicedFramesRef.current++;
+        audioFrameCount++;
+        if (audioFrameCount % 6 === 0) setAudioLevel(rms);
+      });
+    } catch {
+      dispatch({
+        type: "VERIFICATION_FAILED",
+        error: "Microphone access denied. Please allow microphone permission and try again.",
+      });
+      return;
+    }
 
     session.startMotion().catch(() => session.skipMotion());
     session.startTouch().catch(() => session.skipTouch());
@@ -75,13 +85,10 @@ export function VerifyWalletConnected({
 
     dispatch({ type: "CAPTURE_DONE" });
 
-    setTimeout(() => {
-      dispatch({ type: "PROOF_COMPLETE" });
-    }, 2000);
-
     session
       .complete(wallet?.adapter, connection)
       .then((result) => {
+        dispatch({ type: "PROOF_COMPLETE" });
         if (result.success) {
           dispatch({
             type: "VERIFICATION_SUCCESS",
