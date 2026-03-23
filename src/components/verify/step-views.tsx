@@ -80,6 +80,15 @@ export function VerifiedView({
   );
 }
 
+function isRelayerError(error: string): boolean {
+  return (
+    error.includes("DOCTYPE") ||
+    error.includes("Failed to fetch") ||
+    error.includes("NetworkError") ||
+    error.includes("localhost")
+  );
+}
+
 export function FailedView({
   error,
   onReset,
@@ -87,14 +96,25 @@ export function FailedView({
   error: string;
   onReset: () => void;
 }) {
+  const relayerDown = isRelayerError(error);
+
   return (
     <div className="text-center space-y-6">
       <AlertCircle className="mx-auto h-12 w-12 text-danger" />
       <div>
         <p className="font-sans text-xl font-semibold text-foreground">
-          Verification failed
+          {relayerDown ? "Relayer not connected" : "Verification failed"}
         </p>
-        <p className="mt-1 text-sm text-muted">{error}</p>
+        <p className="mt-1 text-sm text-muted">
+          {relayerDown
+            ? "The IAM relayer service is not running. Verification requires a live relayer connected to Solana devnet."
+            : error}
+        </p>
+        {relayerDown && (
+          <p className="mt-2 text-xs text-muted">
+            This is a devnet demo. End-to-end verification will be available when the relayer is deployed.
+          </p>
+        )}
       </div>
       <button
         onClick={onReset}

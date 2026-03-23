@@ -39,7 +39,7 @@ export function HeroSection() {
               </ShimmerButton>
             </Link>
             <a
-              href="/technology"
+              href="/paper"
               className="rounded-full border border-foreground/20 bg-foreground/5 px-6 py-3 text-sm font-medium text-foreground/80 transition-colors duration-200 hover:border-foreground/40 hover:bg-foreground/10 hover:text-foreground"
             >
               Read the Paper

@@ -37,21 +37,22 @@ export function VerifyWalletless({
     setHasMotion(navigator.maxTouchPoints > 0);
   }, []);
 
-  function handleStart() {
+  async function handleStart() {
     voicedFramesRef.current = 0;
 
     const session = pulse.createSession(touchRef.current ?? undefined);
     sessionRef.current = session;
 
-    // Fire and forget — sensors start capturing asynchronously
-    session.startAudio((rms) => {
+    // Request audio first (mandatory) — must complete before other permissions
+    // to avoid iOS gesture context collision with DeviceMotion permission dialog
+    await session.startAudio((rms) => {
       setAudioLevel(rms);
       if (rms > 0.015) voicedFramesRef.current++;
     }).catch(() => session.skipAudio());
+
     session.startMotion().catch(() => session.skipMotion());
     session.startTouch().catch(() => session.skipTouch());
 
-    // Show capture UI immediately — timer starts after 3-second countdown
     dispatch({ type: "START_CAPTURE" });
   }
 
