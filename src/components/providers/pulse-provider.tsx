@@ -13,6 +13,7 @@ export function PulseProvider({ children }: { children: React.ReactNode }) {
         "devnet",
       rpcEndpoint: process.env.NEXT_PUBLIC_SOLANA_RPC,
       relayerUrl: process.env.NEXT_PUBLIC_RELAYER_URL,
+      relayerApiKey: process.env.NEXT_PUBLIC_RELAYER_API_KEY,
       wasmUrl: process.env.NEXT_PUBLIC_WASM_URL,
       zkeyUrl: process.env.NEXT_PUBLIC_ZKEY_URL,
     };
