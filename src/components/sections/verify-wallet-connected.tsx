@@ -52,14 +52,37 @@ export function VerifyWalletConnected({
     const session = pulse.createSession(touchRef.current ?? document.body);
     sessionRef.current = session;
 
-    // Audio is mandatory — must complete before other permissions
-    // to avoid iOS gesture context collision with DeviceMotion permission dialog
+    // Motion first — DeviceMotionEvent.requestPermission() requires an active
+    // user gesture on iOS. getUserMedia does not. If audio goes first, the gesture
+    // token is consumed by the mic dialog and motion is silently denied.
+    if (hasMotion) {
+      try {
+        await session.startMotion();
+        if (!session.isMotionCapturing()) {
+          dispatch({
+            type: "VERIFICATION_FAILED",
+            error: "Motion permission denied. Please allow motion access and try again.",
+          });
+          return;
+        }
+      } catch {
+        dispatch({
+          type: "VERIFICATION_FAILED",
+          error: "Motion permission denied. Please allow motion access and try again.",
+        });
+        return;
+      }
+    } else {
+      session.skipMotion();
+    }
+
+    // Audio second — getUserMedia works without a gesture on secure origins
     try {
       let audioFrameCount = 0;
       await session.startAudio((rms) => {
-        if (rms > 0.015) voicedFramesRef.current++;
+        if (rms > 0.008) voicedFramesRef.current++;
         audioFrameCount++;
-        if (audioFrameCount % 6 === 0) setAudioLevel(rms);
+        if (audioFrameCount % 2 === 0) setAudioLevel(rms);
       });
     } catch {
       dispatch({
@@ -69,9 +92,6 @@ export function VerifyWalletConnected({
       return;
     }
 
-    // Motion permission must be awaited — on iOS the dialog blocks and capture
-    // time is lost if we proceed before the user approves.
-    try { await session.startMotion(); } catch { session.skipMotion(); }
     session.startTouch().catch(() => session.skipTouch());
 
     dispatch({ type: "START_CAPTURE" });

@@ -166,8 +166,8 @@ export function PulseChallenge({
   // --- Active capture ---
   const remaining = Math.max(0, CAPTURE_DURATION_S - elapsed);
   const progress = (elapsed / CAPTURE_DURATION_S) * 100;
-  const normalizedAudio = Math.min(audioLevel * 10, 1);
-  const isVoiceActive = audioLevel > 0.015;
+  const normalizedAudio = Math.min(audioLevel * 25, 1);
+  const isVoiceActive = audioLevel > 0.005;
   const normalizedTouch = Math.min(touchLevel, 1);
 
   return (
