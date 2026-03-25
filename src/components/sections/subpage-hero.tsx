@@ -10,9 +10,11 @@ export function SubpageHero({
       <h1 className="text-glow-cyan font-mono text-4xl font-bold tracking-[0.02em] md:text-5xl lg:text-6xl">
         {title}
       </h1>
-      <p className="mt-6 text-lg text-muted leading-relaxed md:text-xl whitespace-pre-line">
-        {subtitle}
-      </p>
+      {subtitle && (
+        <p className="mt-6 text-lg text-muted leading-relaxed md:text-xl whitespace-pre-line">
+          {subtitle}
+        </p>
+      )}
     </section>
   );
 }
