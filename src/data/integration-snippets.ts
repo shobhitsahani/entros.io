@@ -8,7 +8,10 @@ export const integrationSnippets: IntegrationSnippet[] = [
       "Users verify without a wallet. The Pulse SDK generates a proof and submits it via the IAM relayer. Your API key identifies your escrow account.",
     code: `import { PulseSDK } from '@iam-protocol/pulse-sdk';
 
-const pulse = new PulseSDK({ cluster: 'devnet' });
+const pulse = new PulseSDK({
+  cluster: 'devnet',
+  relayerUrl: 'https://relayer.iam-protocol.org',
+});
 
 // User completes Pulse challenge on your site
 const result = await pulse.verify();

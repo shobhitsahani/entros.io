@@ -9,9 +9,10 @@ const CONFIG_OPTIONS = [
   { name: "cluster", type: '"devnet" | "mainnet-beta"', description: "Solana cluster to connect to" },
   { name: "rpcEndpoint", type: "string", description: "Custom RPC URL (optional)" },
   { name: "relayerUrl", type: "string", description: "IAM relayer endpoint for walletless mode" },
+  { name: "relayerApiKey", type: "string", description: "API key identifying your integrator escrow account" },
   { name: "wasmUrl", type: "string", description: "Path to iam_hamming.wasm circuit artifact" },
   { name: "zkeyUrl", type: "string", description: "Path to iam_hamming_final.zkey proving key" },
-  { name: "threshold", type: "number", description: "Hamming distance threshold (default: 30)" },
+  { name: "threshold", type: "number", description: "Hamming distance threshold (default: 96)" },
 ];
 
 export function IntegrateGuide() {

@@ -14,7 +14,7 @@ export const verificationSteps: VerificationStep[] = [
     description:
       "Three sensor streams record in parallel: voice, touch, and motion. 12 seconds of simultaneous behavioral data.",
     detail:
-      "The Pulse SDK accesses the device microphone, accelerometer, gyroscope, and touch digitizer. All sensors record in parallel for 12 seconds. Raw data stays in device memory and never reaches a network interface. On desktop, motion is skipped. Audio and mouse-based touch capture provide sufficient behavioral signal.",
+      "The Pulse SDK accesses the device microphone, accelerometer, gyroscope, and touch digitizer. All sensors record in parallel for 12 seconds. Raw data stays in device memory and never reaches a network interface. On desktop, motion sensors are unavailable. Mouse pointer dynamics provide equivalent kinematic features.",
     icon: "activity",
   },
   {
@@ -38,7 +38,7 @@ export const verificationSteps: VerificationStep[] = [
     description:
       "Poseidon(fingerprint || salt) produces the TBH commitment. The fingerprint and salt stay on-device.",
     detail:
-      "A large cryptographically-secure salt is generated. The Poseidon hash function (chosen for ZK-circuit efficiency over BN254 field elements) takes the fingerprint concatenated with the salt to produce H_TBH. This commitment is the only value that leaves the device.",
+      "A large cryptographically-secure salt is generated. The Poseidon hash function (chosen for ZK-circuit efficiency over BN254 field elements) takes the fingerprint concatenated with the salt to produce H_TBH. The commitment and ZK proof are transmitted. The fingerprint and salt remain on-device, encrypted.",
     icon: "lock",
   },
   {
@@ -46,7 +46,7 @@ export const verificationSteps: VerificationStep[] = [
     description:
       "Groth16 ZK proof: distance is within the valid range. Not too similar (replay), not too different (imposter).",
     detail:
-      "The proof verifies four things: both commitments are valid Poseidon hashes of real fingerprints, the Hamming distance falls below the maximum threshold (natural human variation), and the distance exceeds a minimum threshold (blocks perfect replay where a bot submits identical data). The verifier learns nothing about the actual fingerprints.",
+      "The proof verifies three statements: both commitments are valid Poseidon hashes of real fingerprints, the Hamming distance falls below the maximum threshold (natural human variation), and the distance exceeds a minimum threshold (blocks perfect replay where a bot submits identical data). The verifier learns nothing about the actual fingerprints.",
     icon: "proof",
   },
   {

@@ -5,7 +5,7 @@ import { PaperContent } from "./paper-content";
 export const metadata = {
   title: "Research Paper",
   description:
-    "IAM Protocol: A Framework for Temporally-Consistent, Decentralized Proof-of-Humanity on Solana",
+    "IAM Protocol: Proof-of-Humanity through Temporal Biometric Consistency",
 };
 
 export default function PaperPage() {

@@ -1,238 +1,250 @@
-# IAM Protocol: A Framework for Temporally-Consistent, Decentralized Proof-of-Humanity
+# IAM Protocol: Proof-of-Humanity through Temporal Biometric Consistency
 
-**Document Version:** 2.0 (Updated for Solana / ZK Self-Proof Architecture)
-**Original Date:** June 27, 2025
-**Updated:** March 19, 2026
-**Word Count:** Approx. 5000
+**Version:** 3.0
+**Date:** March 25, 2026
 
 ---
 
-#### **Abstract**
+#### Abstract
 
-The proliferation of sophisticated AI and bot networks necessitates a robust method for verifying human uniqueness and liveness in digital ecosystems—a concept known as Proof-of-Humanity (PoH). Existing solutions often rely on centralized authorities, invasive static biometrics (e.g., iris scans), or socially-correlatable data, creating significant vulnerabilities in privacy, security, and accessibility. This paper introduces the IAM Protocol, a novel, decentralized framework for PoH and Self-Sovereign Identity (SSI). Its core innovation is the concept of **temporal consistency**, asserting that a human's identity is best proven not by a single secret, but by the dynamic, chaotic, and continuous signature of their biological and behavioral patterns over time. The framework leverages a multi-modal "Liveness Interlock" to generate a **Temporal-Biometric Hash (TBH)**, which is then validated by a decentralized "Anonymity Ring" of peers using Multi-Party Computation (MPC). The resulting attestations are anchored to an evolving, non-transferable token (NTT), forming a private and secure Decentralized Identity (DID). This paper details the mathematical foundations of the TBH, the cryptographic architecture of the validation mechanism, the game-theoretic incentives underpinning the system's security, and the application layer that brings its utility to the digital world.
+This paper presents the IAM Protocol, a decentralized Proof-of-Humanity framework built on Solana. The protocol proves humanness through temporal consistency: the observation that a person's behavioral signature (voice prosody, hand tremor, touch dynamics) varies within a bounded range across sessions, while synthetic or replayed data falls outside that range. During each verification, the user's device captures multi-modal sensor data, extracts a 134-dimensional feature vector, and compresses it into a 256-bit Temporal Fingerprint via SimHash. A Groth16 zero-knowledge proof demonstrates that the Hamming distance between the current fingerprint and a previous one falls within an acceptable range, without revealing either fingerprint. The proof is verified on-chain by a Solana program. Successful verifications update a non-transferable identity token (the IAM Anchor) with a progressive Trust Score that rewards consistent re-verification over time. The protocol requires no wallet, no payment, and no crypto knowledge from the end user. Raw biometric data never leaves the device.
 
-**Keywords:** *Proof-of-Humanity (PoH), Decentralized Identity (DID), Behavioral Biometrics, Multi-Party Computation (MPC), Zero-Knowledge Proofs (ZKP), Liveness Detection, Temporal Consistency, Non-Transferable Tokens (NTT).*
-
----
-
-### **1. Introduction: The Core Philosophy of the IAM Protocol**
-
-The digital landscape is at an inflection point. The distinction between human and artificial actors is increasingly blurred, posing an existential threat to the integrity of online economies, governance models, and social platforms. Sybil attacks, where a single adversary creates numerous fake identities, can undermine everything from fair token distribution (airdrops) and democratic voting in DAOs to the spread of disinformation.
-
-The fundamental flaw in most current PoH systems is their reliance on a single, static biometric "secret" (an iris scan, a palm print). This is analogous to using the same password everywhere. If it's compromised once, it's compromised forever. The IAM Protocol operates on a different principle: **Proof-of-Humanity through Temporal Consistency and Multi-Modal Biometric Hashing.** A human is not a static data point; they are a continuous, dynamic process. The "liveness" of a human has a unique, chaotic, and high-entropy signature over time. AI can mimic a snapshot, but mimicking this temporal signature perfectly is computationally prohibitive.
-
-Instead of asking, *"What is your secret?"*, we ask, *"Are you still you?"*. By focusing on the unique, difficult-to-replicate *dynamics* of human liveness over time, we create a more resilient, private, and equitable foundation for digital identity.
-
-The framework is built on three pillars, which this paper will detail in subsequent sections:
-
-1.  **The Liveness Interlock (The "Pulse"):** A multi-modal, time-series liveness check that generates a temporary, high-entropy "Temporal-Biometric Hash," detailed in Section 2.
-2.  **The Anonymity Ring (The "Chorus"):** A decentralized validation process using Multi-Party Computation (MPC) and Ring Signatures, where a small, random group of peers validates a user's Pulse without ever seeing their data, detailed in Section 3.
-3.  **The IAM Anchor (The "Anchor"):** An evolving, non-transferable token that acts as the user's DID, storing cryptographic attestations of their temporal consistency, not their raw data. This is supported by a robust economic model (Section 4) and provides a flexible application layer (Section 5).
+**Keywords:** Proof-of-Humanity, Behavioral Biometrics, Zero-Knowledge Proofs, Groth16, SimHash, Temporal Consistency, Solana, Decentralized Identity.
 
 ---
 
-### **2. Pillar I: Mathematical Modeling of the Temporal-Biometric Hash (TBH)**
+### 1. Introduction
 
-#### **2.1. Objective**
+Sybil attacks cost Solana protocols hundreds of millions of dollars annually. A single adversary creates thousands of wallet addresses to claim airdrops, manipulate DAO votes, or extract MEV. Existing defenses fall into three categories: static biometrics (Worldcoin's iris scanning), social graph analysis (BrightID), and CAPTCHA-style cognitive tests (hCaptcha). Each has a structural weakness. Static biometrics create permanent identifiers that cannot be revoked if compromised. Social graphs are vulnerable to collusion. Cognitive tests are solved by modern AI systems.
 
-To define a deterministic, yet unpredictable, process for converting raw, multi-modal sensor data into a compact, secure, and privacy-preserving cryptographic hash. This process must satisfy the following criteria: High Uniqueness, High Spoof-Resistance, Temporal Consistency, Privacy Preservation, and Computational Efficiency on standard consumer hardware.
+The IAM Protocol takes a different approach. A human is a continuous dynamic process, not a static data point. Voice prosody shifts between utterances. Hand tremor varies with fatigue. Touch pressure changes with posture. These micro-variations follow a bounded pattern unique to each person. A bot can mimic a single sample, but producing consistent temporal drift across multiple sessions requires modeling the full complexity of human neuromuscular control.
 
-#### **2.2. The Liveness Interlock: Data Acquisition Protocol**
+The protocol exploits this property through three mechanisms:
 
-The TBH is generated from data captured during the "Liveness Interlock," a user-facing challenge designed to elicit unique behavioral and biological responses.
+1. **The Temporal-Biometric Hash (TBH):** A 256-bit fingerprint derived from voice, motion, and touch features captured during a 12-second behavioral challenge.
+2. **ZK Self-Proof:** A Groth16 zero-knowledge proof that the Hamming distance between the current and previous TBH is within a valid range, without revealing either value.
+3. **The IAM Anchor:** A non-transferable on-chain identity token with a progressive Trust Score that increases with consistent re-verification.
 
-* **Challenge Generation:** The protocol issues a nonce-seeded challenge consisting of two parts: a phonetically-balanced, non-sensical phrase to be spoken aloud (e.g., *"Oro rura lamo ree see"*) to prevent dictionary-based audio deepfake attacks, and a simple, continuous 2D gesture to be traced on the screen (e.g., a Lissajous curve).
-* **Synchronous Data Streams (`S`):**
-    * **`S_audio`**: Audio is captured at 16kHz, focusing on prosody, not semantics.
-    * **`S_motion`**: Motion is captured from the IMU (accelerometer + gyroscope) at 100Hz, capturing hand tremor and unique motor control dynamics.
-    * **`S_touch`**: Touch events (coordinates, pressure, area) are captured from the digitizer at 120Hz.
-
-#### **2.3. The Transformation Pipeline: From Raw Data to Hash**
-
-The novelty and patentability of the TBH lie in this specific multi-stage pipeline.
-
-**Step 1: Feature Extraction (The "Distillation")**
-The raw time-series data is distilled into a concise feature vector (`V_features`) by applying specialized mathematical transformations.
-
-* **Audio Processing (`S_audio` -> `V_audio`):**
-    1.  **Speaker Feature Extraction:** The audio signal is analyzed for fundamental frequency (F0), jitter (pitch perturbation), shimmer (amplitude perturbation), and harmonics-to-noise ratio (HNR). These capture the physiological characteristics of the vocal tract and laryngeal control.
-    2.  **Formant Ratios and Spectral Shape:** Formant frequency ratios (F1/F2, F2/F3) and Long-Term Average Spectrum (LTAS) statistics capture vocal tract resonance geometry. These features are stable within a speaker but vary across individuals.
-    3.  **Statistical Condensing:** F0 contour statistics, jitter and shimmer measures, and per-feature entropy are computed over the capture period. This condenses the temporal data into a fixed-size vector `V_audio` representing the speaker's vocal signature.
-
-* **Motion & Touch Processing (`S_motion`, `S_touch` -> `V_kinematic`):**
-    1.  **Jerk and Jounce Analysis:** We compute the third (jerk) and fourth (jounce) derivatives of the motion and touch-coordinate data. Involuntary human movements have a unique, high-frequency jerk signature that is difficult for algorithms to replicate.
-    2.  **Mouse Dynamics (Desktop):** On devices without motion sensors, mouse movement patterns replace IMU data. Path curvature, directional entropy, speed distribution, and micro-correction frequency capture habitual motor control patterns unique to each user.
-    3.  **Statistical Condensing:** Similar to audio, we compute statistical moments of these kinematic features to produce a fixed-size vector `V_kinematic`.
-
-**Step 2: Feature Fusion and Hashing (The "Amalgamation")**
-1.  **Concatenation:** The feature vectors `V_audio` and `V_kinematic` are concatenated into a single feature vector, `V_fused`.
-2.  **Perceptual Hashing (SimHash):** We use a locality-sensitive hashing (LSH) algorithm, specifically **SimHash**, which is designed so that similar inputs result in similar hashes. The `V_fused` vector is projected onto a set of random hyperplanes. The final hash, the **Temporal Fingerprint (`F_T`)**, is a bitstring where each bit represents which side of a hyperplane the vector fell. Two `F_T` values from the same user will have a small Hamming distance.
-
-**Step 3: Cryptographic Commitment (The "Sealing")**
-The Temporal Fingerprint (`F_T`) is private. To create a verifiable public commitment, we hash it.
-1.  **Salt and Hash:** A large, cryptographically-secure random number (the `salt`) is generated. The final **Temporal-Biometric Hash (`H_TBH`)** is computed as:
-    `H_TBH = Poseidon(F_T || salt)`
-    The **Poseidon hash function** is chosen for its efficiency in ZK-SNARK circuits, a critical requirement for later stages. The pair (`H_TBH`, `salt`) is the output, with `salt` and `F_T` remaining private to the user.
+Users verify through a web browser. The proof is submitted to Solana via a relayer service funded by the integrating application. The user needs no wallet, no SOL, and no understanding of cryptography.
 
 ---
 
-### **3. Pillar II: The Anonymity Ring - Cryptographic Architecture**
+### 2. The Temporal-Biometric Hash
 
-#### **3.1. Objective**
+#### 2.1 Data Acquisition
 
-To design a decentralized, trustless, and anonymous protocol for validating a user's Temporal Fingerprint (`F_T`). The protocol must allow a group of existing members to verify the consistency of a new `F_T` from a user against their historical record, without any party learning anything about the user's actual biometric data.
+Each verification session presents the user with a unique challenge: a randomly generated nonsense phrase and a Lissajous curve to trace on screen. The challenge elicits involuntary behavioral signatures rather than testing cognitive ability. A bot cannot precompute responses for an unknown prompt.
 
-#### **3.2. Ring Formation and Collusion Resistance**
+Three data streams are captured simultaneously:
 
-We use Verifiable Random Functions (VRFs) and staking to ensure fair and unpredictable validator selection.
-1.  **Eligibility:** A user must have a mature IAM Anchor and stake a minimum amount of the native token to be eligible.
-2.  **Selection Process:** When a user (Prover) initiates a validation, all eligible validators locally compute a VRF output using a recent block hash. Those whose output falls below a difficulty threshold submit their proof. The Prover's client selects the first `n` valid proofs it sees to form the Anonymity Ring (`R`). This process is decentralized and resistant to manipulation.
+- **Audio** (`S_audio`): Captured at 16kHz (or the device's native rate on iOS). Focuses on prosody, not speech content.
+- **Motion** (`S_motion`): IMU accelerometer and gyroscope data at the device's native rate (60-100Hz). On desktop devices without an IMU, mouse pointer dynamics substitute.
+- **Touch** (`S_touch`): Pointer events (coordinates, pressure, contact area) from the user's finger or cursor.
 
-#### **3.3. The Core Validation Protocol: MPC with Homomorphic Encryption**
+#### 2.2 Feature Extraction
 
-The goal is for the Ring to confirm that the Hamming distance between the user's `F_T_new` and their historical model (represented by `F_T_previous`) is below a threshold `t`, without seeing either value.
+Raw sensor data is distilled into a 134-dimensional feature vector through three parallel extraction pipelines.
 
-**Pre-computation:** The user's `F_T_previous` is stored in their private vault, encrypted under a Paillier homomorphic encryption scheme: `Enc(F_T_previous)`.
+**Speaker features (44 dimensions).** The audio stream yields: fundamental frequency (F0) statistics and delta, jitter measures (local, RAP, PPQ5, DDP), shimmer measures (local, APQ3, APQ5, DDA), harmonics-to-noise ratio (HNR) statistics, formant frequency ratios (F1/F2, F2/F3) via LPC analysis, long-term average spectrum (LTAS) statistics (spectral centroid, rolloff, flatness, spread), voicing ratio, and amplitude statistics with entropy. These features characterize the physiological properties of the vocal tract and are stable within a speaker but vary across individuals.
 
-**The Protocol:**
-1.  **User's Preparation:** The user computes the bitwise XOR between new and previous fingerprints: `X = F_T_new ⊕ F_T_previous`. They encrypt each bit of `X` individually with the Paillier public key and distribute these encrypted bits among the Ring members using a secret sharing scheme.
-2.  **MPC-based Summation:** The Ring members engage in an MPC protocol. Leveraging the additive property of Paillier (`Enc(a) * Enc(b) = Enc(a+b)`), they collectively multiply the encrypted bits they hold to compute the encrypted sum of the bits, which is the encrypted Hamming distance: `Enc(HammingDistance)`.
-3.  **Threshold Check:** The members engage in a second MPC protocol (e.g., using Yao's Garbled Circuits) to perform a private comparison. The protocol takes `Enc(HammingDistance)` and a public `Enc(t)` as input and outputs a single shared bit, `b_result`, indicating if the distance is less than the threshold, without revealing the actual distance.
+Each speaker feature presents a distinct challenge to synthesis. F0 is trivial to match with text-to-speech engines. Formant ratios encode vocal tract geometry specific to each person. Jitter and shimmer measure involuntary micro-perturbations in pitch period and amplitude that TTS engines produce with unnaturally low or uniform values. HNR catches synthetic audio because TTS produces unnaturally clean signals without the breath noise present in real speech.
 
-#### **3.4. Validator Attestation: Anonymous Approval via Ring Signatures**
+**Kinematic features (54 dimensions).** On mobile devices with IMU and touch data available, pointer dynamics from finger tracing provide the kinematic features: path curvature, directional entropy, speed and acceleration profiles, jerk magnitude, micro-correction frequency, pause ratios, path efficiency, segment lengths, speed jitter variance, normalized path length, and angle autocorrelation. On desktop (no IMU), mouse pointer dynamics fill this role. Finger tracing has natural inter-session variance because no two paths are identical.
 
-If `b_result` is `1`, the Ring must attest to this on-chain.
-1.  **Message Creation:** The members agree on a standard validation message `M`, such as `M = "Validation(H_TBH_new, timestamp)"`.
-2.  **Ring Signature Generation:** The members of Ring `R` form a public key group. One member generates a **Ring Signature** `σ` for the message `M`.
-3.  **Transaction Broadcast:** The signature is broadcast to the blockchain. The smart contract can verify that `σ` is a valid signature from *some member* of the public key group `R`, but cannot determine which one, thus protecting the validators.
+**Touch features (36 dimensions).** Touch coordinate velocity and acceleration, pressure statistics, contact area statistics, path jerk, and per-signal jitter variance. These capture the fine motor control patterns of the user's interaction with the screen.
 
----
+**Feature fusion.** Each modality group is independently normalized to zero mean and unit variance (z-score normalization) before concatenation. This ensures each group contributes equally to the SimHash projection regardless of raw magnitude differences. A NaN sanitization step replaces any non-finite values with zero before normalization, preventing a single degenerate feature from poisoning the entire group.
 
-### **4. Pillar III: Game Theory and Economic Incentivization**
+#### 2.3 SimHash Fingerprinting
 
-#### **4.1. Objective**
+The 134-dimensional fused feature vector is compressed into a 256-bit Temporal Fingerprint (`F_T`) using SimHash, a locality-sensitive hashing algorithm. SimHash projects the feature vector onto 256 deterministic random hyperplanes (seeded from a fixed constant for reproducibility). Each bit of the fingerprint is the sign of the dot product between the feature vector and one hyperplane.
 
-To create a cryptoeconomic model that aligns the incentives of all participants with the long-term security of the protocol. The system must ensure that honest participation is profitable and that the cost of a successful attack is prohibitively high.
+Two fingerprints from the same person across different sessions will have a small Hamming distance (typically 20-65 bits out of 256 in our testing). Two fingerprints from different people will have a distance near 128 (random). A replayed fingerprint will have distance 0 (identical).
 
-#### **4.2. The IAM (IAM) Token**
+#### 2.4 Cryptographic Commitment
 
-The protocol's economic security is anchored by a native utility token, the **IAM (IAM) token**, used for:
-1.  **Staking for Eligibility:** Users must stake a minimum amount of IAM (`S_min`) to become validators, acting as collateral.
-2.  **Rewarding Honest Validation:** Validators receive rewards in IAM.
-3.  **Governance:** IAM holders vote on protocol parameter changes.
+The Temporal Fingerprint is private. To create a verifiable commitment without revealing the fingerprint, we compute:
 
-#### **4.3. Incentive Design: The Validation Cycle**
+```
+H_TBH = Poseidon(pack_lo(F_T), pack_hi(F_T), salt)
+```
 
-The economic cycle is designed as a closed loop. Users never pay — the integrating application (dApp, website, protocol) funds verifications.
-
-1.  **Integrator Deposit:** An integrating application deposits SOL, USDC, or staked IAM tokens into a protocol escrow to purchase verification capacity. This is analogous to how hCaptcha charges websites per verification, not end users.
-2.  **Relayer Submission:** When a user completes a verification, the IAM relayer submits the on-chain transaction using funds from the integrator's escrow. The user requires no wallet and pays no fees.
-3.  **The Fee Pool:** A margin on each verification (~$0.007 on a ~$0.01 fee) is collected into the protocol treasury.
-4.  **Reward Distribution:** The treasury periodically uses the fees to buy IAM from the open market, which is then distributed as rewards to honest validators. This creates constant buy pressure for IAM based on real-world utility.
-
-#### **4.4. Punishment Design: Slashing and Ejection**
-
-The stake `S_min` is the core of the punishment mechanism. Malicious behavior is detected via a probabilistic **"Audit Ring"** mechanism.
-
-1.  **Probabilistic Audits:** A small, random fraction (e.g., 0.5%) of all successful validations automatically triggers a secondary audit by a new, larger Anonymity Ring.
-2.  **Slashing Conditions:**
-    * **Disagreement (False Positive):** If the primary Ring approved a validation but the Audit Ring rejects it, all `n` members of the primary Ring have their `S_min` stake slashed. A portion of the slashed IAM is awarded to the Audit Ring members, incentivizing this "policing" work.
-    * **Non-Participation (Censorship):** A validator who fails to participate in a protocol within the time limit incurs a micro-slash, with repeated failures leading to full ejection.
+The fingerprint's 256 bits are packed into two 128-bit BN254 field elements. A cryptographically random 248-bit salt is generated per session. Poseidon is chosen for its efficiency inside ZK-SNARK circuits. The commitment `H_TBH` and salt are the outputs. The raw fingerprint `F_T` remains on the device.
 
 ---
 
-### **5. Pillar IV: The IAM Anchor - DID Architecture and Application Layer**
+### 3. ZK Verification
 
-#### **5.1. Objective**
+#### 3.1 The Hamming Distance Circuit
 
-To define the architecture of the IAM Protocol's Decentralized Identity (DID) component, the "IAM Anchor." This architecture must serve as a secure, private, and persistent root of trust for an individual's digital life. It needs to be an evolving entity that grows in trustworthiness over time, while providing a flexible interface for third-party applications (dApps) to verify claims without compromising user privacy.
+Re-verification requires proving that the current fingerprint is similar to (but not identical to) the previous one, without revealing either. We implement this as a Groth16 circuit (BN254 curve, ~1,996 constraints) that proves three statements:
 
-#### **5.2. The IAM Anchor: An Evolving DID**
+1. `Poseidon(pack(F_T_new), salt_new) == commitment_new`
+2. `Poseidon(pack(F_T_prev), salt_prev) == commitment_prev`
+3. `min_distance <= HammingDistance(F_T_new, F_T_prev) < threshold`
 
-The Anchor is implemented as a non-transferable token, adhering to modern standards for such assets. It is not a static certificate but a living record of an individual's proven temporal consistency. Its structure is a hybrid of on-chain and off-chain data.
+**Public inputs:** `commitment_new`, `commitment_prev`, `threshold`, `min_distance`
+**Private witnesses:** `F_T_new[256]`, `F_T_prev[256]`, `salt_new`, `salt_prev`
 
-**5.2.1. On-Chain Data Structure**
-The on-chain program for the Anchor stores only public, non-sensitive metadata. The implementation targets Solana (via the Anchor framework) using Program Derived Addresses (PDAs) for each identity, but the data model is chain-agnostic:
+The minimum distance constraint (`min_distance = 3`) prevents exact replay attacks. The threshold constraint (`threshold = 96`) rejects fingerprints from different people. The circuit computes Hamming distance via bitwise XOR and popcount, all expressed as R1CS constraints verified by the Groth16 verifier.
 
-**Anchor Data Fields:**
-- `creation_timestamp` (u64): When the identity was first minted
-- `last_verification_timestamp` (u64): Most recent successful verification
-- `verification_count` (u32): Total successful verifications
-- `trust_score` (u16): Computed reputation metric
-- `current_commitment` (bytes32): Latest Poseidon commitment H_TBH
-- `owner` (public key): The wallet that controls this identity
+#### 3.2 Proof Generation and On-Chain Verification
 
-The Anchor is implemented as a non-transferable token using SPL Token-2022 with a transfer hook that rejects all transfers. The PDA is derived from the owner's wallet public key, ensuring a one-to-one mapping between wallets and identities.
+Proof generation runs client-side in the browser using snarkjs (WASM). Proving takes under 1 second on modern hardware. The proof is serialized into 256 bytes (proof_a + proof_b + proof_c in the groth16-solana format) with 4 public inputs (32 bytes each).
 
-* **Trust Score (`trust_score`):** This key innovation is a numerical representation of the identity's reliability, calculated from its age, verification count, and the regularity of re-verifications. It incentivizes users to maintain their identity's "liveness."
+On-chain verification uses the `groth16-solana` crate, which implements the BN254 pairing check within Solana's compute budget (<200K compute units). The verification program:
 
-#### **5.2.2. Off-Chain Data (User's Private Data Vault)**
-The user's private data vault holds the sensitive information: the encrypted **Historical Consistency Model (`M_H`)**, past (`F_T`, `salt`) pairs, and any W3C-compliant Verifiable Credentials (VCs).
+1. Validates a challenge nonce (anti-replay, single-use, time-limited)
+2. Runs the Groth16 pairing check
+3. If valid, creates a VerificationResult PDA as an audit trail
+4. If invalid, reverts the entire transaction (challenge nonce preserved for retry)
 
-### **5.3. ZKP-Powered Application Layer**
-The utility of the Anchor is unlocked when dApps interact with it via Zero-Knowledge Proofs.
+#### 3.3 Trusted Setup
 
-**The Interaction Flow:**
-1.  **dApp Request:** A dApp requests proof of a claim (e.g., "Prove you are a unique human over 18").
-2.  **User's Wallet Generates Proof:** The user's wallet acts as the Prover, using on-chain and off-chain data to generate a ZK-SNARK.
-3.  **dApp Verifies Proof:** The dApp acts as the Verifier, confirming the proof's validity without learning any underlying private data.
-
-**Example ZKP Circuits (Proof Schemas):**
-* **Proof of Uniqueness:** Proves the user has a recent, valid Ring Signature attestation.
-* **Proof of Maturity:** Proves the Anchor's `creationTimestamp` is before a certain date.
-* **Proof of Trust:** Proves the Anchor's `trustScore` is above a certain threshold.
-
-### **5.4. Integrating with Verifiable Credentials (VCs)**
-The system is designed for seamless integration with third-party credentials.
-
-1.  **Issuance:** A trusted issuer (e.g., a government) issues a VC where the `credentialSubject` is the user's IAM Protocol DID.
-2.  **Storage:** The user stores this VC in their private vault.
-3.  **ZKP Generation about VCs:** The user can generate a single ZKP for a compound statement, such as `ZK.prove(user.is_unique() AND user.is_over_18())`. The dApp learns only that the user is compliant, not their specific identity or age.
+The Groth16 circuit requires a structured reference string produced by a trusted setup ceremony. Phase 1 uses the Hermez community Powers of Tau ceremony (multi-contributor, production-grade, circuit-agnostic). Phase 2 currently has a single contributor with entropy from system randomness. A multi-party computation ceremony with 10+ independent contributors will precede mainnet deployment. The toxic waste is compromised only if all contributors collude.
 
 ---
 
-### **6. Conclusion and Future Work**
-The IAM Protocol presents a comprehensive, multi-layered framework for a new generation of Proof-of-Humanity and Decentralized Identity. By shifting the paradigm from static secrets to dynamic, temporal consistency, it offers a path to resolving the fundamental trilemma of security, privacy, and accessibility in digital identity. The synthesis of behavioral biometrics, advanced cryptography (MPC, ZKPs, Ring Signatures), and robust cryptoeconomic incentives creates a resilient ecosystem where trust is not merely asserted but continuously earned and proven.
+### 4. The IAM Anchor
 
-The novelty of the framework is found in the specific, interlocking architecture of its pillars: the multi-modal hashing pipeline of the TBH, the privacy-preserving validation protocol of the Anonymity Ring, the probabilistic audit mechanism of the economic model, and the dynamic, evolving nature of the IAM Anchor.
+#### 4.1 On-Chain Identity
 
-**Future work will proceed along the following tracks:**
-* **Prototype Development:** Building a proof-of-concept implementation of the Liveness Interlock on mobile devices and smart contract deployment on a testnet.
-* **Performance Analysis:** Benchmarking the computational overhead of the MPC and ZKP circuits to ensure a smooth user experience.
-* **Security Audits:** Rigorous third-party audits of the cryptographic protocols and smart contracts to identify and mitigate potential vulnerabilities.
-* **Pilot Programs:** Partnering with DAOs, DeFi protocols, and Web3 social platforms to test the framework in real-world scenarios and gather feedback for further refinement.
+Each verified user receives a non-transferable identity token implemented as an SPL Token-2022 mint with the NonTransferable extension. The token is a Program Derived Address (PDA) derived from the user's wallet public key, enforcing a one-to-one mapping between wallets and identities.
 
-By building the IAM Protocol, we aim to provide a foundational public good for the next generation of the internet—an internet where digital identity is secure, self-sovereign, and fundamentally human.
+The identity state stores:
+
+| Field | Type | Purpose |
+|-------|------|---------|
+| `owner` | Pubkey | Wallet that controls this identity |
+| `creation_timestamp` | i64 | When the identity was first minted |
+| `last_verification_timestamp` | i64 | Most recent successful verification |
+| `verification_count` | u32 | Total successful verifications |
+| `trust_score` | u16 | Progressive reputation metric |
+| `current_commitment` | [u8; 32] | Latest Poseidon commitment |
+| `recent_timestamps` | [i64; 10] | Rolling window for Trust Score computation |
+
+#### 4.2 Progressive Trust Score
+
+The Trust Score rewards consistency over time, not rapid repetition. A bot verifying 100 times in one day scores lower than a human verifying weekly for months.
+
+The formula combines three components:
+
+1. **Recency-weighted verification count.** Each of the last 10 verification timestamps contributes `3000 / (30 + days_since)` to a recency score with a 30-day half-life. This is multiplied by a base increment from the protocol config.
+
+2. **Regularity bonus.** The standard deviation of gaps between consecutive verifications is computed. Lower variance (more regular spacing) yields a higher bonus, up to 20 points. Irregular bursts score zero.
+
+3. **Age bonus.** `isqrt(min(age_days, 365)) * 2`, where `isqrt` is deterministic integer square root (Newton's method, no floating point). Diminishing returns prevent gaming via old unused accounts.
+
+The score is capped at a protocol-configurable maximum (currently 10,000). Trust Score computation happens on-chain inside the `update_anchor` instruction, reading protocol parameters from a cross-program PDA. The caller cannot set an arbitrary score.
+
+#### 4.3 Walletless Mode
+
+The default verification flow requires no wallet. The user visits a website that embeds the Pulse SDK, completes a 12-second behavioral challenge, and receives a verification result. The ZK proof is submitted to a relayer service that builds and signs the on-chain transaction using funds from the integrating application's escrow deposit. The user's biometric fingerprint is stored locally (encrypted with AES-256-GCM, key in IndexedDB) for future re-verification.
+
+Wallet-connected mode exists for DeFi and DAO users who want self-custody. The user signs the verification transaction directly, mints their IAM Anchor, and builds an on-chain Trust Score.
 
 ---
 
-### **Addendum: v2 Implementation Architecture (March 2026)**
+### 5. Economic Model
 
-The v2 implementation introduces two significant architectural changes from the original framework described above, while preserving all mathematical foundations:
+#### 5.1 Participants
 
-**1. Target Chain: Solana**
-The protocol targets Solana as its primary deployment chain. Solana offers 100-1000x lower costs for identity operations ($0.001 for ZK verification vs $2-20 on Ethereum), sub-second finality, native Poseidon hashing support (`solana-poseidon`, `light-poseidon`), production-ready Groth16 verification (<200K compute units via `groth16-solana`), and a Rust-native development environment that unifies on-chain programs with the off-chain executor. The acute Sybil problem on Solana (98M monthly users, $370-500M extracted by MEV bots) provides immediate market demand.
+The protocol has three participant classes:
 
-**2. ZK Self-Proof Replacing MPC**
-The original Anonymity Ring MPC protocol (Section 3.3) — while theoretically sound — presents significant deployment challenges at consumer scale (latency, coordination, complexity). The v2 architecture replaces the MPC-based validation with a **ZK self-proof model**: the user's device generates a Groth16 zero-knowledge proof that their new TBH is within Hamming distance `t` of their previous TBH, without revealing either value. The on-chain verifier program checks only the proof — it never sees the TBH or any biometric data.
+**Users** pay nothing. Walletless mode requires no wallet, no SOL, no crypto knowledge. The integrating application funds the verification.
 
-This eliminates: the MPC coordination problem, peer-to-peer latency, Paillier encryption overhead, and Garbled Circuit complexity. The Anonymity Ring is preserved but its role is simplified to: (a) issuing challenge nonces (preventing replay), (b) vouching for verification witnesses, and (c) attesting on-chain via aggregate signature. Ring members no longer compute on biometric data.
+**Integrators** (websites, protocols, dApps) deposit SOL or USDC into a protocol escrow to purchase verification capacity at approximately $0.01 per verification. The protocol retains roughly 70% margin after Solana transaction costs ($0.003 per transaction). This is 10x cheaper than the cost of a single Sybil attack on an airdrop.
 
-The mathematical framework for the TBH (Section 2), the game-theoretic incentive model (Section 4), and the IAM Anchor DID architecture (Section 5) remain unchanged. See `IAM_V2_RESEARCH_AND_ANALYSIS.md` for the full strategic and technical rationale.
+**Validators** stake the IAM utility token to participate in the Anonymity Ring. Validators are selected via Switchboard VRF for each verification request. They issue challenge nonces, relay attestations, and earn staking rewards from protocol revenue.
 
-**3. Security Hardening (v2.1)**
-The v2.1 update adds four layers of bot resistance:
+#### 5.2 Revenue Cycle
 
-- **Minimum Hamming distance constraint**: The ZK circuit now enforces `min_distance <= HammingDistance(F_T_new, F_T_prev) < threshold`. Perfect replay (distance 0) and near-replay (distance 1-2) are rejected at the proof level. Real human behavioral drift produces 5-20 bits of natural variation between sessions.
+Integrator fees flow to the protocol treasury. The treasury buys IAM tokens on the open market and distributes them to active validators as staking rewards. This creates buy pressure proportional to real verification volume.
 
-- **Behavioral entropy scoring**: The feature extraction pipeline computes Shannon entropy per speaker feature (F0, HNR, amplitude) and jitter variance (variance of windowed jerk variance) for motion and touch axes. Real human data has moderate, fluctuating entropy. Synthetic data from TTS engines or scripted inputs produces suspiciously uniform distributions that shift the SimHash fingerprint away from the baseline.
+#### 5.3 Slashing
 
-- **Progressive Trust Score**: The Trust Score formula uses recency-weighted verification count (30-day decay half-life), regularity bonuses (consistent weekly verification scores higher than 100 verifications in one day), and diminishing-returns age bonus (sqrt scaling). The Anchor stores the last 10 verification timestamps for rolling computation.
+A probabilistic audit mechanism (0.5% of verifications) triggers secondary verification by an independent ring. If the primary ring approved a fraudulent verification, all ring members lose their staked tokens. Non-participation incurs progressive micro-slashing. Validators can unstake and recover their full stake when not under investigation.
 
-- **Per-session randomness**: Each verification generates a unique random phrase and Lissajous curve. No two sessions share the same challenge. The challenge elicits involuntary behavioral signatures (voice prosody, hand tremor, touch dynamics) rather than testing cognitive ability. A bot cannot precompute responses for an unknown prompt, and the behavioral entropy layers detect synthetic data regardless of challenge content.
+---
 
-- **Speaker feature resistance to synthesis**: Each audio feature presents a distinct challenge to synthetic replication. F0 (fundamental frequency) is trivial to match with text-to-speech engines. Formant ratios are harder because they encode vocal tract geometry specific to each individual. Jitter and shimmer are the strongest defenses: they measure involuntary micro-perturbations in pitch period and amplitude that TTS engines produce with unnaturally low or uniform values. HNR (harmonics-to-noise ratio) catches synthetic audio because TTS produces unnaturally clean signals without the breath noise present in real human speech. A generic bot fails on jitter, shimmer, and HNR. A sophisticated bot that models a specific person's vocal characteristics needs the target's F0, formant geometry, and realistic perturbation patterns simultaneously.
+### 6. Security Analysis
 
-- **Multi-modal fusion**: A bot must fake voice, motion (or mouse dynamics), and touch pressure in parallel. Spoofing one modality is feasible. Spoofing all three with consistent behavioral entropy across 12 seconds of simultaneous capture is not. The 134-dimensional feature vector (44 speaker + 54 motion/mouse + 36 touch) projects through SimHash into a 256-bit fingerprint where each bit depends on all modalities combined.
+#### 6.1 Replay Attacks
 
-These defenses do not claim cryptographic proof of humanness. They make Sybil attacks economically irrational by increasing the cost and time required to build and maintain fake identities at scale.
+The ZK circuit enforces `min_distance >= 3`. An exact replay (distance 0) or near-replay (distance 1-2) is rejected at the proof level. Challenge nonces are single-use and time-limited (5 minutes). A replayed proof with a consumed nonce fails before reaching the verifier.
+
+#### 6.2 Synthetic Data
+
+A bot must simultaneously fake voice prosody, motion dynamics, and touch pressure across 12 seconds of parallel capture. Spoofing one modality is feasible. Spoofing all three with consistent behavioral entropy is not. The 134-dimensional feature vector projects through SimHash into a 256-bit fingerprint where each bit depends on all modalities combined. TTS engines produce unnaturally low jitter and shimmer values. Scripted mouse movement lacks the directional entropy and micro-correction patterns of real cursor paths.
+
+#### 6.3 Sybil Attacks
+
+Each wallet maps to exactly one IAM Anchor (PDA derived from wallet public key). Creating multiple identities requires multiple wallets with independent behavioral profiles sustained across re-verifications. The Trust Score penalizes new accounts and irregular verification patterns. The economic cost of maintaining many fake identities with consistent behavioral drift exceeds the value extractable from most Sybil attacks.
+
+#### 6.4 Privacy
+
+Raw biometric data never leaves the user's device. The ZK proof is the only output. The biometric fingerprint stored locally for re-verification is encrypted with AES-256-GCM using a non-extractable CryptoKey in IndexedDB. On-chain, only the Poseidon commitment (a one-way hash) is stored. The commitment cannot be reversed to recover the fingerprint or any biometric feature.
+
+---
+
+### 7. Implementation Status
+
+The protocol is deployed on Solana devnet with end-to-end verification working in the browser on desktop and mobile.
+
+| Component | Status |
+|-----------|--------|
+| On-chain programs (Anchor/Rust) | 3 programs deployed on devnet. Access control, on-chain Trust Score, proof revert on failure. |
+| ZK circuit (Groth16/Circom) | Hamming distance circuit with min_distance. Trusted setup complete (single contributor, multi-party ceremony before mainnet). |
+| Pulse SDK (TypeScript) | Published on npm. Speaker features, kinematic extraction, SimHash, Poseidon commitment, Groth16 proving, encrypted localStorage. |
+| Executor node (Rust) | Live on Railway. Relayer API, rate limiting, quota tracking, commitment registry. |
+| Demo application (Next.js) | Live on Vercel. Walletless and wallet-connected verification flows. |
+
+52 unit tests cover feature extraction, circuit boundary cases, and the full crypto pipeline. The circuit has been verified manually against the JSON verification key. All programs pass Anchor integration tests.
+
+The Groth16 trusted setup uses a single-contributor Phase 2. A multi-contributor MPC ceremony will precede mainnet deployment. The Phase 1 Powers of Tau uses the Hermez community ceremony.
+
+---
+
+### 8. Related Work
+
+**Worldcoin** uses iris scanning to create a unique biometric identifier per person. The approach requires custom hardware (the Orb), stores a permanent biometric template (the iris code), and has been banned or restricted in 12+ jurisdictions over privacy concerns. IAM captures behavioral signals (not anatomical) that change over time and are processed entirely on-device.
+
+**BrightID** verifies uniqueness through social graph analysis. Users vouch for each other in verification parties. The system is vulnerable to coordinated collusion and requires social coordination that limits adoption.
+
+**Reclaim Protocol** proves ownership of existing web2 accounts via TLS session proofs. It answers "do you control this account?" not "are you human?" IAM and Reclaim are complementary: Reclaim proves account ownership, IAM proves the account owner is a living person.
+
+**hCaptcha** and similar CAPTCHA systems test cognitive ability. Modern AI solves most CAPTCHA variants faster than humans. CAPTCHAs verify task completion, not identity persistence across sessions.
+
+---
+
+### 9. Future Work
+
+**Multi-contributor trusted setup ceremony.** Coordinate 10+ independent contributors for the Groth16 Phase 2 ceremony before mainnet deployment. Publish the full transcript of contributions.
+
+**External security audit.** Engage a Solana-specialized auditing firm to review all on-chain programs, the ZK circuit, and the executor node before mainnet.
+
+**Integrator onboarding.** Build the integration SDK (`verifyHumanity()` wrapper), developer documentation site, and escrow deposit flow. Target pilot integrations with Solana DeFi and DAO protocols.
+
+**IAM utility token.** SPL Token-2022 with Confidential Balances extension. Validator staking, verification capacity tiers, and governance. Distribution: 40% community, 20% ecosystem grants, 15% treasury, 15% team (2-year vest), 10% initial liquidity.
+
+**AudioWorklet migration.** Replace the deprecated ScriptProcessorNode with AudioWorklet for lower-latency audio capture.
+
+**Cross-chain deployment.** Port the verification flow to Ethereum L2s after the Solana mainnet launch stabilizes.
+
+---
+
+### 10. Conclusion
+
+The IAM Protocol proves humanness through temporal biometric consistency. Each verification captures the involuntary behavioral signature of voice, motion, and touch, compresses it into a fingerprint via SimHash, and proves similarity to a previous session via a Groth16 zero-knowledge proof. The raw biometric data stays on the device. The proof is verified on Solana. Trust builds with every re-verification.
+
+The protocol is open source and published as a defensive publication to establish prior art. The source code, circuit definitions, and SDK are available at `github.com/iam-protocol`.
+
+---
+
+### References
+
+[1] Douceur, J. R. "The Sybil Attack." IPTPS, 2002.
+[2] Charikar, M. S. "Similarity estimation techniques from rounding algorithms." STOC, 2002.
+[3] Grassi, L., et al. "Poseidon: A New Hash Function for Zero-Knowledge Proof Systems." USENIX Security, 2021.
+[4] Groth, J. "On the Size of Pairing-Based Non-interactive Arguments." EUROCRYPT, 2016.
+[5] Boneh, D., et al. "Verifiable Random Functions." FOCS, 1999.

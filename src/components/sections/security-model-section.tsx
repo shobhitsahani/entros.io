@@ -27,7 +27,7 @@ const DEFENSES = [
   {
     title: "Multi-Modal Capture",
     description:
-      "Three independent sensor streams record in parallel: microphone, accelerometer, and touch digitizer. A bot needs to fake realistic voice, tremor, and touch pressure simultaneously. Spoofing one modality is feasible. Spoofing all three with consistent behavioral entropy is not.",
+      "Three independent sensor streams record in parallel: microphone, pointer/touch digitizer, and device motion (where available). A bot needs to fake realistic voice, tremor, and touch pressure simultaneously. Spoofing one modality is feasible. Spoofing all three with consistent behavioral entropy is not.",
   },
   {
     title: "Economic Disincentives",
@@ -46,7 +46,7 @@ const MODES = [
   {
     title: "Walletless",
     description:
-      "No wallet, no crypto knowledge needed. The Pulse SDK captures your behavioral data, generates a proof, and the IAM relayer submits it on-chain. Proves 'a human is here right now' but does not build persistent identity. Works as a drop-in captcha replacement.",
+      "No wallet, no crypto knowledge needed. The Pulse SDK captures your behavioral data, generates a proof, and the IAM relayer submits it on-chain. Stores the behavioral fingerprint locally (encrypted) for re-verification but does not create an on-chain identity Anchor. Works as a drop-in captcha replacement.",
     accent: "solana-purple",
   },
 ];
