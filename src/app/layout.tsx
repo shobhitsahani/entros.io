@@ -18,12 +18,25 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://iam-human.io"),
   title: {
     default: "IAM Protocol — Proof of Humanity on Solana",
     template: "%s | IAM Protocol",
   },
   description:
     "Prove you're human without revealing who you are. Solana-native identity verification through behavioral liveness — not iris scans, not selfies, not social graphs.",
+  icons: {
+    icon: [
+      { url: "/favicons/icon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicons/icon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicons/icon-48x48.png", sizes: "48x48", type: "image/png" },
+      { url: "/favicons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/favicons/icon-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/favicons/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
   openGraph: {
     title: "IAM Protocol — Proof of Humanity on Solana",
     description:
