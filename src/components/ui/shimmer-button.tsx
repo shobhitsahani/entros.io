@@ -41,6 +41,7 @@ const ShimmerButton = React.forwardRef<HTMLButtonElement, ShimmerButtonProps>(
         className={cn(
           "group relative z-0 flex cursor-pointer items-center justify-center overflow-hidden whitespace-nowrap border border-foreground/15 px-6 py-3 text-foreground [background:var(--bg)] [border-radius:var(--radius)]",
           "transform-gpu transition-transform duration-300 ease-in-out active:translate-y-px",
+          "disabled:opacity-50 disabled:cursor-not-allowed disabled:active:translate-y-0",
           className
         )}
         ref={ref}
@@ -53,8 +54,8 @@ const ShimmerButton = React.forwardRef<HTMLButtonElement, ShimmerButtonProps>(
             "inset-0 absolute size-full",
             "rounded-[inherit] shadow-[inset_0_-8px_10px_#ffffff1f]",
             "transition-shadow duration-300 ease-in-out",
-            "group-hover:shadow-[inset_0_-6px_10px_#ffffff3f]",
-            "group-active:shadow-[inset_0_-10px_10px_#ffffff3f]"
+            "group-[:not(:disabled)]:hover:shadow-[inset_0_-6px_10px_#ffffff3f]",
+            "group-[:not(:disabled)]:active:shadow-[inset_0_-10px_10px_#ffffff3f]"
           )}
         />
 

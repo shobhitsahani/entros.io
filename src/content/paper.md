@@ -3,7 +3,7 @@
 **Document Version:** 3.0 (Updated for Solana / ZK Self-Proof Architecture)
 **Original Date:** June 27, 2025
 **Updated:** March 26, 2026
-**Word Count:** Approx. 5000
+**Word Count:** Approx. 3200
 
 ---
 

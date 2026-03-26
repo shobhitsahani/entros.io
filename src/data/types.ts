@@ -39,12 +39,18 @@ export interface VerificationStep {
   icon: string;
 }
 
+export interface ProtocolComponentLink {
+  label: string;
+  href: string;
+}
+
 export interface ProtocolComponent {
   icon: string;
   title: string;
   subtitle: string;
   description: string;
   highlights: string[];
+  links?: ProtocolComponentLink[];
 }
 
 export interface PrivacyGuarantee {

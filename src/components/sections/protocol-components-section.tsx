@@ -15,14 +15,14 @@ export function ProtocolComponentsSection() {
       </TextShimmer>
 
       <h2 className="mt-6 font-sans text-2xl font-semibold text-foreground md:text-3xl">
-        Three layers, one proof
+        Four layers, one proof
       </h2>
 
-      <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3">
+      <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2">
         {protocolComponents.map((component) => {
           const Icon = getIcon(component.icon);
           return (
-            <GlowCard key={component.title}>
+            <GlowCard key={component.title} className="flex flex-col">
               <Icon
                 className="mb-4 h-8 w-8 text-foreground/50"
                 strokeWidth={1.5}
@@ -47,6 +47,22 @@ export function ProtocolComponentsSection() {
                   </li>
                 ))}
               </ul>
+              {component.links && component.links.length > 0 && (
+                <div className="mt-6 pt-4 border-t border-border flex gap-4">
+                  {component.links.map((link) => (
+                    <a
+                      key={link.href}
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-sm text-foreground/50 transition-colors hover:text-foreground"
+                    >
+                      {link.label}
+                      <span className="text-xs" aria-hidden="true">↗</span>
+                    </a>
+                  ))}
+                </div>
+              )}
             </GlowCard>
           );
         })}

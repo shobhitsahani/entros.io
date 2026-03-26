@@ -41,13 +41,11 @@ const MODES = [
     title: "Wallet-Connected",
     description:
       "Connect a Solana wallet. Your IAM Anchor (non-transferable token) is tied to that wallet. Behavioral fingerprint stored on your device, commitment stored on-chain. Trust Score accumulates over time. This is the persistent identity that integrators check.",
-    accent: "cyan",
   },
   {
     title: "Walletless",
     description:
       "No wallet, no crypto knowledge needed. The Pulse SDK captures your behavioral data, generates a proof, and the IAM relayer submits it on-chain. Stores the behavioral fingerprint locally (encrypted) for re-verification but does not create an on-chain identity Anchor. Works as a drop-in captcha replacement.",
-    accent: "solana-purple",
   },
 ];
 
@@ -100,7 +98,7 @@ export function SecurityModelSection() {
         <div className="mt-8 grid gap-6 md:grid-cols-2">
           {MODES.map((m) => (
             <GlowCard key={m.title}>
-              <p className={`font-mono text-base font-semibold text-${m.accent}`}>
+              <p className="font-mono text-base font-semibold text-foreground">
                 {m.title}
               </p>
               <p className="mt-3 text-sm text-foreground/70 leading-relaxed">

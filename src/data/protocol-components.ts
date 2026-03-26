@@ -13,6 +13,10 @@ export const protocolComponents: ProtocolComponent[] = [
       "On-device Groth16 proof generation",
       "Walletless mode (relayer) and wallet-connected mode",
     ],
+    links: [
+      { label: "GitHub", href: "https://github.com/iam-protocol/pulse-sdk" },
+      { label: "npm", href: "https://www.npmjs.com/package/@iam-protocol/pulse-sdk" },
+    ],
   },
   {
     icon: "proof",
@@ -26,10 +30,13 @@ export const protocolComponents: ProtocolComponent[] = [
       "Under 200K compute units on-chain",
       "Proof generation targets under 5 seconds on mobile",
     ],
+    links: [
+      { label: "GitHub", href: "https://github.com/iam-protocol/circuits" },
+    ],
   },
   {
     icon: "anchor",
-    title: "On-Chain Verifier",
+    title: "On-Chain Programs",
     subtitle: "Three Solana programs",
     description:
       "The iam-verifier program checks ZK proofs. The iam-anchor program manages non-transferable identity tokens (SPL Token-2022). The iam-registry tracks Trust Scores, validator staking, and protocol configuration.",
@@ -38,6 +45,25 @@ export const protocolComponents: ProtocolComponent[] = [
       "Non-transferable token via Token-2022 extension",
       "Trust Score from verification count and age",
       "PDA-derived identity (one per wallet)",
+    ],
+    links: [
+      { label: "GitHub", href: "https://github.com/iam-protocol/protocol-core" },
+    ],
+  },
+  {
+    icon: "server",
+    title: "Executor Node",
+    subtitle: "Off-chain validation service",
+    description:
+      "A Rust service that listens for on-chain verification events, issues challenges, relays attestations, and manages the Anonymity Ring. Handles walletless transaction submission via the relayer API.",
+    highlights: [
+      "Solana RPC subscription via geyser/websocket",
+      "Challenge issuance and attestation relay",
+      "Walletless relayer for integrator-funded transactions",
+      "Configurable CORS and rate limiting",
+    ],
+    links: [
+      { label: "GitHub", href: "https://github.com/iam-protocol/executor-node" },
     ],
   },
 ];

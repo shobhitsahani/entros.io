@@ -6,6 +6,7 @@ import { ProtocolComponentsSection } from "@/components/sections/protocol-compon
 import { PrivacySection } from "@/components/sections/privacy-section";
 import { SecurityModelSection } from "@/components/sections/security-model-section";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
+import { VerificationOrb } from "@/components/ui/verification-orb";
 
 export const metadata: Metadata = {
   title: "Technology",
@@ -20,6 +21,7 @@ export default function Technology() {
         title="How It Works"
         subtitle="The full verification pipeline, end to end."
       />
+      <VerificationOrb />
       <VerificationTimelineSection />
       <ProtocolComponentsSection />
       <PrivacySection />
@@ -30,10 +32,10 @@ export default function Technology() {
           Zero data. On-chain proof.
         </p>
         <div className="mt-8 flex justify-center">
-          <Link href="/verify">
+          <Link href="/solutions">
             <ShimmerButton className="text-sm font-medium lg:text-base">
               <span className="flex items-center gap-2">
-                Try the Demo
+                See Use Cases
                 <span aria-hidden="true">→</span>
               </span>
             </ShimmerButton>

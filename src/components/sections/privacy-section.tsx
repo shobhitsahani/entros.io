@@ -23,7 +23,7 @@ export function PrivacySection() {
           return (
             <div
               key={guarantee.title}
-              className="flex gap-4 border-l-2 border-border pl-6 transition-colors hover:border-cyan"
+              className="flex gap-4"
             >
               <Icon
                 className="mt-0.5 h-5 w-5 shrink-0 text-foreground/50"

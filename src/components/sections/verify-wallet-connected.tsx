@@ -40,6 +40,8 @@ export function VerifyWalletConnected({
   const sessionRef = useRef<PulseSession | null>(null);
   const [audioLevel, setAudioLevel] = useState(0);
   const [hasMotion, setHasMotion] = useState(false);
+  const [requesting, setRequesting] = useState(false);
+  const startingRef = useRef(false);
   const voicedFramesRef = useRef(0);
 
   useEffect(() => {
@@ -47,54 +49,63 @@ export function VerifyWalletConnected({
   }, []);
 
   async function handleStart() {
-    voicedFramesRef.current = 0;
+    if (startingRef.current) return;
+    startingRef.current = true;
+    setRequesting(true);
 
-    const session = pulse.createSession(touchRef.current ?? document.body);
-    sessionRef.current = session;
+    try {
+      voicedFramesRef.current = 0;
 
-    // Motion first — DeviceMotionEvent.requestPermission() requires an active
-    // user gesture on iOS. getUserMedia does not. If audio goes first, the gesture
-    // token is consumed by the mic dialog and motion is silently denied.
-    if (hasMotion) {
-      try {
-        await session.startMotion();
-        if (!session.isMotionCapturing()) {
+      const session = pulse.createSession(touchRef.current ?? document.body);
+      sessionRef.current = session;
+
+      // Motion first — DeviceMotionEvent.requestPermission() requires an active
+      // user gesture on iOS. getUserMedia does not. If audio goes first, the gesture
+      // token is consumed by the mic dialog and motion is silently denied.
+      if (hasMotion) {
+        try {
+          await session.startMotion();
+          if (!session.isMotionCapturing()) {
+            dispatch({
+              type: "VERIFICATION_FAILED",
+              error: "Motion permission denied. Please allow motion access and try again.",
+            });
+            return;
+          }
+        } catch {
           dispatch({
             type: "VERIFICATION_FAILED",
             error: "Motion permission denied. Please allow motion access and try again.",
           });
           return;
         }
+      } else {
+        session.skipMotion();
+      }
+
+      // Audio second — getUserMedia works without a gesture on secure origins
+      try {
+        let audioFrameCount = 0;
+        await session.startAudio((rms) => {
+          if (rms > 0.008) voicedFramesRef.current++;
+          audioFrameCount++;
+          if (audioFrameCount % 2 === 0) setAudioLevel(rms);
+        });
       } catch {
         dispatch({
           type: "VERIFICATION_FAILED",
-          error: "Motion permission denied. Please allow motion access and try again.",
+          error: "Microphone access denied. Please allow microphone permission and try again.",
         });
         return;
       }
-    } else {
-      session.skipMotion();
+
+      session.startTouch().catch(() => session.skipTouch());
+
+      dispatch({ type: "START_CAPTURE" });
+    } finally {
+      startingRef.current = false;
+      setRequesting(false);
     }
-
-    // Audio second — getUserMedia works without a gesture on secure origins
-    try {
-      let audioFrameCount = 0;
-      await session.startAudio((rms) => {
-        if (rms > 0.008) voicedFramesRef.current++;
-        audioFrameCount++;
-        if (audioFrameCount % 2 === 0) setAudioLevel(rms);
-      });
-    } catch {
-      dispatch({
-        type: "VERIFICATION_FAILED",
-        error: "Microphone access denied. Please allow microphone permission and try again.",
-      });
-      return;
-    }
-
-    session.startTouch().catch(() => session.skipTouch());
-
-    dispatch({ type: "START_CAPTURE" });
   }
 
   async function handleCaptureComplete() {
@@ -107,8 +118,13 @@ export function VerifyWalletConnected({
 
     dispatch({ type: "CAPTURE_DONE" });
 
-    session
-      .complete(wallet?.adapter, connection)
+    const PROOF_TIMEOUT_MS = 60_000;
+    const proofPromise = session.complete(wallet?.adapter, connection);
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("Proof generation timed out. Please try again.")), PROOF_TIMEOUT_MS)
+    );
+
+    Promise.race([proofPromise, timeoutPromise])
       .then((result) => {
         dispatch({ type: "PROOF_COMPLETE" });
         if (result.success) {
@@ -182,8 +198,8 @@ export function VerifyWalletConnected({
           )}
         </div>
         <div className="flex justify-center">
-          <ShimmerButton className="text-sm font-medium" onClick={handleStart}>
-            Start Verification
+          <ShimmerButton className="text-sm font-medium" onClick={handleStart} disabled={requesting}>
+            {requesting ? "Requesting access..." : "Start Verification"}
           </ShimmerButton>
         </div>
         <p className="text-center text-xs text-muted">
