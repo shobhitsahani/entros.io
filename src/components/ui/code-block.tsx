@@ -31,7 +31,7 @@ function tokenizeLine(line: string): React.ReactNode[] {
     // Comments
     if (line.slice(i, i + 2) === "//") {
       tokens.push(
-        <span key={i} className="text-muted">
+        <span key={i} className="text-[#9090A0]">
           {line.slice(i)}
         </span>
       );
@@ -68,7 +68,7 @@ function tokenizeLine(line: string): React.ReactNode[] {
       const nextNonSpace = line.slice(end).match(/^(\s*)\(/);
       if (nextNonSpace) {
         tokens.push(
-          <span key={i} className="text-solana-purple">
+          <span key={i} className="text-[#C084FC]">
             {word}
           </span>
         );
