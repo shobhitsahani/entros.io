@@ -25,9 +25,10 @@ export function HeroSection() {
 
         <GlassPanel className="mx-auto mt-10 max-w-2xl rounded-2xl px-8 py-6">
           <p className="text-base text-foreground/80 leading-relaxed md:text-lg">
-            Voice, motion, and touch. Hashed into a ZK proof on
-            your device. Raw biometric data never leaves. Trust that
-            grows with every verification. Verified on Solana.
+            Proof of humanity through voice, motion, and touch. Hashed
+            into a ZK proof on your device. Raw biometric data never
+            leaves. Trust that grows with every verification. Verified
+            on Solana.
           </p>
           <div className="mt-6 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link href="/verify">
