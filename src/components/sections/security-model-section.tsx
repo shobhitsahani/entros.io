@@ -56,7 +56,7 @@ export function SecurityModelSection() {
     <section className="mx-auto max-w-5xl px-6 py-20">
       <TextShimmer
         as="span"
-        className="font-mono text-sm tracking-widest uppercase"
+        className="font-mono text-base tracking-widest uppercase"
         duration={3}
       >
         {"// SECURITY MODEL"}
@@ -87,7 +87,7 @@ export function SecurityModelSection() {
       <div className="mt-16">
         <TextShimmer
           as="span"
-          className="font-mono text-sm tracking-widest uppercase"
+          className="font-mono text-base tracking-widest uppercase"
           duration={3}
         >
           {"// VERIFICATION MODES"}

@@ -5,7 +5,7 @@ export const features: Feature[] = [
     icon: "pulse",
     title: "The Pulse",
     description:
-      "Voice, motion, and touch captured simultaneously on your device. A unique random challenge each session.",
+      "Voice, motion, and touch is captured simultaneously on your device. A unique random challenge each session.",
     benefit:
       "Behavioral entropy scoring detects synthetic data patterns. Raw data never leaves your device.",
   },

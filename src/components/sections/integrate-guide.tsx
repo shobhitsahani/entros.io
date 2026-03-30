@@ -21,7 +21,7 @@ export function IntegrateGuide() {
       <section>
         <TextShimmer
           as="span"
-          className="font-mono text-sm tracking-widest uppercase"
+          className="font-mono text-base tracking-widest uppercase"
           duration={3}
         >
           {"// QUICK START"}
@@ -54,7 +54,7 @@ export function IntegrateGuide() {
       <section>
         <TextShimmer
           as="span"
-          className="font-mono text-sm tracking-widest uppercase"
+          className="font-mono text-base tracking-widest uppercase"
           duration={3}
         >
           {"// CONFIGURATION"}
@@ -95,7 +95,7 @@ export function IntegrateGuide() {
       <section>
         <TextShimmer
           as="span"
-          className="font-mono text-sm tracking-widest uppercase"
+          className="font-mono text-base tracking-widest uppercase"
           duration={3}
         >
           {"// PRICING"}
@@ -117,7 +117,7 @@ export function IntegrateGuide() {
       <section>
         <TextShimmer
           as="span"
-          className="font-mono text-sm tracking-widest uppercase"
+          className="font-mono text-base tracking-widest uppercase"
           duration={3}
         >
           {"// ABUSE PREVENTION"}

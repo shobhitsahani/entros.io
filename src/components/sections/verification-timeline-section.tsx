@@ -33,7 +33,7 @@ export function VerificationTimelineSection() {
       <div className="mx-auto max-w-2xl text-center">
         <TextShimmer
           as="span"
-          className="font-mono text-sm tracking-widest uppercase"
+          className="font-mono text-base tracking-widest uppercase"
           duration={3}
         >
           {"// VERIFICATION FLOW"}

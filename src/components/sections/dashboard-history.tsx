@@ -42,7 +42,7 @@ export function DashboardHistory() {
     <section className="mt-12">
       <TextShimmer
         as="span"
-        className="font-mono text-sm tracking-widest uppercase"
+        className="font-mono text-base tracking-widest uppercase"
         duration={3}
       >
         {"// VERIFICATION HISTORY"}
