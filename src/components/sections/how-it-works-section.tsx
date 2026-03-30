@@ -20,13 +20,13 @@ export function HowItWorksSection() {
           return (
             <GlowCard key={feature.title}>
               <Icon className="mb-6 h-8 w-8 text-foreground/50" strokeWidth={1.5} />
-              <h3 className="mb-3 font-sans text-xl font-semibold text-foreground">
+              <h2 className="mb-3 font-sans text-xl font-semibold text-foreground">
                 {feature.title}
-              </h3>
+              </h2>
               <p className="text-sm leading-relaxed text-foreground/60">
                 {feature.description}
               </p>
-              <p className="mt-4 text-sm text-foreground/40">
+              <p className="mt-4 text-sm text-foreground/60">
                 {feature.benefit}
               </p>
             </GlowCard>

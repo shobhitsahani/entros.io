@@ -123,9 +123,9 @@ export function IntegrateGuide() {
           {"// ABUSE PREVENTION"}
         </TextShimmer>
 
-        <h3 className="mt-4 font-mono text-xl font-bold text-foreground">
+        <h2 className="mt-4 font-mono text-xl font-bold text-foreground">
           Your escrow, your rules.
-        </h3>
+        </h2>
         <p className="mt-3 text-sm text-foreground/70 leading-relaxed max-w-2xl">
           Walletless mode follows the same model as reCAPTCHA Enterprise and
           hCaptcha: the integrator pays per verification, not the user. You
