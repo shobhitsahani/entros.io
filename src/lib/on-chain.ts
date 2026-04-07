@@ -17,10 +17,14 @@ export function commitmentBytesToHex(bytes: Uint8Array): string {
   );
 }
 
+// Anchor discriminator for VerificationResult account, base58 encoded.
+// sha256("account:VerificationResult")[0..8] = [104,111,80,172,219,191,162,38]
+const VERIFICATION_RESULT_DISC_B58 = "JU9cxeSQjfT";
+
 /**
  * Fetch VerificationResult PDAs from iam-verifier program.
- * Filters by verifier pubkey at offset 8 (after Anchor discriminator).
- * Account layout: 8 (disc) + 32 (verifier) + 32 (proof_hash) + 8 (verified_at) + 1 (is_valid)
+ * Filters by discriminator (to exclude Challenge accounts) and verifier pubkey.
+ * Account layout: 8 (disc) + 32 (verifier) + 32 (proof_hash) + 8 (verified_at) + 1 (is_valid) + 32 (nonce) + 1 (bump)
  */
 export async function fetchVerificationHistory(
   walletPubkey: string,
@@ -30,6 +34,7 @@ export async function fetchVerificationHistory(
 
   const accounts = await connection.getProgramAccounts(verifierProgramId, {
     filters: [
+      { memcmp: { offset: 0, bytes: VERIFICATION_RESULT_DISC_B58 } },
       { memcmp: { offset: 8, bytes: walletPubkey } },
     ],
   });
@@ -44,8 +49,8 @@ export async function fetchVerificationHistory(
     const proofHash = data.slice(40, 72);
     // verified_at: i64 at offset 72
     const verifiedAt = Number(data.readBigInt64LE(72));
-    // is_valid: bool at offset 80
-    const isValid = data[80] === 1;
+    // is_valid is always true for persisted VerificationResults (invalid proofs revert the tx)
+    const isValid = true;
 
     entries.push({
       id: pubkey.toBase58(),

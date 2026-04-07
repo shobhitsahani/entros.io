@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useConnection } from "@solana/wallet-adapter-react";
-import { fetchIdentityState, type IdentityState } from "@iam-protocol/pulse-sdk";
+import { type IdentityState, PROGRAM_IDS } from "@iam-protocol/pulse-sdk";
+import { PublicKey } from "@solana/web3.js";
 import { WalletConnectButton } from "@/components/ui/wallet-connect-button";
 import { GlowCard } from "@/components/ui/glow-card";
 import { commitmentBytesToHex } from "@/lib/on-chain";
@@ -27,7 +28,7 @@ function formatDate(unixSeconds: number): string {
 }
 
 export function DashboardAnchorView() {
-  const { publicKey, connected } = useWallet();
+  const { publicKey, connected, disconnect } = useWallet();
   const { connection } = useConnection();
   const [identity, setIdentity] = useState<IdentityState | null>(null);
   const [loading, setLoading] = useState(false);
@@ -40,8 +41,42 @@ export function DashboardAnchorView() {
     }
     setLoading(true);
     setError(null);
-    fetchIdentityState(publicKey.toBase58(), connection)
-      .then((state) => setIdentity(state))
+
+    // Direct account read with manual deserialization (avoids IDL fetch issues)
+    const programId = new PublicKey(PROGRAM_IDS.iamAnchor);
+    const [identityPda] = PublicKey.findProgramAddressSync(
+      [new TextEncoder().encode("identity"), publicKey.toBuffer()],
+      programId
+    );
+
+    connection.getAccountInfo(identityPda)
+      .then((account: { data: Uint8Array } | null) => {
+        if (!account || account.data.length < 62) {
+          setIdentity(null);
+          return;
+        }
+        const data = account.data;
+        const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
+
+        // IdentityState layout: 8 disc + 32 owner + 8 creation + 8 lastVerif + 4 count + 2 trust + 32 commitment + 32 mint
+        const creationTimestamp = Number(view.getBigInt64(40, true));
+        const lastVerificationTimestamp = Number(view.getBigInt64(48, true));
+        const verificationCount = view.getUint32(56, true);
+        const trustScore = view.getUint16(60, true);
+        const currentCommitment = new Uint8Array(data.slice(62, 94));
+        const mintBytes = data.slice(94, 126);
+        const mintPubkey = new PublicKey(mintBytes);
+
+        setIdentity({
+          owner: publicKey.toBase58(),
+          creationTimestamp,
+          lastVerificationTimestamp,
+          verificationCount,
+          trustScore,
+          currentCommitment,
+          mint: mintPubkey.toBase58(),
+        });
+      })
       .catch(() => setError("Failed to fetch identity state"))
       .finally(() => setLoading(false));
   }, [publicKey, connected, connection]);
@@ -65,10 +100,33 @@ export function DashboardAnchorView() {
     );
   }
 
+  const truncatedAddress = publicKey
+    ? `${publicKey.toBase58().slice(0, 4)}...${publicKey.toBase58().slice(-4)}`
+    : "";
+
+  const walletBadge = (
+    <div className="flex justify-center mb-6">
+      <div className="inline-flex items-center gap-2 rounded-full border border-cyan/30 bg-cyan/5 px-4 py-1.5">
+        <span className="h-2 w-2 rounded-full bg-cyan animate-pulse" />
+        <span className="font-mono text-xs text-cyan">{truncatedAddress}</span>
+        <button
+          onClick={() => disconnect()}
+          className="ml-1 text-xs text-foreground/40 hover:text-foreground transition-colors"
+          aria-label="Disconnect wallet"
+        >
+          &times;
+        </button>
+      </div>
+    </div>
+  );
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-16">
-        <Loader2 className="h-8 w-8 text-cyan animate-spin" />
+      <div className="py-16">
+        {walletBadge}
+        <div className="flex items-center justify-center">
+          <Loader2 className="h-8 w-8 text-cyan animate-spin" />
+        </div>
       </div>
     );
   }
@@ -76,6 +134,7 @@ export function DashboardAnchorView() {
   if (error) {
     return (
       <div className="mx-auto max-w-md text-center space-y-4 py-12">
+        {walletBadge}
         <ShieldAlert className="mx-auto h-10 w-10 text-danger" strokeWidth={1.5} />
         <p className="text-sm text-muted">{error}</p>
       </div>
@@ -85,6 +144,7 @@ export function DashboardAnchorView() {
   if (!identity) {
     return (
       <div className="mx-auto max-w-md text-center space-y-6 py-12">
+        {walletBadge}
         <ShieldAlert className="mx-auto h-12 w-12 text-muted" strokeWidth={1.5} />
         <div>
           <p className="font-sans text-xl font-semibold text-foreground">
@@ -105,6 +165,8 @@ export function DashboardAnchorView() {
   }
 
   return (
+    <div>
+      {walletBadge}
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
       <GlowCard className="lg:col-span-1">
         <div className="flex flex-col items-center text-center">
@@ -120,9 +182,14 @@ export function DashboardAnchorView() {
               style={{ width: `${Math.min(identity.trustScore, 100)}%` }}
             />
           </div>
-          <p className="mt-2 text-xs text-muted">
-            {identity.trustScore > 0 ? "Active" : "Pending"}
-          </p>
+          {identity.trustScore > 0 ? (
+            <p className="mt-2 text-xs text-muted">Active</p>
+          ) : (
+            <div className="mt-3 text-xs text-muted max-w-[200px]">
+              <p className="text-cyan font-mono">Baseline established</p>
+              <p className="mt-1">Re-verify to start building your Trust Score. Each session that matches your behavioral pattern increases it.</p>
+            </div>
+          )}
         </div>
       </GlowCard>
 
@@ -133,7 +200,7 @@ export function DashboardAnchorView() {
               Verifications
             </p>
             <p className="mt-1 text-2xl font-mono font-bold text-foreground">
-              {identity.verificationCount}
+              {identity.verificationCount + 1}
             </p>
           </div>
           <div>
@@ -174,6 +241,7 @@ export function DashboardAnchorView() {
           </Link>
         </div>
       </GlowCard>
+    </div>
     </div>
   );
 }
