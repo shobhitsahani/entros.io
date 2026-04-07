@@ -9,9 +9,7 @@ import { TextShimmer } from "@/components/ui/text-shimmer";
 import { Loader2, ShieldAlert } from "lucide-react";
 
 // sha256("account:IdentityState")[0..8] encoded as base58
-// bytes: [73,186,21,193,70,120,104,118] → base58: "9mBcaGnRqsK"
-// Computed offline matching the Anchor discriminator convention used in on-chain.ts
-const IDENTITY_STATE_DISC_B58 = "9mBcaGnRqsK";
+const IDENTITY_STATE_DISC_B58 = "T7d2447Yv5U";
 
 interface OnChainStats {
   totalAnchors: number;
