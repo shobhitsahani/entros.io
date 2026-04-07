@@ -1,6 +1,6 @@
 "use client";
 
-import { integrationSnippets } from "@/data/integration-snippets";
+import { integrationSnippets, useCaseSnippets } from "@/data/integration-snippets";
 import { CodeBlock } from "@/components/ui/code-block";
 import { GlowCard } from "@/components/ui/glow-card";
 import { TextShimmer } from "@/components/ui/text-shimmer";
@@ -46,6 +46,28 @@ export function IntegrateGuide() {
               </p>
               <p className="text-sm text-muted mb-4">{snippet.description}</p>
               <CodeBlock code={snippet.code}  />
+            </GlowCard>
+          ))}
+        </div>
+      </section>
+
+      <section>
+        <TextShimmer
+          as="span"
+          className="font-mono text-base tracking-widest uppercase"
+          duration={3}
+        >
+          {"// USE CASES"}
+        </TextShimmer>
+
+        <div className="mt-6 grid gap-6 lg:grid-cols-2">
+          {useCaseSnippets.map((snippet) => (
+            <GlowCard key={snippet.title} className={snippet.title === "Display verification status" ? "lg:col-span-2" : ""}>
+              <p className="font-mono text-base font-semibold text-foreground mb-1">
+                {snippet.title}
+              </p>
+              <p className="text-sm text-muted mb-4">{snippet.description}</p>
+              <CodeBlock code={snippet.code} />
             </GlowCard>
           ))}
         </div>
