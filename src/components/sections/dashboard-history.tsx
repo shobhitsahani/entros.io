@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useConnection } from "@solana/wallet-adapter-react";
+import { PublicKey } from "@solana/web3.js";
+import { PROGRAM_IDS } from "@iam-protocol/pulse-sdk";
 import { TextShimmer } from "@/components/ui/text-shimmer";
-import { fetchVerificationHistory, type VerificationHistoryEntry } from "@/lib/on-chain";
-import { CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { CheckCircle, Loader2, Fingerprint } from "lucide-react";
 
 function formatTimestamp(unixSeconds: number): string {
   return new Date(unixSeconds * 1000).toLocaleDateString("en-US", {
@@ -19,20 +20,47 @@ function formatTimestamp(unixSeconds: number): string {
 export function DashboardHistory() {
   const { publicKey, connected } = useWallet();
   const { connection } = useConnection();
-  const [history, setHistory] = useState<VerificationHistoryEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mintTimestamp, setMintTimestamp] = useState<number | null>(null);
+  const [reVerifications, setReVerifications] = useState<number[]>([]);
 
   useEffect(() => {
     if (!publicKey || !connected) {
-      setHistory([]);
+      setMintTimestamp(null);
+      setReVerifications([]);
       return;
     }
     setLoading(true);
     setError(null);
-    fetchVerificationHistory(publicKey.toBase58(), connection)
-      .then(setHistory)
-      .catch(() => setError("Verification history unavailable"))
+
+    // Build history entirely from the IdentityState PDA (authoritative source)
+    (async () => {
+      const programId = new PublicKey(PROGRAM_IDS.iamAnchor);
+      const [identityPda] = PublicKey.findProgramAddressSync(
+        [new TextEncoder().encode("identity"), publicKey.toBuffer()],
+        programId
+      );
+      const account = await connection.getAccountInfo(identityPda);
+      if (!account || account.data.length < 207) {
+        setMintTimestamp(null);
+        setReVerifications([]);
+        return;
+      }
+
+      const view = new DataView(account.data.buffer, account.data.byteOffset, account.data.byteLength);
+      setMintTimestamp(Number(view.getBigInt64(40, true)));
+
+      // recent_timestamps: 10 x i64 at offset 127 (newest at index 0)
+      // Only written by successful updateAnchor calls
+      const timestamps: number[] = [];
+      for (let i = 0; i < 10; i++) {
+        const ts = Number(view.getBigInt64(127 + i * 8, true));
+        if (ts > 0) timestamps.push(ts);
+      }
+      setReVerifications(timestamps);
+    })()
+      .catch(() => setError("Failed to load verification history"))
       .finally(() => setLoading(false));
   }, [publicKey, connected, connection]);
 
@@ -58,44 +86,50 @@ export function DashboardHistory() {
         <p className="mt-6 text-sm text-muted">{error}</p>
       )}
 
-      {!loading && !error && history.length === 0 && (
+      {!loading && !error && !mintTimestamp && (
         <p className="mt-6 text-sm text-muted">
           No verification history found. Complete a verification to see entries here.
         </p>
       )}
 
-      {!loading && history.length > 0 && (
-        <div className="mt-6 space-y-3">
-          {history.map((entry) => (
+      {!loading && !error && mintTimestamp && (
+        <div className="mt-6 space-y-3 max-h-[600px] overflow-y-auto pr-1">
+          {reVerifications.map((ts, i) => (
             <div
-              key={entry.id}
+              key={ts}
               className="flex items-center gap-4 rounded-xl border border-border bg-surface/30 px-5 py-4"
             >
-              {entry.isValid ? (
-                <CheckCircle className="h-5 w-5 shrink-0 text-solana-green" />
-              ) : (
-                <XCircle className="h-5 w-5 shrink-0 text-danger" />
-              )}
-
+              <CheckCircle className="h-5 w-5 shrink-0 text-solana-green" />
               <div className="flex-1 min-w-0">
                 <span className="text-sm font-medium text-foreground">
-                  {entry.isValid ? "Verified" : "Failed"}
+                  Re-verification #{reVerifications.length - i}
                 </span>
-                <p className="mt-0.5 text-xs font-mono text-muted truncate">
-                  {entry.commitmentHash}
+                <p className="mt-0.5 text-xs text-muted">
+                  Behavioral consistency confirmed within threshold
                 </p>
               </div>
-
               <div className="text-right shrink-0">
                 <p className="text-xs text-muted">
-                  {formatTimestamp(entry.timestamp)}
-                </p>
-                <p className="mt-0.5 text-xs font-mono text-foreground/60 truncate max-w-[100px]">
-                  {entry.id.slice(0, 8)}...
+                  {formatTimestamp(ts)}
                 </p>
               </div>
             </div>
           ))}
+
+          <div className="flex items-center justify-between rounded-lg border border-cyan/20 bg-cyan/5 px-5 py-4">
+            <div className="flex items-center gap-3">
+              <Fingerprint className="h-5 w-5 text-cyan" strokeWidth={1.5} />
+              <div>
+                <p className="text-sm font-medium text-foreground">Initial verification</p>
+                <p className="mt-0.5 text-xs text-muted">Behavioral baseline established</p>
+              </div>
+            </div>
+            <div className="text-right shrink-0">
+              <p className="text-xs text-muted">
+                {formatTimestamp(mintTimestamp)}
+              </p>
+            </div>
+          </div>
         </div>
       )}
     </section>
