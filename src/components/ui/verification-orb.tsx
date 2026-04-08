@@ -54,6 +54,12 @@ export function VerificationOrb() {
     const center = size / 2;
     const focalLength = 3.5;
 
+    // Read theme-aware cyan color from CSS variable
+    const rawCyan = getComputedStyle(document.documentElement).getPropertyValue("--color-cyan").trim();
+    const cyanRGB = rawCyan.startsWith("#")
+      ? `${parseInt(rawCyan.slice(1, 3), 16)}, ${parseInt(rawCyan.slice(3, 5), 16)}, ${parseInt(rawCyan.slice(5, 7), 16)}`
+      : "0, 240, 255";
+
     // Set canvas resolution for crisp rendering
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = size * dpr;
@@ -64,9 +70,9 @@ export function VerificationOrb() {
 
     // Pre-create soul orb gradient (constant — avoid allocating per frame)
     const soulGlow = ctx.createRadialGradient(center, center, 0, center, center, 12);
-    soulGlow.addColorStop(0, "rgba(0, 240, 255, 0.35)");
-    soulGlow.addColorStop(0.4, "rgba(0, 240, 255, 0.08)");
-    soulGlow.addColorStop(1, "rgba(0, 240, 255, 0)");
+    soulGlow.addColorStop(0, `rgba(${cyanRGB}, 0.35)`);
+    soulGlow.addColorStop(0.4, `rgba(${cyanRGB}, 0.08)`);
+    soulGlow.addColorStop(1, `rgba(${cyanRGB}, 0)`);
 
     function project(v: [number, number, number]): [number, number, number] {
       const perspective = focalLength / (focalLength + v[2]);
@@ -101,7 +107,7 @@ export function VerificationOrb() {
         ctx.beginPath();
         ctx.moveTo(a[0], a[1]);
         ctx.lineTo(b[0], b[1]);
-        ctx.strokeStyle = `rgba(0, 240, 255, ${opacity})`;
+        ctx.strokeStyle = `rgba(${cyanRGB}, ${opacity})`;
         ctx.lineWidth = 0.8;
         ctx.stroke();
       }
@@ -114,7 +120,7 @@ export function VerificationOrb() {
 
       ctx.beginPath();
       ctx.arc(center, center, 2.5, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(0, 240, 255, 0.7)";
+      ctx.fillStyle = `rgba(${cyanRGB}, 0.7)`;
       ctx.fill();
 
       frameRef.current = requestAnimationFrame(draw);

@@ -6,6 +6,7 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 const solutionsDropdown = [
   { label: "Use Cases", href: "/solutions" },
+  { label: "Agent Anchor", href: "/agents" },
   { label: "Integrate", href: "/integrate" },
 ];
 
@@ -53,13 +54,13 @@ export function Navbar() {
         <div className="ml-auto flex items-center gap-3">
           <Link
             href="/dashboard"
-            className="hidden md:inline-flex items-center rounded-full px-4 py-1.5 text-sm font-mono font-medium border border-white/15 bg-white/5 backdrop-blur-md text-foreground/60 hover:text-foreground hover:bg-white/10 transition-colors duration-200"
+            className="hidden md:inline-flex items-center rounded-full px-4 py-1.5 text-sm font-mono font-medium border border-border bg-surface/50 backdrop-blur-md text-foreground/60 hover:text-foreground hover:bg-surface-hover transition-colors duration-200"
           >
             Dashboard
           </Link>
           <Link
             href="/verify"
-            className="hidden md:inline-flex items-center rounded-full px-4 py-1.5 text-sm font-mono font-medium border border-white/15 bg-white/5 backdrop-blur-md text-cyan hover:text-foreground hover:bg-white/10 transition-colors duration-200"
+            className="hidden md:inline-flex items-center rounded-full px-4 py-1.5 text-sm font-mono font-medium border border-border bg-surface/50 backdrop-blur-md text-cyan hover:text-foreground hover:bg-surface-hover transition-colors duration-200"
           >
             Verify
           </Link>
