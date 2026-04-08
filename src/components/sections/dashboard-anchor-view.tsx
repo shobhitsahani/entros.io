@@ -12,10 +12,13 @@ import { commitmentBytesToHex } from "@/lib/on-chain";
 import { ArrowRight, Wallet, Loader2, ShieldAlert } from "lucide-react";
 
 function formatRelativeTime(unixSeconds: number): string {
-  const diff = Date.now() - unixSeconds * 1000;
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const now = new Date();
+  const then = new Date(unixSeconds * 1000);
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const thenStart = new Date(then.getFullYear(), then.getMonth(), then.getDate()).getTime();
+  const days = Math.round((todayStart - thenStart) / (1000 * 60 * 60 * 24));
   if (days === 0) return "today";
-  if (days === 1) return "1 day ago";
+  if (days === 1) return "yesterday";
   return `${days} days ago`;
 }
 
