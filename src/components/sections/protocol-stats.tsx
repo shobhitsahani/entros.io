@@ -58,22 +58,21 @@ export function ProtocolStats() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
     setLoading(true);
     setError(null);
 
     (async () => {
       const programId = new PublicKey(PROGRAM_IDS.iamAnchor);
 
-      // Fetch all IdentityState PDAs filtered by discriminator.
-      // We fetch enough bytes to read: trust_score (u16 @ 60) and
-      // last_verification_timestamp (i64 @ 48) and verification_count (u32 @ 56).
-      // The full slice we need spans offset 48..62 = 14 bytes.
       const accounts = await connection.getProgramAccounts(programId, {
         filters: [
           { memcmp: { offset: 0, bytes: IDENTITY_STATE_DISC_B58 } },
         ],
         dataSlice: { offset: 48, length: 14 }, // lastVerif(8) + count(4) + trust(2)
       });
+
+      if (cancelled) return;
 
       if (accounts.length === 0) {
         setStats({
@@ -101,16 +100,17 @@ export function ProtocolStats() {
           data.byteLength
         );
 
-        // Offsets are relative to our dataSlice start (48)
-        const lastVerif = Number(view.getBigInt64(0, true));   // original offset 48
-        const count = view.getUint32(8, true);                 // original offset 56
-        const trust = view.getUint16(12, true);                // original offset 60
+        const lastVerif = Number(view.getBigInt64(0, true));
+        const count = view.getUint32(8, true);
+        const trust = view.getUint16(12, true);
 
         totalTrust += trust;
         if (trust > highestTrust) highestTrust = trust;
-        totalVerifications += count + 1; // +1 for initial mint
+        totalVerifications += count + 1;
         if (lastVerif > mostRecentTimestamp) mostRecentTimestamp = lastVerif;
       }
+
+      if (cancelled) return;
 
       setStats({
         totalAnchors: accounts.length,
@@ -123,8 +123,10 @@ export function ProtocolStats() {
         mostRecentTimestamp: mostRecentTimestamp > 0 ? mostRecentTimestamp : null,
       });
     })()
-      .catch(() => setError("Failed to fetch on-chain stats. The RPC may be rate-limited — try again shortly."))
-      .finally(() => setLoading(false));
+      .catch(() => { if (!cancelled) setError("Failed to fetch on-chain stats. The RPC may be rate-limited — try again shortly."); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+
+    return () => { cancelled = true; };
   }, [connection]);
 
   return (
