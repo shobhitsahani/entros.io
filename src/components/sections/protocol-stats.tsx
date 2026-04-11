@@ -123,7 +123,7 @@ export function ProtocolStats() {
         mostRecentTimestamp: mostRecentTimestamp > 0 ? mostRecentTimestamp : null,
       });
     })()
-      .catch(() => { if (!cancelled) setError("Failed to fetch on-chain stats. The RPC may be rate-limited — try again shortly."); })
+      .catch(() => { if (!cancelled) setError("Failed to fetch on-chain stats. The RPC may be rate-limited—try again shortly."); })
       .finally(() => { if (!cancelled) setLoading(false); });
 
     return () => { cancelled = true; };

@@ -2,7 +2,7 @@ import type { VerificationStep } from "./types";
 
 export const verificationSteps: VerificationStep[] = [
   {
-    title: "01 — Challenge",
+    title: "01—Challenge",
     description:
       "A random nonsense phrase and Lissajous curve generated fresh for each session. No two sessions share the same challenge.",
     detail:
@@ -10,7 +10,7 @@ export const verificationSteps: VerificationStep[] = [
     icon: "mic",
   },
   {
-    title: "02 — Capture",
+    title: "02—Capture",
     description:
       "Three sensor streams record in parallel: voice, touch, and motion. 12 seconds of simultaneous behavioral data.",
     detail:
@@ -18,7 +18,7 @@ export const verificationSteps: VerificationStep[] = [
     icon: "activity",
   },
   {
-    title: "03 — Extract + Score",
+    title: "03—Extract + Score",
     description:
       "Speaker features (F0, jitter, shimmer, HNR, formants), jerk analysis, statistical condensing. Plus entropy scoring to detect synthetic data.",
     detail:
@@ -26,7 +26,7 @@ export const verificationSteps: VerificationStep[] = [
     icon: "scan",
   },
   {
-    title: "04 — Hash",
+    title: "04—Hash",
     description:
       "SimHash projects features into a 256-bit fingerprint. Same-user fingerprints cluster; imposters diverge.",
     detail:
@@ -34,7 +34,7 @@ export const verificationSteps: VerificationStep[] = [
     icon: "hash",
   },
   {
-    title: "05 — Commit",
+    title: "05—Commit",
     description:
       "Poseidon(fingerprint || salt) produces the TBH commitment. The fingerprint and salt stay on-device.",
     detail:
@@ -42,7 +42,7 @@ export const verificationSteps: VerificationStep[] = [
     icon: "lock",
   },
   {
-    title: "06 — Prove",
+    title: "06—Prove",
     description:
       "Groth16 ZK proof: distance is within the valid range. Not too similar (replay), not too different (imposter).",
     detail:
@@ -50,11 +50,11 @@ export const verificationSteps: VerificationStep[] = [
     icon: "proof",
   },
   {
-    title: "07 — Verify",
+    title: "07—Verify",
     description:
       "Proof verified on Solana. Anchor updated. Progressive Trust Score recalculated from verification history.",
     detail:
-      "The statistical feature summary is validated server-side by proprietary models that detect synthetic data, then the ZK proof is verified on-chain. Both must pass. The server sees only derived statistics (means, variances, spectral coefficients) — never raw recordings. On success, the Anchor stores the verification timestamp in a rolling history. Trust Score recalculates using recency weighting and regularity analysis.",
+      "The statistical feature summary is validated server-side by proprietary models that detect synthetic data, then the ZK proof is verified on-chain. Both must pass. The server sees only derived statistics (means, variances, spectral coefficients)—never raw recordings. On success, the Anchor stores the verification timestamp in a rolling history. Trust Score recalculates using recency weighting and regularity analysis.",
     icon: "check-circle",
   },
 ];

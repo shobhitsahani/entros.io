@@ -25,7 +25,7 @@ export const flywheel: FlyWheelStep[] = [
   {
     step: "User verifies",
     description:
-      "User pays ~0.005 SOL protocol fee per verification. The fee is included in the same transaction as the ZK proof — one signature, one prompt.",
+      "User pays ~0.005 SOL protocol fee per verification. The fee is included in the same transaction as the ZK proof—one signature, one prompt.",
   },
   {
     step: "Treasury collects",
@@ -90,7 +90,7 @@ export const tokenUtilities: TokenUtility[] = [
 export const launchDetails = {
   mechanism: "MetaDAO or curated community sale",
   airdrop:
-    "First airdrop exclusively to IAM-verified humans. Your Trust Score determines allocation — the protocol rewards real users, not bot farms.",
+    "First airdrop exclusively to IAM-verified humans. Your Trust Score determines allocation—the protocol rewards real users, not bot farms.",
   standard: "SPL Token-2022 with Confidential Balances",
   supply: "Fixed at genesis",
 };

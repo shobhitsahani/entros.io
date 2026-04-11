@@ -7,7 +7,7 @@ export const features: Feature[] = [
     description:
       "Voice, motion, and touch is captured simultaneously on your device. A unique random challenge each session.",
     benefit:
-      "Behavioral entropy scoring detects synthetic data patterns. Raw data stays on your device — only derived statistical features are validated server-side.",
+      "Behavioral entropy scoring detects synthetic data patterns. Raw data stays on your device—only derived statistical features are validated server-side.",
   },
   {
     icon: "proof",

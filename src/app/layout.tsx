@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     template: "%s | IAM Protocol",
   },
   description:
-    "Prove you're human without revealing who you are. Solana-native identity verification through behavioral liveness — not iris scans, not selfies, not social graphs.",
+    "Prove you're human without revealing who you are. Solana-native identity verification through behavioral liveness—not iris scans, not selfies, not social graphs.",
   icons: {
     icon: [
       { url: "/favicons/icon-32x32.png", sizes: "32x32", type: "image/png" },

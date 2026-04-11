@@ -5,7 +5,7 @@ import { ProtocolStats } from "@/components/sections/protocol-stats";
 export const metadata: Metadata = {
   title: "Protocol Stats",
   description:
-    "Live on-chain metrics for the IAM Protocol — total anchors minted, trust scores, and verification activity on Solana devnet.",
+    "Live on-chain metrics for the IAM Protocol—total anchors minted, trust scores, and verification activity on Solana devnet.",
 };
 
 export default function Stats() {

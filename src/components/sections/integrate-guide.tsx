@@ -173,10 +173,10 @@ export function IntegrateGuide() {
             </p>
           </GlowCard>
           <GlowCard>
-            <p className="font-mono text-sm font-semibold text-foreground">Escrow budgets</p>
+            <p className="font-mono text-sm font-semibold text-foreground">Protocol fee defense</p>
             <p className="mt-2 text-sm text-foreground/70 leading-relaxed">
-              Set a deposit limit. When it runs out, verifications pause
-              automatically. No surprise bills. Top up when ready.
+              Every verification costs the user SOL. Bot farms must fund
+              wallets and pay per attempt. The cost scales with the attack.
             </p>
           </GlowCard>
           <GlowCard>
