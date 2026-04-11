@@ -6,7 +6,7 @@ export const protocolComponents: ProtocolComponent[] = [
     title: "Pulse SDK",
     subtitle: "Client-side capture and proving",
     description:
-      "A TypeScript library that runs on the user's phone or browser. It captures sensor data, extracts features, generates the TBH commitment, and produces the ZK proof. Raw biometric data never leaves this library — only derived statistical features and the proof are transmitted.",
+      "A TypeScript library that runs on the user's phone or browser. It captures sensor data, extracts features, generates the TBH commitment, and produces the ZK proof. Raw biometric data never leaves this library—only derived statistical features and the proof are transmitted.",
     highlights: [
       "Browser and React Native support",
       "Audio, IMU, and touch capture in parallel",
@@ -55,7 +55,7 @@ export const protocolComponents: ProtocolComponent[] = [
     title: "Executor Node",
     subtitle: "Off-chain relay and challenge service",
     description:
-      "A Rust service that generates signed challenges, relays attestations, and manages walletless transaction submission. The public protocol layer — open source for trust and auditability.",
+      "A Rust service that generates signed challenges, relays attestations, and manages walletless transaction submission. The public protocol layer—open source for trust and auditability.",
     highlights: [
       "Server-generated signed challenges (anti-bot)",
       "SAS attestation issuance",
@@ -71,7 +71,7 @@ export const protocolComponents: ProtocolComponent[] = [
     title: "Validation Service",
     subtitle: "Proprietary defense layer",
     description:
-      "A private Rust crate that analyzes the 134-dimensional statistical feature summary for synthetic artifacts, cross-modality inconsistencies, and Sybil patterns. The defense layer — proprietary because the asymmetry between attackers and defenders demands it. The protocol is open so you can trust it. The validation is private so attackers can't bypass it.",
+      "A private Rust crate that analyzes the 134-dimensional statistical feature summary for synthetic artifacts, cross-modality inconsistencies, and Sybil patterns. The defense layer—proprietary because the asymmetry between attackers and defenders demands it. The protocol is open so you can trust it. The validation is private so attackers can't bypass it.",
     highlights: [
       "TTS and synthetic data detection",
       "Cross-wallet fingerprint registry (Sybil detection)",

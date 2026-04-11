@@ -11,7 +11,7 @@ export function TrustSignalsSection() {
         className="font-mono text-base tracking-widest uppercase"
         duration={3}
       >
-        {"// SIGNALS"}
+        {"// STATUS"}
       </TextShimmer>
 
       <div className="mt-12">

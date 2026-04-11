@@ -43,7 +43,7 @@ export function HeroSection() {
         <GlassPanel className="mx-auto mt-10 max-w-2xl rounded-2xl px-8 py-6">
           <p className="text-base text-foreground/80 leading-relaxed md:text-lg">
             The IAM Protocol verifies liveness through behavioral
-            dynamics — voice prosody, hand tremor, touch patterns. Built on
+            dynamics—voice prosody, hand tremor, touch patterns. Built on
             Solana. Privacy by architecture.
           </p>
           <div className="mt-6 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">

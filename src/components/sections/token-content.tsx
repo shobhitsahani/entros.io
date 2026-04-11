@@ -215,7 +215,7 @@ export function TokenContent() {
                 <p className="mt-1 text-sm text-foreground/70">
                   The protocol generates SOL revenue before the token launches.
                   Treasury accumulates real value. The token amplifies the
-                  flywheel — it doesn&apos;t create it.
+                  flywheel—it doesn&apos;t create it.
                 </p>
               </div>
             </div>

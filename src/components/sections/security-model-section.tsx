@@ -12,7 +12,7 @@ const DEFENSES = [
   {
     title: "Server-Side Feature Validation",
     description:
-      "The 134-dimensional statistical feature summary is validated by proprietary server-side models before the on-chain proof is accepted. These models detect synthetic speech artifacts, unnatural jitter patterns, and cross-modality inconsistencies. The validation logic is private — the attacker can see that checks happen but not how they work.",
+      "The 134-dimensional statistical feature summary is validated by proprietary server-side models before the on-chain proof is accepted. These models detect synthetic speech artifacts, unnatural jitter patterns, and cross-modality inconsistencies. The validation logic is private—the attacker can see that checks happen but not how they work.",
   },
   {
     title: "Progressive Trust Score",
@@ -32,12 +32,12 @@ const DEFENSES = [
   {
     title: "Cross-Wallet Fingerprint Registry",
     description:
-      "The server maintains a registry of all verified behavioral fingerprints. New verifications are compared against existing entries. Sybil attacks — where one actor creates many identities — produce clustered fingerprints that the registry detects and rejects.",
+      "The server maintains a registry of all verified behavioral fingerprints. New verifications are compared against existing entries. Sybil attacks—where one actor creates many identities—produce clustered fingerprints that the registry detects and rejects.",
   },
   {
     title: "Economic Disincentives",
     description:
-      "Each verification costs the user SOL. Each wallet requires funding. Server-side validation rejects synthetic data before it reaches the chain. Maintaining thousands of fake identities over months — funding wallets, paying per verification, building Trust Score across separate days — costs real money. The attacker pays for every attempt.",
+      "Each verification costs the user SOL. Each wallet requires funding. Server-side validation rejects synthetic data before it reaches the chain. Maintaining thousands of fake identities over months—funding wallets, paying per verification, building Trust Score across separate days—costs real money. The attacker pays for every attempt.",
   },
 ];
 
@@ -72,8 +72,8 @@ export function SecurityModelSection() {
       </h2>
       <p className="mt-3 max-w-2xl text-foreground/70">
         Open protocol for trust. Private validation for security. Synthetic
-        data is rejected server-side before reaching the chain. Integrators
-        pay only for successful human verifications.
+        data is rejected server-side before reaching the chain. Users pay a
+        small protocol fee per verification. Bots pay real money at scale.
       </p>
 
       <div className="mt-10 grid gap-4 md:grid-cols-2">
