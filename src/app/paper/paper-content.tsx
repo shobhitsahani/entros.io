@@ -7,7 +7,16 @@ import { PageWrapper } from "@/components/layout/page-wrapper";
 export function PaperContent({ content }: { content: string }) {
   return (
     <PageWrapper>
-      <div className="mx-auto max-w-3xl mb-8 flex justify-end">
+      <div className="mx-auto max-w-3xl mb-8 flex justify-end gap-3">
+        <a
+          href="https://doi.org/10.5281/zenodo.19517442"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2 text-sm font-mono text-foreground/70 transition-colors hover:text-foreground hover:border-border-hover"
+        >
+          Zenodo DOI
+          <span aria-hidden="true">↗</span>
+        </a>
         <a
           href="/iam-protocol-2026.pdf"
           download

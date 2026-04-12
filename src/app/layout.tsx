@@ -66,10 +66,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${jetbrainsMono.variable}`}
+      className={`${inter.variable} ${jetbrainsMono.variable} overflow-x-hidden`}
       suppressHydrationWarning
     >
-      <body className="min-h-screen bg-background text-foreground font-sans antialiased">
+      <body className="min-h-screen overflow-x-hidden bg-background text-foreground font-sans antialiased">
         <ThemeProvider>
           <Navbar />
           <main className="flex-1">{children}</main>

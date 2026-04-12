@@ -15,7 +15,7 @@ export function TrustSignalsSection() {
       </TextShimmer>
 
       <div className="mt-12">
-        <BentoGrid className="auto-rows-[16rem] lg:grid-cols-3 lg:grid-rows-3">
+        <BentoGrid className="auto-rows-auto lg:auto-rows-[16rem] lg:grid-cols-3 lg:grid-rows-3">
           {trustSignals.map((signal) => (
             <BentoCard
               key={signal.name}
