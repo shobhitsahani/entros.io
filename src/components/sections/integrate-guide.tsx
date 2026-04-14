@@ -4,6 +4,7 @@ import { integrationSnippets, useCaseSnippets } from "@/data/integration-snippet
 import { CodeBlock } from "@/components/ui/code-block";
 import { GlowCard } from "@/components/ui/glow-card";
 import { TextShimmer } from "@/components/ui/text-shimmer";
+import { IntegratePlayground } from "./integrate-playground";
 
 const CONFIG_OPTIONS = [
   { name: "cluster", type: '"devnet" | "mainnet-beta"', description: "Solana cluster to connect to" },
@@ -48,6 +49,29 @@ export function IntegrateGuide() {
               <CodeBlock code={snippet.code}  />
             </GlowCard>
           ))}
+        </div>
+      </section>
+
+      <section>
+        <TextShimmer
+          as="span"
+          className="font-mono text-base tracking-widest uppercase"
+          duration={3}
+        >
+          {"// TRY IT LIVE"}
+        </TextShimmer>
+
+        <h2 className="mt-4 font-mono text-xl font-bold text-foreground">
+          Query on-chain identity.
+        </h2>
+        <p className="mt-3 text-sm text-foreground/70 leading-relaxed max-w-2xl">
+          This is what your integration reads. Paste any wallet address to see
+          its IAM verification status, Trust Score, and history directly from
+          Solana devnet.
+        </p>
+
+        <div className="mt-6">
+          <IntegratePlayground />
         </div>
       </section>
 
