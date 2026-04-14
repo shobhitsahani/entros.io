@@ -26,11 +26,34 @@ export function AgentsCheckSection() {
   const { connection } = useConnection();
   const [agentAsset, setAgentAsset] = useState("");
   const [operator, setOperator] = useState<AgentHumanOperator | null>(null);
+  const [liveTrustScore, setLiveTrustScore] = useState<number | null>(null);
   const [checked, setChecked] = useState(false);
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const autoChecked = useRef(false);
   const requestId = useRef(0);
+
+  async function fetchLiveTrustScore(walletAddress: string) {
+    try {
+      const { PublicKey } = await import("@solana/web3.js");
+      const programId = new PublicKey("GZYwTp2ozeuRA5Gof9vs4ya961aANcJBdUzB7LN6q4b2");
+      const walletPubkey = new PublicKey(walletAddress);
+      const [identityPda] = PublicKey.findProgramAddressSync(
+        [new TextEncoder().encode("identity"), walletPubkey.toBuffer()],
+        programId
+      );
+      const accountInfo = await connection.getAccountInfo(identityPda);
+      if (!accountInfo || accountInfo.data.length < 62) return null;
+      const view = new DataView(
+        accountInfo.data.buffer,
+        accountInfo.data.byteOffset,
+        accountInfo.data.byteLength
+      );
+      return view.getUint16(60, true);
+    } catch {
+      return null;
+    }
+  }
 
   async function runCheck(asset: string) {
     if (!asset.trim()) return;
@@ -38,6 +61,7 @@ export function AgentsCheckSection() {
     setChecking(true);
     setError(null);
     setOperator(null);
+    setLiveTrustScore(null);
     setChecked(false);
 
     try {
@@ -45,6 +69,11 @@ export function AgentsCheckSection() {
       if (requestId.current !== thisRequest) return;
       setOperator(result);
       setChecked(true);
+
+      if (result?.wallet) {
+        const live = await fetchLiveTrustScore(result.wallet);
+        if (requestId.current === thisRequest) setLiveTrustScore(live);
+      }
     } catch {
       if (requestId.current !== thisRequest) return;
       setError("Invalid asset address or network error.");
@@ -64,7 +93,7 @@ export function AgentsCheckSection() {
   }, [connection]);
 
   return (
-    <section className="mt-16">
+    <section>
       <TextShimmer
         as="span"
         className="font-mono text-base tracking-widest uppercase"
@@ -152,15 +181,20 @@ export function AgentsCheckSection() {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <p className="text-xs font-mono uppercase tracking-widest text-muted">
-                    Trust Score
+                    Trust Score (Live)
                   </p>
                   <p className="mt-1 text-3xl font-mono font-bold text-foreground">
-                    {operator.trustScore}
+                    {liveTrustScore !== null ? liveTrustScore : operator.trustScore}
                   </p>
+                  {liveTrustScore !== null && liveTrustScore !== operator.trustScore && (
+                    <p className="mt-1 text-xs text-muted">
+                      {operator.trustScore} at attestation
+                    </p>
+                  )}
                 </div>
                 <div>
                   <p className="text-xs font-mono uppercase tracking-widest text-muted">
-                    Verified At
+                    Attested At
                   </p>
                   <p className="mt-1 text-sm font-mono text-foreground">
                     {formatTimestamp(operator.verifiedAt)}

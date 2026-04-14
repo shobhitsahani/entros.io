@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { TextShimmer } from "@/components/ui/text-shimmer";
 import { GlowCard } from "@/components/ui/glow-card";
+import { ShimmerButton } from "@/components/ui/shimmer-button";
 import {
   Coins,
   Shield,
@@ -221,6 +223,23 @@ export function TokenContent() {
             </div>
           </div>
         </GlowCard>
+      </section>
+
+      <section className="mt-20 text-center">
+        <hr className="mx-auto mb-16 w-24 border-t border-foreground/[0.06]" />
+        <p className="font-mono text-xl tracking-[0.02em] text-foreground md:text-2xl">
+          Prove you&apos;re human. Build your Trust Score.
+        </p>
+        <div className="mt-8 flex justify-center">
+          <Link href="/verify">
+            <ShimmerButton className="text-sm font-medium lg:text-base">
+              <span className="flex items-center gap-2">
+                Try the Demo
+                <span aria-hidden="true">→</span>
+              </span>
+            </ShimmerButton>
+          </Link>
+        </div>
       </section>
     </div>
   );

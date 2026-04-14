@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { SubpageHero } from "@/components/sections/subpage-hero";
+import { TokenHeroAnimation } from "@/components/sections/token-hero-animation";
 import { TokenContent } from "@/components/sections/token-content";
 
 export const metadata: Metadata = {
@@ -15,6 +16,7 @@ export default function Token() {
         title="IAM Token"
         subtitle="The economic layer of verified humanity."
       />
+      <TokenHeroAnimation />
       <TokenContent />
     </>
   );
