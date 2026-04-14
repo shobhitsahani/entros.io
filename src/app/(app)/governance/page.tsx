@@ -13,7 +13,7 @@ export default function Governance() {
     <>
       <SubpageHero
         title="IAM Governance Plugin"
-        subtitle="Human-verified governance for Solana DAOs."
+        subtitle={"Human-verified governance\u00A0for\u00A0Solana\u00A0DAOs.\nEvery vote backed by a live, recently\u00A0verified\u00A0human."}
       />
       <section className="mx-auto max-w-7xl px-6 pb-24">
         <GovernanceContent />

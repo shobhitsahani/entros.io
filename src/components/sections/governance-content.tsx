@@ -52,11 +52,11 @@ await program.methods
 
 export function GovernanceContent() {
   return (
-    <div className="space-y-20">
+    <div className="space-y-32">
       {/* Problem */}
       <section className="relative">
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 items-center">
-          <div className="lg:pr-4">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 items-center">
+          <div>
             <TextShimmer
               as="span"
               className="font-mono text-base tracking-widest uppercase"

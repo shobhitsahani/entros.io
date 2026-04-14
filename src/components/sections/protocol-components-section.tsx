@@ -18,11 +18,12 @@ export function ProtocolComponentsSection() {
         Five layers, one proof
       </h2>
 
-      <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2">
-        {protocolComponents.map((component) => {
+      <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-6">
+        {protocolComponents.map((component, i) => {
           const Icon = getIcon(component.icon);
+          const colSpan = i < 3 ? "md:col-span-2" : "md:col-span-3";
           return (
-            <GlowCard key={component.title} className="flex flex-col">
+            <GlowCard key={component.title} className={`flex flex-col ${colSpan}`}>
               <Icon
                 className="mb-4 h-8 w-8 text-foreground/50"
                 strokeWidth={1.5}

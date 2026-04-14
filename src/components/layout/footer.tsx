@@ -11,6 +11,9 @@ export function Footer() {
           <p className="mt-2 text-xs text-foreground/60">
             Proof of Humanity on Solana
           </p>
+          <p className="mt-1 text-xs text-foreground/40">
+            IAM Protocol™
+          </p>
         </div>
 
         <div className="flex flex-col gap-2 text-sm text-muted">

@@ -16,8 +16,10 @@ export default function Agents() {
         title="IAM Agent Anchor"
         subtitle={"Verify\u00A0the\u00A0human\u00A0behind\u00A0every AI\u00A0agent\u00A0on\u00A0Solana."}
       />
-      <section className="mx-auto max-w-7xl px-6 pb-24">
+      <section className="mx-auto max-w-7xl px-6 pb-20">
         <AgentsContent />
+      </section>
+      <section className="mx-auto max-w-7xl px-6 pb-24">
         <AgentsCheckSection />
       </section>
     </>

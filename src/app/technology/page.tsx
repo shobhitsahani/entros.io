@@ -5,6 +5,8 @@ import { VerificationTimelineSection } from "@/components/sections/verification-
 import { ProtocolComponentsSection } from "@/components/sections/protocol-components-section";
 import { PrivacySection } from "@/components/sections/privacy-section";
 import { SecurityModelSection } from "@/components/sections/security-model-section";
+import { VerificationModesSection } from "@/components/sections/verification-modes-section";
+import { ResearchValidationSection } from "@/components/sections/research-validation-section";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { VerificationOrb } from "@/components/ui/verification-orb";
 
@@ -26,10 +28,12 @@ export default function Technology() {
       <ProtocolComponentsSection />
       <PrivacySection />
       <SecurityModelSection />
+      <VerificationModesSection />
+      <ResearchValidationSection />
       <section className="mx-auto max-w-3xl px-6 py-24 text-center">
         <hr className="mx-auto mb-16 w-24 border-t border-foreground/[0.06]" />
         <p className="font-mono text-xl tracking-[0.02em] text-foreground md:text-2xl">
-          Raw data stays. Proof goes on-chain.
+          Raw data stays on your device. Statistical features are validated. Proof goes on-chain.
         </p>
         <div className="mt-8 flex justify-center">
           <Link href="/solutions">

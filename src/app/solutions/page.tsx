@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { SubpageHero } from "@/components/sections/subpage-hero";
+import { SolutionsHeroAnimation } from "@/components/sections/solutions-hero-animation";
 import { SolutionCasesSection } from "@/components/sections/solution-cases-section";
 import { IntegrationSection } from "@/components/sections/integration-section";
 import { PartnersSection } from "@/components/sections/partners-section";
@@ -19,6 +20,7 @@ export default function Solutions() {
         title="Solutions"
         subtitle={"Proof-of-Humanity for protocols that need to know their users are real,\nwithout learning who they are."}
       />
+      <SolutionsHeroAnimation />
       <SolutionCasesSection />
       <IntegrationSection />
       <PartnersSection />
