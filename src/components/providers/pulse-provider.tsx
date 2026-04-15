@@ -16,6 +16,7 @@ export function PulseProvider({ children }: { children: React.ReactNode }) {
       relayerApiKey: process.env.NEXT_PUBLIC_RELAYER_API_KEY,
       wasmUrl: process.env.NEXT_PUBLIC_WASM_URL,
       zkeyUrl: process.env.NEXT_PUBLIC_ZKEY_URL,
+      debug: process.env.NODE_ENV === "development",
     };
     return new PulseSDK(config);
   }, []);
