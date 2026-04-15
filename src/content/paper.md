@@ -2,8 +2,8 @@
 
 **Document Version:** 3.0
 **Original Date:** June 27, 2025
-**Updated:** April 10, 2026
-**Word Count:** Approx. 5000
+**Updated:** April 14, 2026
+**Word Count:** Approx. 6300
 
 ---
 
@@ -262,6 +262,16 @@ Each wallet maps to exactly one IAM Anchor (enforced by PDA derivation). Creatin
 
 The Trust Score penalizes new accounts (age bonus starts at 0) and irregular patterns (regularity bonus requires consistent spacing). An adversary building 1,000 identities with Trust Score > 500 over 3 months incurs costs that exceed the value of most airdrop allocations.
 
+#### **6.4.1. Layered Sybil Resistance**
+
+IAM's Sybil resistance operates through three independent layers, each raising the cost of maintaining duplicate identities:
+
+* **Economic deterrence.** Each verification costs the user SOL. Each wallet requires funding. Maintaining thousands of fake identities over months requires sustained capital expenditure that scales linearly with the attack surface.
+* **Temporal deterrence.** Trust Score rewards consistency over time. Weekly re-verifications across months carry more weight than bulk verifications in a single session. A bot farm must maintain each identity's behavioral signature across sessions and days, compounding the operational cost per identity.
+* **Behavioral fingerprint comparison.** The server-side registry compares each new verification's SimHash fingerprint against existing entries. One person operating multiple wallets produces clustered fingerprints that the registry detects. The discriminative power of the 134-feature behavioral fingerprint is being empirically calibrated through data collection from diverse users.
+
+These layers are complementary. Economic cost makes Sybil farming expensive. Temporal requirements make it slow. Behavioral comparison makes it detectable. An attacker must defeat all three simultaneously. The fingerprint registry's effectiveness improves as empirical data informs threshold calibration, and the architecture supports evolution toward probabilistic risk scoring as the user population grows.
+
 #### **6.5. Privacy**
 
 **Theorem 2 (Zero-Knowledge Privacy).** *The on-chain verifier learns only that the Hamming distance between two fingerprints falls within [δ_min, δ_max). It learns neither fingerprint, neither salt, nor any feature vector.*
@@ -347,7 +357,9 @@ A native application also unlocks sensor modalities that browsers restrict: pers
 
 ### **8. Implementation and Benchmarks**
 
-The protocol is deployed on Solana devnet with five components: three Anchor/Rust on-chain programs with full constraint validation and on-chain Trust Score; a Groth16/Circom circuit (1,996 constraints) with trusted setup; the Pulse SDK (TypeScript, published on npm, 60 tests including an 8-phase adversarial pen test harness); an executor node (Rust, live on Railway) providing the relayer API with rate limiting and commitment registry; and a demo application (Next.js on Vercel) with walletless and wallet-connected flows.
+The protocol is deployed on Solana devnet with six components: three Anchor/Rust on-chain programs with full constraint validation and on-chain Trust Score; a Groth16/Circom circuit (1,996 constraints) with trusted setup; the Pulse SDK (TypeScript, published on npm, 60 SDK tests including an 8-phase adversarial pen test harness); a server-side validation service (Rust, 32 tests); an executor node (Rust, live on Railway) providing the relayer API with rate limiting and commitment registry; and a demo application (Next.js on Vercel) with walletless and wallet-connected flows. A Realms DAO voter weight plugin (38 tests) provides governance integration. Total test coverage: 155 tests across all repos.
+
+The protocol fee treasury is live on devnet, collecting 0.005 SOL per verification. The fee is deducted atomically within the batched verification transaction and is admin-adjustable. Treasury balance is publicly auditable on Solana Explorer.
 
 #### **8.1. Performance Benchmarks**
 
@@ -364,6 +376,16 @@ Benchmarks measured on Chrome 132 (M1 MacBook Pro) and Safari (iPhone 15 Pro Max
 The total pipeline from button click to on-chain proof takes approximately 11–16 seconds depending on the configured capture window, plus ~900 ms of computation. On mobile (iPhone 15 Pro Max, Safari), all three sensor streams (audio, IMU motion, touch) capture simultaneously. Audio captures at the device-native 48 kHz and is processed identically. Proof generation completes within the same time budget via snarkjs WASM.
 
 **Comparative context.** Groth16 proof generation at ~850 ms compares favorably to PLONK-based systems, which require ~2.5s for equivalent circuit sizes [22]. On-chain verification at ~180K compute units fits within Solana's 200K default budget; PLONK verification would exceed it. Poseidon commitment at ~3 ms reflects the hash's ZK-optimized design (~300 R1CS constraints vs. ~25,000 for SHA-256 in-circuit [3]).
+
+#### **8.2. Desktop vs. Mobile Verification**
+
+Desktop verification operates with reduced sensor modalities. Mouse pointer dynamics serve as a proxy for hand movement, but capture wrist and finger motion rather than the arm and trunk movement available via mobile accelerometers. No touch pressure data is available from standard mice or trackpads. The effective dimensionality of the behavioral fingerprint is lower on desktop.
+
+Published research quantifies the gap. Multi-modal touch and IMU fusion on mobile devices reports EER below 1% [27]. Desktop-only behavioral authentication (keystroke dynamics and mouse movement) reports EER in the 6–13% range across multiple studies. The difference reflects the richer sensor environment available on mobile: accelerometer, gyroscope, magnetometer, and capacitive touch digitizer with pressure sensitivity.
+
+IAM accepts desktop verification as a valid but weaker signal. The verification produces a legitimate behavioral fingerprint and ZK proof regardless of device. Trust Score accumulates identically. The server-side validation applies the same checks. The practical difference is that desktop fingerprints have lower inter-person discriminability, and the Sybil registry threshold may need to be more conservative for desktop-only users.
+
+The mobile application, targeting the Solana dApp Store, is the production target for strongest verification signal. Native sensor APIs provide sub-millisecond accelerometer timestamps, touch pressure data, and persistent background access without per-session permission prompts.
 
 ---
 
@@ -414,3 +436,7 @@ The protocol is open source and published as a defensive disclosure to establish
 21. Paik, S., Hwang, C., Kim, S., and Seo, J. H. "On the reversibility of locality-sensitive hashing-based biometric template protections." *IEEE Trans. Dependable and Secure Computing*, 2025.
 22. Gabizon, A., Williamson, Z. J., and Ciobotaru, O. "PLONK: Permutations over Lagrange-bases for oecumenical noninteractive arguments of knowledge." *IACR ePrint 2019/953*, 2019.
 23. "Countries that have banned or investigated Worldcoin." BitPinas, 2026. https://bitpinas.com/learn-how-to-guides/list-countries-banned-investigated-worldcoin/
+24. Zang, Y., et al. "SONAR: A Synthetic AI-Audio Detection Framework and Benchmark." *arXiv:2410.04324*, 2024–2025.
+25. Chen, Y., et al. "VoiceRadar: A New Paradigm of Voice Deepfake Detection via Micro-Frequency Estimation." *Proc. NDSS*, 2025.
+26. Pouw, W., et al. "The human voice aligns with whole-body kinetics." *Proc. Royal Society B*, 2025.
+27. Stragapede, G., et al. "BioMoTouch: Touch-Based Behavioral Authentication Using Motion and Touch Sensor Fusion." *arXiv:2604.07071*, 2025.
