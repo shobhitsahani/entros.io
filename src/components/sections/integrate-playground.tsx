@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { GlowCard } from "@/components/ui/glow-card";
 import { CheckCircle, XCircle, Loader2, Search, ExternalLink } from "lucide-react";
+import { explorerUrl } from "@/lib/explorer";
 
 const DEMO_WALLET = "2jowceXRayDC3ufU3kRjf67zT3cLv48q4gbcdhA1SNQw";
 const IAM_ANCHOR_PROGRAM = "GZYwTp2ozeuRA5Gof9vs4ya961aANcJBdUzB7LN6q4b2";
@@ -190,7 +191,7 @@ export function IntegratePlayground() {
               <div className="mt-1 flex items-center gap-2">
                 <p className="text-xs font-mono text-foreground/60 break-all">{result.anchorPda}</p>
                 <a
-                  href={`https://explorer.solana.com/address/${result.anchorPda}?cluster=devnet`}
+                  href={explorerUrl(result.anchorPda)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="shrink-0 text-cyan hover:text-foreground transition-colors"

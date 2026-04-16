@@ -9,6 +9,7 @@ import {
 import { TextShimmer } from "@/components/ui/text-shimmer";
 import { GlowCard } from "@/components/ui/glow-card";
 import { Bot, CheckCircle, ExternalLink, Loader2, Search } from "lucide-react";
+import { explorerUrl } from "@/lib/explorer";
 
 const TEST_AGENT = "m8b6ADwZUqL3JNazingq5VKJBmFeS8Rz1w487i4must";
 
@@ -217,11 +218,11 @@ export function AgentsCheckSection() {
                       {operator.anchorPda}
                     </p>
                     <a
-                      href={`https://explorer.solana.com/address/${operator.anchorPda}?cluster=devnet`}
+                      href={explorerUrl(operator.anchorPda)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="shrink-0 text-cyan hover:text-foreground transition-colors"
-                      title="View on Solana Explorer"
+                      aria-label="View on Solana Explorer"
                     >
                       <ExternalLink className="h-3.5 w-3.5" />
                     </a>

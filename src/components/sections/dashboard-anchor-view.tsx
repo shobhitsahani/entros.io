@@ -9,7 +9,8 @@ import { PublicKey } from "@solana/web3.js";
 import { WalletConnectButton } from "@/components/ui/wallet-connect-button";
 import { GlowCard } from "@/components/ui/glow-card";
 import { commitmentBytesToHex } from "@/lib/on-chain";
-import { ArrowRight, Wallet, Loader2, ShieldAlert } from "lucide-react";
+import { explorerUrl } from "@/lib/explorer";
+import { ArrowRight, ExternalLink, Wallet, Loader2, ShieldAlert } from "lucide-react";
 
 function formatRelativeTime(unixSeconds: number): string {
   const now = new Date();
@@ -234,7 +235,47 @@ export function DashboardAnchorView() {
           </div>
         </div>
 
-        <div className="mt-6 pt-6 border-t border-border">
+        <div className="mt-6 pt-6 border-t border-border space-y-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div>
+              <p className="text-xs font-mono uppercase tracking-widest text-muted">
+                Owner
+              </p>
+              <div className="mt-1 flex items-center gap-2">
+                <p className="text-xs font-mono text-foreground/60 truncate">
+                  {identity.owner}
+                </p>
+                <a
+                  href={explorerUrl(identity.owner)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 text-cyan hover:text-foreground transition-colors"
+                  aria-label="View owner on Solana Explorer"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+              </div>
+            </div>
+            <div>
+              <p className="text-xs font-mono uppercase tracking-widest text-muted">
+                Mint
+              </p>
+              <div className="mt-1 flex items-center gap-2">
+                <p className="text-xs font-mono text-foreground/60 truncate">
+                  {identity.mint}
+                </p>
+                <a
+                  href={explorerUrl(identity.mint)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 text-cyan hover:text-foreground transition-colors"
+                  aria-label="View mint on Solana Explorer"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+              </div>
+            </div>
+          </div>
           <Link
             href="/verify"
             className="inline-flex items-center gap-2 text-sm text-cyan hover:text-foreground transition-colors"
