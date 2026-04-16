@@ -32,8 +32,6 @@ const RINGS = [
   { radius: 1.18, tiltX: -0.1, tiltZ: 2.7, particles: 3, speed: -0.12 },
 ];
 
-// No ambient dust — clean structure only
-
 interface Pt { x: number; y: number; z: number }
 
 function rotY(x: number, y: number, z: number, a: number): [number, number, number] {
@@ -138,8 +136,8 @@ export function TokenOrbitAnimation({ className }: { className?: string }) {
         for (let p = 0; p < ring.particles; p++) {
           const phase = (((t * ring.speed + p / ring.particles) % 1) + 1) % 1;
 
-          // Trail: 3 dots at decreasing opacity
-          for (let tr = 0; tr < 3; tr++) {
+          // Single dot per particle (no trail)
+          for (let tr = 0; tr < 1; tr++) {
             const trailPhase = (((phase - tr * 0.012) % 1) + 1) % 1;
             const idx = trailPhase * RING_SEGMENTS;
             const iA = Math.floor(idx) % RING_SEGMENTS;
@@ -194,7 +192,7 @@ export function TokenOrbitAnimation({ className }: { className?: string }) {
       viewBox="70 80 360 340"
       className={className}
       aria-hidden="true"
-      style={{ pointerEvents: "none" }}
+      style={{ pointerEvents: "none", overflow: "visible" }}
     />
   );
 }
