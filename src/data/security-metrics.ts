@@ -8,15 +8,15 @@ export interface CampaignResult {
 export const campaignResults: CampaignResult[] = [
   {
     tier: "T1",
-    passRate: "~0%",
-    costPerSuccess: "negligible",
-    status: "Defended (baseline)",
+    passRate: "0%",
+    costPerSuccess: "N/A",
+    status: "Defended (500 varied attempts blocked)",
   },
   {
     tier: "T2",
-    passRate: "pending",
-    costPerSuccess: "pending",
-    status: "Log-only measurement",
+    passRate: "0%",
+    costPerSuccess: "N/A",
+    status: "Defended (500 varied attempts blocked)",
   },
   {
     tier: "T3",
@@ -56,4 +56,4 @@ export const campaignResults: CampaignResult[] = [
   },
 ];
 
-export const lastUpdated = "April 2026";
+export const lastUpdated = "April 17, 2026";
