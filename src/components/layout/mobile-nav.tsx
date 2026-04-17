@@ -6,8 +6,14 @@ import { Menu, X } from "lucide-react";
 
 const sections = [
   {
+    heading: "Technology",
     items: [
-      { label: "Technology", href: "/technology" },
+      { label: "How It Works", href: "/technology" },
+      { label: "Security Program", href: "/security" },
+    ],
+  },
+  {
+    items: [
       { label: "Token", href: "/token" },
       { label: "Paper", href: "/paper" },
     ],

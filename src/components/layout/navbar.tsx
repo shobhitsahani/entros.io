@@ -4,6 +4,11 @@ import { MobileNav } from "./mobile-nav";
 import { NavDropdown } from "./nav-dropdown";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
+const technologyDropdown = [
+  { label: "How It Works", href: "/technology" },
+  { label: "Security Program", href: "/security" },
+];
+
 const solutionsDropdown = [
   { label: "Use Cases", href: "/solutions" },
   { label: "Agent Anchor", href: "/agents" },
@@ -25,7 +30,11 @@ export function Navbar() {
 
         <ul className="absolute left-1/2 -translate-x-1/2 hidden items-center gap-8 md:flex">
           {mainNav.map((item) =>
-            item.label === "Solutions" ? (
+            item.label === "Technology" ? (
+              <li key={item.href}>
+                <NavDropdown label="Technology" items={technologyDropdown} />
+              </li>
+            ) : item.label === "Solutions" ? (
               <li key={item.href}>
                 <NavDropdown label="Solutions" items={solutionsDropdown} />
               </li>

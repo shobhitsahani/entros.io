@@ -26,6 +26,9 @@ export function Footer() {
           <Link href="/verify" className="transition-colors hover:text-foreground">
             Verify
           </Link>
+          <Link href="/security" className="transition-colors hover:text-foreground">
+            Security
+          </Link>
         </div>
 
         <div className="flex flex-col gap-2 text-sm text-muted">
