@@ -149,7 +149,7 @@ export function TemporalConsistencySection() {
     if (!el) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry?.isIntersecting) setVisible(true);
+        if (entry) setVisible(entry.isIntersecting);
       },
       { threshold: 0.2 }
     );
