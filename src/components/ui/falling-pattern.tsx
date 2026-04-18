@@ -129,7 +129,13 @@ export function FallingPattern({ className }: { className?: string }) {
 
     setup();
 
+    let lastWidth = container.getBoundingClientRect().width;
     const resizeObserver = new ResizeObserver(() => {
+      // Only re-setup on width changes. Height-only changes come from
+      // mobile browser chrome hiding/showing and cause scroll stutter.
+      const currentWidth = container.getBoundingClientRect().width;
+      if (Math.abs(currentWidth - lastWidth) < 1) return;
+      lastWidth = currentWidth;
       setup();
       if (inView) {
         lastTime = performance.now();
