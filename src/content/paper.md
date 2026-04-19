@@ -2,7 +2,7 @@
 
 **Document Version:** 3.0
 **Original Date:** June 27, 2025
-**Updated:** April 14, 2026
+**Updated:** April 19, 2026
 **Word Count:** Approx. 6300
 
 ---
@@ -332,6 +332,25 @@ A native mobile application can perform deterministic checks unavailable to brow
 This constitutes a *positive security model*: rather than detecting characteristics of bots (negative model, probabilistic), the system verifies characteristics known to be genuine (positive model, deterministic). Device attestation forms the foundation layer. Behavioral biometric verification with ZK proofs operates on top of it. The combination addresses both the provenance question (did this data come from a real device?) and the identity question (is this behavioral pattern consistent with the claimed identity?).
 
 A native application also unlocks sensor modalities that browsers restrict: persistent accelerometer access with a single permission grant on iOS (browsers re-prompt each session), pressure-sensitive touch data on supported Android devices, and background re-verification without requiring the user to open a web page.
+
+#### **6.10. Empirical Adversarial Validation**
+
+The theoretical defenses described in Sections 6.1–6.9 are validated empirically through a continuous internal red team program. An adversarial testing harness submits synthesized feature vectors to the production validation service over HTTP, measuring per-tier pass rates against the live Tier 1 enforcement layer — the gate preceding on-chain submission. An attempt that fails Tier 1 cannot proceed to challenge fetch, ZK proof generation, or transaction submission, so a 0% Tier 1 pass rate implies a 0% on-chain anchor creation rate by construction.
+
+The attack taxonomy spans eight tiers ordered by sophistication. Results for the first three tiers (the highest-priority attacks implementable without external TTS models) are summarized below.
+
+| Tier | Attack class | Attempts | Tier 1 pass rate |
+|------|-------------|----------|-----------|
+| T1 | Procedural synthesis | 2,000 | 0% |
+| T2 | Multi-strategy parameter variation | 4,000 | 0% |
+| T3a | Unconstrained feature optimization | 1,000 | 0% |
+| T3b | Constrained feature optimization | 9,000 | 0% |
+
+T1 exercises trivial procedural synthesis (sine-wave harmonics with additive noise). T2 extends this with four waveform strategies (harmonic, sawtooth, filtered noise, pulse train), four motion patterns (tremor, Brownian, circular, static), and parameter sampling across the full human voice range (80–350 Hz fundamental). T3 reconstructs the SimHash hyperplanes from the open-source SDK constants and uses hill-climbing optimization to craft 134-dimensional feature vectors targeting valid fingerprint distances, optionally constrained to published human feature ranges.
+
+T3b applies distributional constraints derived from published voice science norms, maintaining physiologically plausible feature values throughout the optimization. Inter-feature consistency checks (e.g., perturbation measure ratios inherent to vocal fold mechanics) prevent the optimizer from producing individually plausible but structurally impossible feature combinations.
+
+T4 (modern voice cloning via XTTS-v2, F5-TTS), T5 (coupled cross-modal synthesis), and T6–T8 (identity theft, replay perturbation, adaptive probing) are planned. Aggregate results are published at iamprotocol.io/security. Attack implementation code remains private per responsible-disclosure convention.
 
 ---
 
