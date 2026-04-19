@@ -6,7 +6,7 @@ import { GlassPanel } from "@/components/ui/glass-panel";
 
 export function HeroSection() {
   return (
-    <section className="relative flex flex-col items-center justify-center px-6 pt-36 pb-28 md:pt-44 md:pb-36">
+    <section className="relative flex flex-col items-center justify-center px-6 pt-36 pb-28 md:pt-44 md:pb-36 lg:min-h-[90svh] lg:pt-24 lg:pb-20">
       <div className="pointer-events-none absolute inset-0 bottom-[-40%] overflow-hidden">
         <FallingPattern
           className="h-full [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_70%)]"
