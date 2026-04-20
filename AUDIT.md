@@ -66,7 +66,7 @@ deployment. All have documented implementation paths in the blueprint folder.
 
 ### Tier 2 Hardening (added 2026-04-16)
 
-- [~] **Additional server-side verification signal deployed in log-only mode** — pulse-sdk 0.7.12 surfaces extra sensor data alongside the 134-feature vector. Validation service computes a per-verification metric and emits structured logs for empirical threshold calibration. Enforcement gated behind an env var, defaults off — Tier 1 pipeline behavior unchanged. Once calibration data justifies the threshold, enforcement flips with a single env var change. Backward-compat with older SDK versions verified. Fail-closed coverage (non-finite inputs, short captures) in place.
+- [x] **Additional server-side verification signal live** — pulse-sdk 0.7.12 surfaces extra sensor data alongside the 134-feature vector. Validation service computes a per-verification metric, empirically calibrated and enforced at the validation gate. Backward-compat with older SDK versions verified. Fail-closed coverage (non-finite inputs, short captures) in place. Enabled 2026-04-20.
 
 ---
 
@@ -166,6 +166,20 @@ not fix these in isolation.
 ### Body Limit (added 2026-04-16)
 
 - [x] **Request body limit raised from 4KB to 256KB** — Accommodates extended sensor time-series payloads. Rate limiting (60/min per API key, 10/min for /attest) bounds DoS exposure regardless of body size. Fixed 2026-04-16.
+
+---
+
+## iam-validation (private service)
+
+Closed-source server-side validation microservice on Railway. Receives the
+134-dimensional feature vector plus cross-modal sensor data from the
+executor and applies Tier 1 statistical checks and Tier 2 coupling
+signals. Attack code, specific checks, thresholds, and per-check logic are
+kept private per responsible-disclosure convention.
+
+### High
+
+- [x] **Statistical gap surfaced during T3b campaign** — Feature-space optimization against the server-side validation pipeline found a narrow exploitable seam across a small subset of probes. Hardened via an additional consistency constraint in the validation service; subsequent campaign attempts rejected. Attack mechanism and specific constraint kept private. Fixed 2026-04-18.
 
 ---
 
