@@ -17,7 +17,12 @@ const taxonomy = [
     tests: "Tier 1 distributional realism",
   },
   {
-    tier: "T4",
+    tier: "T4a",
+    attackClass: "Pre-recorded human voice + procedural motion/touch",
+    tests: "Cross-modal temporal coupling (Tier 2)",
+  },
+  {
+    tier: "T4b",
     attackClass: "Modern voice cloning (XTTS-v2, F5-TTS, API-based)",
     tests: "Tier 1 TTS artifact detection",
   },
