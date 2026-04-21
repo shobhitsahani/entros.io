@@ -10,7 +10,7 @@ const DEFENSES = [
   {
     title: "Server-Side Feature Validation",
     description:
-      "The 134-dimensional statistical feature summary is validated by proprietary server-side models before the on-chain proof is accepted. These models detect synthetic speech artifacts, unnatural jitter patterns, and cross-modality inconsistencies. The validation logic is private—the attacker can see that checks happen but not how they work.",
+      "The 134-dimensional statistical feature summary is validated by proprietary server-side models before the on-chain proof is accepted. These models detect synthetic speech artifacts, unnatural jitter patterns, and cross-modal temporal coupling gaps. The validation logic is private—the attacker can see that checks happen but not how they work.",
   },
   {
     title: "Progressive Trust Score",

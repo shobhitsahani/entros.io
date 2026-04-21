@@ -9,7 +9,7 @@ const taxonomy = [
   {
     tier: "T2",
     attackClass: "Parameter-varied procedural",
-    tests: "Tier 1 cross-modality and variance checks",
+    tests: "Tier 1 variance, entropy, and TTS artifact checks",
   },
   {
     tier: "T3",
