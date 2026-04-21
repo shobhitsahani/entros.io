@@ -68,6 +68,10 @@ deployment. All have documented implementation paths in the blueprint folder.
 
 - [x] **Additional server-side verification signal live** — pulse-sdk 0.7.12 surfaces extra sensor data alongside the 134-feature vector. Validation service computes a per-verification metric, empirically calibrated and enforced at the validation gate. Backward-compat with older SDK versions verified. Fail-closed coverage (non-finite inputs, short captures) in place. Enabled 2026-04-20.
 
+### Baseline Reset Flow (added 2026-04-21)
+
+- [x] **Self-service recovery for users with a lost local baseline** — When a wallet has an on-chain IAM Anchor but the device's encrypted baseline is unrecoverable, re-verification previously had no recovery path short of using a different wallet (losing trust score history). Resolution: new on-chain recovery instruction with a 7-day cooldown, wallet-owner-signed, preserves the Anchor token and anchor creation date while rotating the commitment to a fresh fingerprint and resetting verification counters. Humanness is re-asserted via the same Tier 1 validation pipeline used for normal verification. The `/verify` flow detects the missing-baseline state, surfaces a consequence-explicit confirmation dialog, and runs the reset on confirm. Shipped in pulse-sdk 0.9.0 + iamprotocol.io 2026-04-21.
+
 ---
 
 ## Protocol Core (`protocol-core`)
