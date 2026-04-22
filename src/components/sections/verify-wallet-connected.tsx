@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
-import { type PulseSession, PROGRAM_IDS } from "@iam-protocol/pulse-sdk";
+import { type PulseSession, PROGRAM_IDS, fetchChallenge } from "@iam-protocol/pulse-sdk";
 import type { VerifyState, VerifyAction } from "@/components/verify/types";
 import { PulseChallenge } from "@/components/verify/pulse-challenge";
 import {
@@ -52,6 +52,14 @@ export function VerifyWalletConnected({
   // verifications inside the same 24h slice into one contribution, so
   // verifying twice within 24h is a UX surprise unless we flag it.
   const [lastVerificationTimestamp, setLastVerificationTimestamp] = useState<number | null>(null);
+  // Server-issued challenge phrase (master-list #89). Fetched from the
+  // executor's /challenge endpoint during handleStart so the PulseChallenge
+  // displays the authoritative phrase the validation service will
+  // phoneme-match. Null when no fetch has happened yet or the executor was
+  // unreachable — PulseChallenge falls back to client-generated copy in
+  // that case and phrase content binding skips server-side (Tier 1 still
+  // runs).
+  const [challengePhrase, setChallengePhrase] = useState<string | null>(null);
   const startingRef = useRef(false);
   const voicedFramesRef = useRef(0);
   // Intent is tracked alongside the state-machine mirror so the
@@ -103,9 +111,31 @@ export function VerifyWalletConnected({
     startingRef.current = true;
     intentRef.current = intent;
     setRequesting(true);
+    setChallengePhrase(null);
 
     try {
       voicedFramesRef.current = 0;
+
+      // Fire the challenge fetch in parallel with sensor setup. We do NOT
+      // await this before requesting motion permission: `DeviceMotionEvent
+      // .requestPermission()` on iOS consumes the active user-gesture token,
+      // and awaiting a network round-trip between the click and the motion
+      // prompt silently drops that token — motion permission denied.
+      // Awaiting happens after audio/motion/touch permissions resolve but
+      // before START_CAPTURE, so the PulseChallenge renders with whichever
+      // phrase is ready by then (server-issued, or null → client fallback).
+      const relayerUrl = process.env.NEXT_PUBLIC_RELAYER_URL;
+      const relayerApiKey = process.env.NEXT_PUBLIC_RELAYER_API_KEY;
+      const challengePromise: Promise<string | null> =
+        publicKey && relayerUrl
+          ? fetchChallenge(relayerUrl, publicKey.toBase58(), relayerApiKey)
+              .then((c) => c.phrase)
+              .catch((err: unknown) => {
+                const msg = err instanceof Error ? err.message : String(err);
+                console.warn(`[verify] challenge fetch failed: ${msg}`);
+                return null;
+              })
+          : Promise.resolve(null);
 
       // Always attach touch capture to document.body. The PulseChallenge
       // curve DIV is only mounted AFTER we dispatch START_CAPTURE below, so
@@ -159,6 +189,12 @@ export function VerifyWalletConnected({
       }
 
       session.startTouch().catch(() => session.skipTouch());
+
+      // Await the parallel challenge fetch now that permissions have
+      // resolved. The 3-second countdown inside PulseChallenge gives
+      // another buffer for slow networks before the phrase appears.
+      const phrase = await challengePromise;
+      if (phrase) setChallengePhrase(phrase);
 
       dispatch({ type: "START_CAPTURE", intent });
     } finally {
@@ -343,6 +379,7 @@ export function VerifyWalletConnected({
         touchRef={touchRef}
         audioLevel={audioLevel}
         hasMotion={hasMotion}
+        phrase={challengePhrase ?? undefined}
       />
     );
   }

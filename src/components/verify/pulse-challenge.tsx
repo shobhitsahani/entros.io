@@ -24,11 +24,22 @@ export function PulseChallenge({
   touchRef,
   audioLevel = 0,
   hasMotion = true,
+  phrase: providedPhrase,
 }: {
   onComplete: () => void;
   touchRef?: React.RefObject<HTMLDivElement | null>;
   audioLevel?: number;
   hasMotion?: boolean;
+  /**
+   * Server-issued challenge phrase (master-list #89). The verify flow fetches
+   * this from the executor's `/challenge` endpoint so iam-validation can
+   * phoneme-match the transcribed audio against the authoritative phrase.
+   *
+   * Falls back to client-generated when absent (e.g. executor unreachable) so
+   * the capture UI still works — but phrase content binding then skips
+   * server-side, since the server has no record of the phrase to compare.
+   */
+  phrase?: string;
 }) {
   const [countdown, setCountdown] = useState(3);
   const [captureStarted, setCaptureStarted] = useState(false);
@@ -42,7 +53,12 @@ export function PulseChallenge({
   const onCompleteRef = useRef(onComplete);
   onCompleteRef.current = onComplete;
 
-  const phrase = useMemo(() => generatePhrase(5), []);
+  // Prefer the server-issued phrase; only generate client-side if the parent
+  // couldn't fetch one (phrase content binding then skips server-side).
+  const fallbackPhrase = useMemo(() => generatePhrase(5), []);
+  const phrase = providedPhrase && providedPhrase.trim().length > 0
+    ? providedPhrase
+    : fallbackPhrase;
   const lissajousPoints = useMemo(() => {
     const params = randomLissajousParams();
     return generateLissajousPoints(params);
