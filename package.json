@@ -38,5 +38,8 @@
     "eslint-config-next": "16.2.0",
     "tailwindcss": "^4",
     "typescript": "^6.0.2"
+  },
+  "overrides": {
+    "zod": "^3.25.0"
   }
 }
