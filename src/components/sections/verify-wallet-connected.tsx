@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
-import { type PulseSession, PROGRAM_IDS, fetchChallenge } from "@iam-protocol/pulse-sdk";
+import { type PulseSession, PROGRAM_IDS, fetchChallenge } from "@entros/pulse-sdk";
 import type { VerifyState, VerifyAction } from "@/components/verify/types";
 import { PulseChallenge } from "@/components/verify/pulse-challenge";
 import {
@@ -81,7 +81,7 @@ export function VerifyWalletConnected({
       return;
     }
     let cancelled = false;
-    const programId = new PublicKey(PROGRAM_IDS.iamAnchor);
+    const programId = new PublicKey(PROGRAM_IDS.entrosAnchor);
     const [identityPda] = PublicKey.findProgramAddressSync(
       [new TextEncoder().encode("identity"), publicKey.toBuffer()],
       programId,

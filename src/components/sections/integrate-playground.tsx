@@ -7,7 +7,7 @@ import { CheckCircle, XCircle, Loader2, Search, ExternalLink } from "lucide-reac
 import { explorerUrl } from "@/lib/explorer";
 
 const DEMO_WALLET = "2jowceXRayDC3ufU3kRjf67zT3cLv48q4gbcdhA1SNQw";
-const IAM_ANCHOR_PROGRAM = "GZYwTp2ozeuRA5Gof9vs4ya961aANcJBdUzB7LN6q4b2";
+const ENTROS_ANCHOR_PROGRAM = "GZYwTp2ozeuRA5Gof9vs4ya961aANcJBdUzB7LN6q4b2";
 
 interface IdentityResult {
   trustScore: number;
@@ -68,7 +68,7 @@ export function IntegratePlayground() {
         return;
       }
 
-      const programId = new PublicKey(IAM_ANCHOR_PROGRAM);
+      const programId = new PublicKey(ENTROS_ANCHOR_PROGRAM);
       const [identityPda] = PublicKey.findProgramAddressSync(
         [new TextEncoder().encode("identity"), pubkey.toBuffer()],
         programId
@@ -106,7 +106,7 @@ export function IntegratePlayground() {
           Live on Solana devnet
         </p>
         <p className="text-sm text-foreground/70 mb-5">
-          Paste any wallet address to check its IAM verification status on-chain.
+          Paste any wallet address to check its Entros verification status on-chain.
         </p>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
@@ -155,7 +155,7 @@ export function IntegratePlayground() {
             <div>
               <p className="text-sm font-medium text-foreground">Not verified</p>
               <p className="text-xs text-muted mt-0.5">
-                This wallet has no IAM Anchor on devnet. No Trust Score, no verification history.
+                This wallet has no Entros Anchor on devnet. No Trust Score, no verification history.
               </p>
             </div>
           </div>
@@ -187,7 +187,7 @@ export function IntegratePlayground() {
               </div>
             </div>
             <div className="mt-4 pt-3 border-t border-border/50">
-              <p className="text-xs font-mono uppercase tracking-widest text-muted">IAM Anchor PDA</p>
+              <p className="text-xs font-mono uppercase tracking-widest text-muted">Entros Anchor PDA</p>
               <div className="mt-1 flex items-center gap-2">
                 <p className="text-xs font-mono text-foreground/60 break-all">{result.anchorPda}</p>
                 <a
@@ -216,7 +216,7 @@ export function IntegratePlayground() {
         >
           2jowce...SNQw
         </button>{" "}
-        (IAM verified wallet on devnet)
+        (Entros verified wallet on devnet)
       </p>
     </div>
   );

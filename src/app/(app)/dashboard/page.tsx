@@ -7,14 +7,14 @@ import { DashboardAgents } from "@/components/sections/dashboard-agents";
 export const metadata: Metadata = {
   title: "Dashboard",
   description:
-    "Your IAM Anchor details, Trust Score, and verification history.",
+    "Your Entros Anchor details, Trust Score, and verification history.",
 };
 
 export default function Dashboard() {
   return (
     <>
       <SubpageHero
-        title="Your IAM Anchor"
+        title="Your Entros Anchor"
         subtitle={"Trust Score, verification history,\nand on-chain identity status."}
       />
       <section className="mx-auto max-w-7xl px-6 pb-24">

@@ -1,5 +1,5 @@
 import { Connection, PublicKey } from "@solana/web3.js";
-import { PROGRAM_IDS } from "@iam-protocol/pulse-sdk";
+import { PROGRAM_IDS } from "@entros/pulse-sdk";
 
 export interface VerificationHistoryEntry {
   id: string;
@@ -22,7 +22,7 @@ export function commitmentBytesToHex(bytes: Uint8Array): string {
 const VERIFICATION_RESULT_DISC_B58 = "JU9cxeSQjfT";
 
 /**
- * Fetch VerificationResult PDAs from iam-verifier program.
+ * Fetch VerificationResult PDAs from entros-verifier program.
  * Filters by discriminator (to exclude Challenge accounts) and verifier pubkey.
  * Post-binding-patch layout (2026-04-20, 182 bytes):
  *   8 disc + 32 verifier + 32 proof_hash + 8 verified_at + 1 is_valid +
@@ -36,7 +36,7 @@ export async function fetchVerificationHistory(
   walletPubkey: string,
   connection: Connection,
 ): Promise<VerificationHistoryEntry[]> {
-  const verifierProgramId = new PublicKey(PROGRAM_IDS.iamVerifier);
+  const verifierProgramId = new PublicKey(PROGRAM_IDS.entrosVerifier);
 
   const accounts = await connection.getProgramAccounts(verifierProgramId, {
     filters: [

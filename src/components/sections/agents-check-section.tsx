@@ -5,7 +5,7 @@ import { useConnection } from "@solana/wallet-adapter-react";
 import {
   getAgentHumanOperator,
   type AgentHumanOperator,
-} from "@iam-protocol/pulse-sdk";
+} from "@entros/pulse-sdk";
 import { TextShimmer } from "@/components/ui/text-shimmer";
 import { GlowCard } from "@/components/ui/glow-card";
 import { Bot, CheckCircle, ExternalLink, Loader2, Search } from "lucide-react";
@@ -103,7 +103,7 @@ export function AgentsCheckSection() {
       </TextShimmer>
       <p className="mt-4 text-sm text-foreground/70 max-w-2xl">
         Enter any agent&apos;s asset address to check if it has a verified human
-        operator via IAM.
+        operator via Entros.
       </p>
 
       <div className="mt-6">
@@ -153,10 +153,10 @@ export function AgentsCheckSection() {
               <Bot className="h-6 w-6 text-muted" strokeWidth={1.5} />
               <div>
                 <p className="text-sm font-medium text-foreground">
-                  No IAM attestation
+                  No Entros attestation
                 </p>
                 <p className="text-xs text-muted mt-0.5">
-                  This agent has no verified human operator linked via IAM
+                  This agent has no verified human operator linked via Entros
                   Protocol.
                 </p>
               </div>
@@ -211,7 +211,7 @@ export function AgentsCheckSection() {
                 </div>
                 <div className="sm:col-span-2">
                   <p className="text-xs font-mono uppercase tracking-widest text-muted">
-                    IAM Anchor PDA
+                    Entros Anchor PDA
                   </p>
                   <div className="mt-1 flex items-center gap-2">
                     <p className="text-xs font-mono text-foreground/70 break-all">
@@ -245,7 +245,7 @@ export function AgentsCheckSection() {
         >
           m8b6AD...4must
         </button>{" "}
-        (IAM test agent on devnet)
+        (Entros test agent on devnet)
       </p>
     </section>
   );

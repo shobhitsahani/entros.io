@@ -5,7 +5,7 @@ import { VerifyFlow } from "@/components/sections/verify-flow";
 export const metadata: Metadata = {
   title: "Verify",
   description:
-    "Prove you are human with IAM Protocol. Walletless or wallet-connected verification on Solana devnet.",
+    "Prove you are human with Entros Protocol. Walletless or wallet-connected verification on Solana devnet.",
 };
 
 export default function Verify() {

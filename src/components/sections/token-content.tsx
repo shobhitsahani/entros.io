@@ -106,7 +106,7 @@ export function TokenContent() {
         </TextShimmer>
 
         <h2 className="mt-4 font-mono text-xl font-bold text-foreground md:text-2xl">
-          The governance and staking token of the IAM Protocol.
+          The governance and staking token of the Entros Protocol.
         </h2>
 
         <div className="mt-8 grid gap-3">

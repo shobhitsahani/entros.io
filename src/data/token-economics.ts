@@ -33,14 +33,14 @@ export const flywheel: FlyWheelStep[] = [
       "Fees accumulate in the protocol treasury PDA on-chain. Transparent, auditable, no off-chain billing.",
   },
   {
-    step: "Treasury buys IAM",
+    step: "Treasury buys Entros",
     description:
-      "Protocol revenue is used to purchase IAM tokens on the open market, creating sustained buy pressure proportional to verification volume.",
+      "Protocol revenue is used to purchase Entros tokens on the open market, creating sustained buy pressure proportional to verification volume.",
   },
   {
     step: "Validators earn",
     description:
-      "IAM tokens are distributed as staking rewards to validators who run the server-side validation service, incentivizing honest and high-quality validation.",
+      "Entros tokens are distributed as staking rewards to validators who run the server-side validation service, incentivizing honest and high-quality validation.",
   },
   {
     step: "Security improves",
@@ -77,7 +77,7 @@ export const tokenUtilities: TokenUtility[] = [
   {
     title: "Validator Staking",
     description:
-      "Stake IAM to run a validation node in the server-side verification network. Staked validators earn protocol fees proportional to their stake and performance.",
+      "Stake Entros to run a validation node in the server-side verification network. Staked validators earn protocol fees proportional to their stake and performance.",
   },
   {
     title: "Governance",
@@ -87,14 +87,14 @@ export const tokenUtilities: TokenUtility[] = [
   {
     title: "Capacity Tiers",
     description:
-      "Large integrators can stake IAM tokens for priority access and reduced fees, replacing per-verification costs with a staking model at scale.",
+      "Large integrators can stake Entros tokens for priority access and reduced fees, replacing per-verification costs with a staking model at scale.",
   },
 ];
 
 export const launchDetails = {
   mechanism: "MetaDAO or curated community sale",
   airdrop:
-    "First airdrop exclusively to IAM-verified humans. Your Trust Score determines allocation—the protocol rewards real users, not bot farms.",
+    "First airdrop exclusively to Entros-verified humans. Your Trust Score determines allocation—the protocol rewards real users, not bot farms.",
   standard: "SPL Token-2022 with Confidential Balances",
   supply: "Fixed at genesis",
 };

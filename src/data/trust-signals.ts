@@ -23,7 +23,7 @@ export const trustSignals: TrustSignal[] = [
     name: "Open Protocol",
     description: "Protocol layer is fully public.",
     detail: "MIT licensed. 3 Anchor programs, 1 Circom circuit, 1 TypeScript SDK on GitHub. Server-side validation models are proprietary—open protocol for trust, private defense for security.",
-    href: "https://github.com/iam-protocol",
+    href: "https://github.com/entros-protocol",
     cta: "View on GitHub",
     gridArea: "lg:col-start-2 lg:col-end-3 lg:row-start-1 lg:row-end-4",
   },

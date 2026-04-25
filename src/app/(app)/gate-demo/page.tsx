@@ -3,30 +3,30 @@
 import { useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { SubpageHero } from "@/components/sections/subpage-hero";
-import { IAMGate } from "@/components/ui/iam-gate";
+import { EntrosGate } from "@/components/ui/entros-gate";
 import { GlowCard } from "@/components/ui/glow-card";
 import { CodeBlock } from "@/components/ui/code-block";
 import { WalletConnectButton } from "@/components/ui/wallet-connect-button";
 import { CheckCircle } from "lucide-react";
 
-const USAGE_CODE = `import { IAMGate } from "@/components/ui/iam-gate";
+const USAGE_CODE = `import { EntrosGate } from "@/components/ui/entros-gate";
 
 export function PremiumPage() {
   return (
-    <IAMGate minTrustScore={100}>
+    <EntrosGate minTrustScore={100}>
       {/* Children render only when the connected wallet
-          has an IAM Anchor with trust score >= 100 */}
+          has an Entros Anchor with trust score >= 100 */}
       <h1>Welcome, verified human.</h1>
-    </IAMGate>
+    </EntrosGate>
   );
 }`;
 
 const COMPONENT_CODE = `"use client";
 
 /**
- * <IAMGate> — drop-in route guard for IAM Trust Score.
+ * <EntrosGate> — drop-in route guard for Entros Trust Score.
  *
- * Renders children only when the connected wallet has an IAM Anchor with
+ * Renders children only when the connected wallet has an Entros Anchor with
  * trustScore >= minTrustScore. Otherwise renders a fallback (default: a
  * verification prompt linking to /verify, or a custom node via the
  * \`fallback\` prop).
@@ -36,16 +36,16 @@ const COMPONENT_CODE = `"use client";
  *   - @solana/web3.js (PublicKey, Connection)
  *   - @solana/wallet-adapter-react (useWallet, useConnection)
  *   - @solana/wallet-adapter-react-ui (WalletMultiButton — the universal Solana wallet UI)
- *   - @iam-protocol/pulse-sdk (PROGRAM_IDS constant)
+ *   - @entros/pulse-sdk (PROGRAM_IDS constant)
  *   - lucide-react (icons)
  *   - Tailwind CSS for styling (no custom design system imports)
  *
  * Drop into any Next.js + Tailwind project with Solana wallet adapter set up.
  *
  * Example:
- *   <IAMGate minTrustScore={100}>
+ *   <EntrosGate minTrustScore={100}>
  *     <PremiumContent />
- *   </IAMGate>
+ *   </EntrosGate>
  *
  * SECURITY: This is a client-side gate. It is suitable for UI gating, paywalls
  * with low stakes, and progressive disclosure. For high-stakes access control
@@ -59,13 +59,13 @@ import Link from "next/link";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { PROGRAM_IDS } from "@iam-protocol/pulse-sdk";
+import { PROGRAM_IDS } from "@entros/pulse-sdk";
 import { Loader2, ShieldAlert, Wallet } from "lucide-react";
 
 const EXPECTED_SIZE = 62;
-const IAM_PROGRAM_ID = new PublicKey(PROGRAM_IDS.iamAnchor);
+const ENTROS_PROGRAM_ID = new PublicKey(PROGRAM_IDS.entrosAnchor);
 
-interface IAMGateProps {
+interface EntrosGateProps {
   minTrustScore: number;
   children: ReactNode;
   fallback?: ReactNode;
@@ -79,13 +79,13 @@ type FetchState =
   | { status: "no-identity" }
   | { status: "ready"; trustScore: number };
 
-export function IAMGate({
+export function EntrosGate({
   minTrustScore,
   children,
   fallback,
   loadingFallback,
   verifyHref = "/verify",
-}: IAMGateProps) {
+}: EntrosGateProps) {
   const { publicKey, connected } = useWallet();
   const { connection } = useConnection();
   const [fetchState, setFetchState] = useState<FetchState>({ status: "loading" });
@@ -104,7 +104,7 @@ export function IAMGate({
         try {
           const [identityPda] = PublicKey.findProgramAddressSync(
             [new TextEncoder().encode("identity"), publicKey.toBuffer()],
-            IAM_PROGRAM_ID,
+            ENTROS_PROGRAM_ID,
           );
           const conn = connection ?? new Connection("https://api.devnet.solana.com", "confirmed");
           const account = await conn.getAccountInfo(identityPda);
@@ -194,7 +194,7 @@ function DefaultFallback({
                 Connect your wallet
               </p>
               <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                This content requires a verified IAM identity.
+                This content requires a verified Entros identity.
               </p>
             </div>
             <WalletMultiButton />
@@ -208,7 +208,7 @@ function DefaultFallback({
                 Verify your humanness
               </p>
               <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                This content requires an IAM Anchor with Trust Score{" "}
+                This content requires an Entros Anchor with Trust Score{" "}
                 <span className="font-mono text-zinc-900 dark:text-zinc-100">{minTrustScore}</span>{" "}
                 or higher.
               </p>
@@ -272,7 +272,7 @@ export default function GateDemo() {
   return (
     <>
       <SubpageHero
-        title="IAM Gate"
+        title="Entros Gate"
         subtitle={
           "A drop-in React component to gate content by Trust Score.\n" +
           "Wraps any children, renders only when the connected wallet meets your threshold."
@@ -325,7 +325,7 @@ export default function GateDemo() {
               <p className="text-xs font-mono text-muted uppercase tracking-widest mb-4">
                 Live preview
               </p>
-              <IAMGate minTrustScore={threshold}>
+              <EntrosGate minTrustScore={threshold}>
                 <div className="rounded-xl border border-solana-green/30 bg-solana-green/5 p-6 text-center">
                   <CheckCircle className="mx-auto h-8 w-8 text-solana-green mb-3" />
                   <p className="font-sans text-lg font-semibold text-foreground">
@@ -335,7 +335,7 @@ export default function GateDemo() {
                     Your Trust Score meets the threshold of {threshold}.
                   </p>
                 </div>
-              </IAMGate>
+              </EntrosGate>
             </div>
           </div>
         </GlowCard>
@@ -358,11 +358,11 @@ export default function GateDemo() {
             <p className="text-sm text-foreground/70 leading-relaxed mb-4">
               Copy this code into your project at{" "}
               <code className="text-cyan bg-surface px-1.5 py-0.5 rounded">
-                components/ui/iam-gate.tsx
+                components/ui/entros-gate.tsx
               </code>
               . It requires{" "}
               <code className="text-cyan bg-surface px-1.5 py-0.5 rounded">
-                @iam-protocol/pulse-sdk
+                @entros/pulse-sdk
               </code>
               ,{" "}
               <code className="text-cyan bg-surface px-1.5 py-0.5 rounded">
@@ -394,12 +394,12 @@ export default function GateDemo() {
               prop to override the default verification prompt entirely.
             </p>
             <CodeBlock
-              code={`<IAMGate
+              code={`<EntrosGate
   minTrustScore={100}
   fallback={<YourCustomPrompt />}
 >
   <PremiumContent />
-</IAMGate>`}
+</EntrosGate>`}
             />
           </section>
         </div>

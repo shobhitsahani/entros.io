@@ -5,7 +5,7 @@ import {
   generatePhrase,
   randomLissajousParams,
   generateLissajousPoints,
-} from "@iam-protocol/pulse-sdk";
+} from "@entros/pulse-sdk";
 
 const CAPTURE_DURATION_S = 12;
 
@@ -32,7 +32,7 @@ export function PulseChallenge({
   hasMotion?: boolean;
   /**
    * Server-issued challenge phrase (master-list #89). The verify flow fetches
-   * this from the executor's `/challenge` endpoint so iam-validation can
+   * this from the executor's `/challenge` endpoint so entros-validation can
    * phoneme-match the transcribed audio against the authoritative phrase.
    *
    * Falls back to client-generated when absent (e.g. executor unreachable) so

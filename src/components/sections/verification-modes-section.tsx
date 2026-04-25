@@ -6,7 +6,7 @@ const MODES = [
     title: "Wallet-Connected",
     signal: "High",
     description:
-      "Connect a Solana wallet. Your IAM Anchor (non-transferable token) is tied to that wallet. Behavioral fingerprint stored on your device, commitment stored on-chain. Trust Score accumulates over time and is visible to every integrator on-chain. This is the persistent, portable identity. Each wallet requires funded SOL, and re-verification costs compound, making bot farms economically unsustainable at scale.",
+      "Connect a Solana wallet. Your Entros Anchor (non-transferable token) is tied to that wallet. Behavioral fingerprint stored on your device, commitment stored on-chain. Trust Score accumulates over time and is visible to every integrator on-chain. This is the persistent, portable identity. Each wallet requires funded SOL, and re-verification costs compound, making bot farms economically unsustainable at scale.",
   },
   {
     title: "Walletless",
@@ -31,7 +31,7 @@ export function VerificationModesSection() {
         Two modes, graduated trust.
       </h3>
       <p className="mt-3 max-w-2xl text-foreground/70">
-        Traditional captcha answers &ldquo;is this session human?&rdquo; IAM
+        Traditional captcha answers &ldquo;is this session human?&rdquo; Entros
         answers a harder question: &ldquo;is this the same human, and how long
         have they been proving it?&rdquo; The protocol provides the signal.
         The integrator sets the threshold for their use case.

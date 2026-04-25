@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useMemo } from "react";
-import { PulseSDK, type PulseConfig } from "@iam-protocol/pulse-sdk";
+import { PulseSDK, type PulseConfig } from "@entros/pulse-sdk";
 
 const PulseContext = createContext<PulseSDK | null>(null);
 

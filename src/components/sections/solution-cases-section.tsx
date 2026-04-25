@@ -22,7 +22,7 @@ export function SolutionCasesSection() {
       </TextShimmer>
 
       <h2 className="mt-6 font-sans text-2xl font-semibold text-foreground md:text-3xl">
-        Where IAM fits
+        Where Entros fits
       </h2>
 
       <div className="mt-10 space-y-2">

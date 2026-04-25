@@ -1,9 +1,9 @@
 "use client";
 
 /**
- * <IAMGate> — drop-in route guard for IAM Trust Score.
+ * <EntrosGate> — drop-in route guard for Entros Trust Score.
  *
- * Renders children only when the connected wallet has an IAM Anchor with
+ * Renders children only when the connected wallet has an Entros Anchor with
  * trustScore >= minTrustScore. Otherwise renders a fallback (default: a
  * verification prompt linking to /verify, or a custom node via the
  * `fallback` prop).
@@ -13,16 +13,16 @@
  *   - @solana/web3.js (PublicKey, Connection)
  *   - @solana/wallet-adapter-react (useWallet, useConnection)
  *   - @solana/wallet-adapter-react-ui (WalletMultiButton — the universal Solana wallet UI)
- *   - @iam-protocol/pulse-sdk (PROGRAM_IDS constant)
+ *   - @entros/pulse-sdk (PROGRAM_IDS constant)
  *   - lucide-react (icons)
  *   - Tailwind CSS for styling (no custom design system imports)
  *
  * Drop into any Next.js + Tailwind project with Solana wallet adapter set up.
  *
  * Example:
- *   <IAMGate minTrustScore={100}>
+ *   <EntrosGate minTrustScore={100}>
  *     <PremiumContent />
- *   </IAMGate>
+ *   </EntrosGate>
  *
  * SECURITY: This is a client-side gate. It is suitable for UI gating, paywalls
  * with low stakes, and progressive disclosure. For high-stakes access control
@@ -36,13 +36,13 @@ import Link from "next/link";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { PROGRAM_IDS } from "@iam-protocol/pulse-sdk";
+import { PROGRAM_IDS } from "@entros/pulse-sdk";
 import { Loader2, ShieldAlert, Wallet } from "lucide-react";
 
 const EXPECTED_SIZE = 62;
-const IAM_PROGRAM_ID = new PublicKey(PROGRAM_IDS.iamAnchor);
+const ENTROS_PROGRAM_ID = new PublicKey(PROGRAM_IDS.entrosAnchor);
 
-interface IAMGateProps {
+interface EntrosGateProps {
   minTrustScore: number;
   children: ReactNode;
   fallback?: ReactNode;
@@ -56,13 +56,13 @@ type FetchState =
   | { status: "no-identity" }
   | { status: "ready"; trustScore: number };
 
-export function IAMGate({
+export function EntrosGate({
   minTrustScore,
   children,
   fallback,
   loadingFallback,
   verifyHref = "/verify",
-}: IAMGateProps) {
+}: EntrosGateProps) {
   const { publicKey, connected } = useWallet();
   const { connection } = useConnection();
   const [fetchState, setFetchState] = useState<FetchState>({ status: "loading" });
@@ -81,7 +81,7 @@ export function IAMGate({
         try {
           const [identityPda] = PublicKey.findProgramAddressSync(
             [new TextEncoder().encode("identity"), publicKey.toBuffer()],
-            IAM_PROGRAM_ID,
+            ENTROS_PROGRAM_ID,
           );
           const conn = connection ?? new Connection("https://api.devnet.solana.com", "confirmed");
           const account = await conn.getAccountInfo(identityPda);
@@ -171,7 +171,7 @@ function DefaultFallback({
                 Connect your wallet
               </p>
               <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                This content requires a verified IAM identity.
+                This content requires a verified Entros identity.
               </p>
             </div>
             <WalletMultiButton />
@@ -185,7 +185,7 @@ function DefaultFallback({
                 Verify your humanness
               </p>
               <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                This content requires an IAM Anchor with Trust Score{" "}
+                This content requires an Entros Anchor with Trust Score{" "}
                 <span className="font-mono text-zinc-900 dark:text-zinc-100">{minTrustScore}</span>{" "}
                 or higher.
               </p>

@@ -10,7 +10,7 @@ import { ShimmerButton } from "@/components/ui/shimmer-button";
 export const metadata: Metadata = {
   title: "Solutions",
   description:
-    "IAM Protocol use cases: Sybil-resistant airdrops, human-verified governance, fair gaming mints, creator verification, bot prevention.",
+    "Entros Protocol use cases: Sybil-resistant airdrops, human-verified governance, fair gaming mints, creator verification, bot prevention.",
 };
 
 export default function Solutions() {
