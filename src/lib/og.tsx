@@ -6,7 +6,7 @@ const logoSrc = `data:image/png;base64,${readFileSync(
   join(process.cwd(), "public", "logos", "IAM.png")
 ).toString("base64")}`;
 
-export const ogAlt = "IAM Protocol — Proof of Humanity on Solana";
+export const ogAlt = "IAM Protocol — Proof of Personhood on Solana";
 export const ogSize = { width: 1200, height: 630 };
 export const ogContentType = "image/png";
 
@@ -39,7 +39,7 @@ export function generateOGImage() {
             letterSpacing: "-0.02em",
           }}
         >
-          Proof of Humanity on Solana
+          Proof of Personhood on Solana
         </div>
 
         <div

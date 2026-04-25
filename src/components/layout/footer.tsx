@@ -9,7 +9,7 @@ export function Footer() {
             IAM<span className="text-cyan">.</span>
           </p>
           <p className="mt-2 text-xs text-foreground/60">
-            Proof of Humanity on Solana
+            Proof of Personhood on Solana
           </p>
           <p className="mt-1 text-xs text-foreground/40">
             IAM Protocol™

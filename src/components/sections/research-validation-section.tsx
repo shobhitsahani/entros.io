@@ -51,7 +51,7 @@ export function ResearchValidationSection() {
       <p className="mt-3 max-w-2xl text-foreground/70">
         Single-modality detection is losing to modern AI. IAM&apos;s multi-modal
         approach is validated by recent research as the correct architecture for
-        proof of humanity in an era of neural speech synthesis and behavioral
+        proof of personhood in an era of neural speech synthesis and behavioral
         simulation.
       </p>
 

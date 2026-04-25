@@ -20,7 +20,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://iamprotocol.io"),
   title: {
-    default: "IAM Protocol — Proof of Humanity on Solana",
+    default: "IAM Protocol — Proof of Personhood on Solana",
     template: "%s | IAM Protocol",
   },
   description:
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: "IAM Protocol — Proof of Humanity on Solana",
+    title: "IAM Protocol — Proof of Personhood on Solana",
     description:
       "Solana-native identity verification through behavioral liveness. Privacy by architecture.",
     url: "https://iamprotocol.io",
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "IAM Protocol — Proof of Humanity on Solana",
+    title: "IAM Protocol — Proof of Personhood on Solana",
     description:
       "Prove you're human without revealing who you are. Built on Solana.",
     creator: "@iam_protocol",

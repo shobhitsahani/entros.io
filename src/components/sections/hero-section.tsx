@@ -25,7 +25,7 @@ export function HeroSection() {
 
         <GlassPanel className="mx-auto mt-10 max-w-2xl rounded-2xl px-8 py-6">
           <p className="text-base text-foreground/80 leading-relaxed md:text-lg">
-            Proof of humanity through voice, motion, and touch. Hashed
+            Proof of personhood through voice, motion, and touch. Hashed
             into a ZK proof on your device. Raw biometric data never
             leaves. Trust that grows with every verification. Verified
             on Solana.

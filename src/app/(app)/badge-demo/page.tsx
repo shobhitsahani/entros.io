@@ -162,7 +162,7 @@ export default function BadgeDemo() {
     <>
       <SubpageHero
         title="IAM Badge"
-        subtitle="A drop-in React component to display on-chain proof-of-humanity status."
+        subtitle="A drop-in React component to display on-chain proof-of-personhood status."
       />
       <div className="mx-auto max-w-5xl px-6 pb-24">
         <GlowCard className="mb-12">

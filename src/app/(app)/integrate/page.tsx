@@ -3,7 +3,7 @@ import { IntegrateGuide } from "@/components/sections/integrate-guide";
 
 export const metadata = {
   title: "Integrate",
-  description: "Add IAM proof-of-humanity verification to your app in 5 lines of code.",
+  description: "Add IAM proof-of-personhood verification to your app in 5 lines of code.",
 };
 
 export default function Integrate() {

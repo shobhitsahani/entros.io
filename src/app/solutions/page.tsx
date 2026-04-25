@@ -18,7 +18,7 @@ export default function Solutions() {
     <>
       <SubpageHero
         title="Solutions"
-        subtitle={"Proof-of-Humanity for protocols that need to know their users are real,\nwithout learning who they are."}
+        subtitle={"Proof-of-Personhood for protocols that need to know their users are real,\nwithout learning who they are."}
       />
       <SolutionsHeroAnimation />
       <SolutionCasesSection />
