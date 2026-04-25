@@ -6,13 +6,13 @@ export function Footer() {
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-6 py-12 md:grid-cols-3">
         <div>
           <p className="font-mono text-sm font-bold text-foreground">
-            IAM<span className="text-cyan">.</span>
+            Entros<span className="text-cyan">.</span>
           </p>
           <p className="mt-2 text-xs text-foreground/60">
             Proof of Personhood on Solana
           </p>
           <p className="mt-1 text-xs text-foreground/40">
-            IAM Protocol™
+            Entros Protocol™
           </p>
         </div>
 
@@ -33,7 +33,7 @@ export function Footer() {
 
         <div className="flex flex-col gap-2 text-sm text-muted">
           <a
-            href="https://github.com/iam-protocol"
+            href="https://github.com/entros-protocol"
             target="_blank"
             rel="noopener noreferrer"
             className="transition-colors hover:text-foreground"
@@ -49,7 +49,7 @@ export function Footer() {
             Discord
           </a>
           <a
-            href="https://x.com/iam_protocol_"
+            href="https://x.com/entros_protocol"
             target="_blank"
             rel="noopener noreferrer"
             className="transition-colors hover:text-foreground"

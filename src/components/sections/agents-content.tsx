@@ -10,7 +10,7 @@ const steps = [
     icon: ShieldCheck,
     title: "Verify as human",
     description:
-      "Complete a behavioral verification to prove you're human. Your IAM Anchor is minted on Solana with a Trust Score that grows over time.",
+      "Complete a behavioral verification to prove you're human. Your Entros Anchor is minted on Solana with a Trust Score that grows over time.",
   },
   {
     icon: Bot,
@@ -22,7 +22,7 @@ const steps = [
     icon: Link2,
     title: "Attest with Agent Anchor",
     description:
-      "Link your IAM Anchor to your agent with one transaction. The attestation is immutable and on-chain. Any platform can verify the link.",
+      "Link your Entros Anchor to your agent with one transaction. The attestation is immutable and on-chain. Any platform can verify the link.",
   },
 ];
 
@@ -114,7 +114,7 @@ export function AgentsContent() {
             </h2>
             <p className="mt-4 text-foreground/70 leading-relaxed">
               Agent Anchor writes immutable metadata on a registered agent
-              linking it to its verified human operator&apos;s IAM Anchor. One
+              linking it to its verified human operator&apos;s Entros Anchor. One
               human, one Trust Score. Register 100 agents and all 100 trace back
               to the same verified identity. Platforms can set policies: minimum
               Trust Score to register, maximum agents per operator.
@@ -195,7 +195,7 @@ export function AgentsContent() {
               <span className="text-cyan">{"from"}</span>
               {" "}
               <span className="text-solana-green">
-                {"'@iam-protocol/pulse-sdk'"}
+                {"'@entros/pulse-sdk'"}
               </span>
               {";\n\n"}
               <span className="text-cyan">{"const"}</span>

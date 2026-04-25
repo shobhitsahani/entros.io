@@ -14,8 +14,8 @@ export const protocolComponents: ProtocolComponent[] = [
       "Walletless mode (relayer) and wallet-connected mode",
     ],
     links: [
-      { label: "GitHub", href: "https://github.com/iam-protocol/pulse-sdk" },
-      { label: "npm", href: "https://www.npmjs.com/package/@iam-protocol/pulse-sdk" },
+      { label: "GitHub", href: "https://github.com/entros-protocol/pulse-sdk" },
+      { label: "npm", href: "https://www.npmjs.com/package/@entros/pulse-sdk" },
     ],
   },
   {
@@ -31,7 +31,7 @@ export const protocolComponents: ProtocolComponent[] = [
       "Proof generation targets under 5 seconds on mobile",
     ],
     links: [
-      { label: "GitHub", href: "https://github.com/iam-protocol/circuits" },
+      { label: "GitHub", href: "https://github.com/entros-protocol/circuits" },
     ],
   },
   {
@@ -39,7 +39,7 @@ export const protocolComponents: ProtocolComponent[] = [
     title: "On-Chain Programs",
     subtitle: "Three Solana programs",
     description:
-      "The iam-verifier program checks ZK proofs. The iam-anchor program manages non-transferable identity tokens (SPL Token-2022). The iam-registry tracks Trust Scores, validator staking, and protocol configuration.",
+      "The entros-verifier program checks ZK proofs. The entros-anchor program manages non-transferable identity tokens (SPL Token-2022). The entros-registry tracks Trust Scores, validator staking, and protocol configuration.",
     highlights: [
       "Anchor framework with full constraint validation",
       "Non-transferable token via Token-2022 extension",
@@ -47,7 +47,7 @@ export const protocolComponents: ProtocolComponent[] = [
       "PDA-derived identity (one per wallet)",
     ],
     links: [
-      { label: "GitHub", href: "https://github.com/iam-protocol/protocol-core" },
+      { label: "GitHub", href: "https://github.com/entros-protocol/protocol-core" },
     ],
   },
   {
@@ -63,7 +63,7 @@ export const protocolComponents: ProtocolComponent[] = [
       "Configurable CORS and rate limiting",
     ],
     links: [
-      { label: "GitHub", href: "https://github.com/iam-protocol/executor-node" },
+      { label: "GitHub", href: "https://github.com/entros-protocol/executor-node" },
     ],
   },
   {

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { SubpageHero } from "@/components/sections/subpage-hero";
-import { IAMBadge } from "@/components/ui/iam-badge";
+import { EntrosBadge } from "@/components/ui/entros-badge";
 import { GlowCard } from "@/components/ui/glow-card";
 import { CodeBlock } from "@/components/ui/code-block";
 
@@ -11,20 +11,20 @@ const COMPONENT_CODE = `"use client";
 
 import { useEffect, useState } from "react";
 import { Connection, PublicKey } from "@solana/web3.js";
-import { PROGRAM_IDS } from "@iam-protocol/pulse-sdk";
+import { PROGRAM_IDS } from "@entros/pulse-sdk";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const EXPECTED_SIZE = 62;
-const IAM_PROGRAM_ID = new PublicKey(PROGRAM_IDS.iamAnchor);
+const ENTROS_PROGRAM_ID = new PublicKey(PROGRAM_IDS.entrosAnchor);
 
-interface IAMBadgeProps {
+interface EntrosBadgeProps {
   walletAddress: string;
   connection?: Connection;
   className?: string;
 }
 
-export function IAMBadge({ walletAddress, connection, className }: IAMBadgeProps) {
+export function EntrosBadge({ walletAddress, connection, className }: EntrosBadgeProps) {
   const [loading, setLoading] = useState(true);
   const [trustScore, setTrustScore] = useState<number | null>(null);
   const [invalid, setInvalid] = useState(false);
@@ -56,7 +56,7 @@ export function IAMBadge({ walletAddress, connection, className }: IAMBadgeProps
         try {
           const [identityPda] = PublicKey.findProgramAddressSync(
             [new TextEncoder().encode("identity"), pubkey.toBuffer()],
-            IAM_PROGRAM_ID
+            ENTROS_PROGRAM_ID
           );
 
           // If no connection prop is passed, use a default devnet connection
@@ -117,7 +117,7 @@ export function IAMBadge({ walletAddress, connection, className }: IAMBadgeProps
       ) : loading ? (
         <>
           <Loader2 className="h-3.5 w-3.5 animate-spin text-muted" />
-          <span>Verifying IAM...</span>
+          <span>Verifying Entros...</span>
         </>
       ) : trustScore !== null ? (
         <>
@@ -137,7 +137,7 @@ export function IAMBadge({ walletAddress, connection, className }: IAMBadgeProps
   );
 }`;
 
-const USAGE_CODE = `import { IAMBadge } from "@/components/ui/iam-badge";
+const USAGE_CODE = `import { EntrosBadge } from "@/components/ui/entros-badge";
 import { useConnection } from "@solana/wallet-adapter-react";
 
 export function ProfileHeader({ walletAddress }) {
@@ -146,7 +146,7 @@ export function ProfileHeader({ walletAddress }) {
   return (
     <div className="flex items-center gap-4">
       <h2 className="text-xl font-bold">{walletAddress}</h2>
-      <IAMBadge walletAddress={walletAddress} connection={connection} />
+      <EntrosBadge walletAddress={walletAddress} connection={connection} />
     </div>
   );
 }`;
@@ -161,7 +161,7 @@ export default function BadgeDemo() {
   return (
     <>
       <SubpageHero
-        title="IAM Badge"
+        title="Entros Badge"
         subtitle="A drop-in React component to display on-chain proof-of-personhood status."
       />
       <div className="mx-auto max-w-5xl px-6 pb-24">
@@ -190,7 +190,7 @@ export default function BadgeDemo() {
               </p>
               <div className="h-10 flex items-center justify-center">
                 {isValidLength ? (
-                  <IAMBadge walletAddress={walletInput} connection={connection} />
+                  <EntrosBadge walletAddress={walletInput} connection={connection} />
                 ) : (
                   <span className="text-sm font-mono text-muted/50">
                     Enter a valid address to preview
@@ -213,7 +213,7 @@ export default function BadgeDemo() {
           <section>
             <h2 className="text-lg font-mono font-bold text-foreground mb-4">2. Component Source</h2>
             <p className="text-sm text-foreground/70 leading-relaxed mb-4">
-              Copy this code into your project at <code className="text-cyan bg-surface px-1.5 py-0.5 rounded">components/ui/iam-badge.tsx</code>. It requires the <code className="text-cyan bg-surface px-1.5 py-0.5 rounded">@iam-protocol/pulse-sdk</code> and <code className="text-cyan bg-surface px-1.5 py-0.5 rounded">@solana/web3.js</code> packages.
+              Copy this code into your project at <code className="text-cyan bg-surface px-1.5 py-0.5 rounded">components/ui/entros-badge.tsx</code>. It requires the <code className="text-cyan bg-surface px-1.5 py-0.5 rounded">@entros/pulse-sdk</code> and <code className="text-cyan bg-surface px-1.5 py-0.5 rounded">@solana/web3.js</code> packages.
             </p>
             <div className="relative">
               <div className="absolute right-4 top-4 z-10">

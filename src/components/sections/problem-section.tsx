@@ -7,7 +7,7 @@ export function ProblemSection() {
         or extensive personal data.
       </p>
       <p className="mt-4 text-xl font-sans font-medium text-foreground leading-relaxed md:text-2xl">
-        IAM proves humanity through behavior alone, on the device you already own.
+        Entros proves humanity through behavior alone, on the device you already own.
       </p>
     </section>
   );

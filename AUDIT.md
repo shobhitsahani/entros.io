@@ -1,4 +1,4 @@
-# IAM Protocol — Security & Quality Audit Tracker
+# Entros Protocol — Security & Quality Audit Tracker
 
 Last updated: 2026-04-21
 
@@ -6,14 +6,14 @@ Running log of resolved bugs, hardening items, and known limitations across
 the protocol's repositories.
 
 **Continuous adversarial testing methodology and current aggregate results**
-are published at [iamprotocol.io/security](https://iamprotocol.io/security).
+are published at [entros.io/security](https://entros.io/security).
 
-**Vulnerability reports:** contact@iamprotocol.io (see Responsible Disclosure
+**Vulnerability reports:** contact@entros.io (see Responsible Disclosure
 below).
 
 ---
 
-## Pulse SDK (`@iam-protocol/pulse-sdk`)
+## Pulse SDK (`@entros/pulse-sdk`)
 
 ### Critical
 
@@ -70,7 +70,7 @@ deployment. All have documented implementation paths in the blueprint folder.
 
 ### Baseline Reset Flow (added 2026-04-21)
 
-- [x] **Self-service recovery for users with a lost local baseline** — When a wallet has an on-chain IAM Anchor but the device's encrypted baseline is unrecoverable, re-verification previously had no recovery path short of using a different wallet (losing trust score history). Resolution: new on-chain recovery instruction with a 7-day cooldown, wallet-owner-signed, preserves the Anchor token and anchor creation date while rotating the commitment to a fresh fingerprint and resetting verification counters. Humanness is re-asserted via the same Tier 1 validation pipeline used for normal verification. The `/verify` flow detects the missing-baseline state, surfaces a consequence-explicit confirmation dialog, and runs the reset on confirm. Shipped in pulse-sdk 0.9.0 + iamprotocol.io 2026-04-21.
+- [x] **Self-service recovery for users with a lost local baseline** — When a wallet has an on-chain Entros Anchor but the device's encrypted baseline is unrecoverable, re-verification previously had no recovery path short of using a different wallet (losing trust score history). Resolution: new on-chain recovery instruction with a 7-day cooldown, wallet-owner-signed, preserves the Anchor token and anchor creation date while rotating the commitment to a fresh fingerprint and resetting verification counters. Humanness is re-asserted via the same Tier 1 validation pipeline used for normal verification. The `/verify` flow detects the missing-baseline state, surfaces a consequence-explicit confirmation dialog, and runs the reset on confirm. Shipped in pulse-sdk 0.9.0 + entros.io 2026-04-21.
 
 ---
 
@@ -87,8 +87,8 @@ end-to-end (browser → SDK → executor → Solana devnet) after deployment. Do
 not fix these in isolation.
 
 - [x] **`update_anchor` did not enforce cross-program binding to `verify_proof`** — The client SDK bundled `create_challenge + verify_proof + update_anchor` atomically, but the programs had no internal cross-reference. A direct Solana client could call `update_anchor` alone with any commitment and any nonce, incrementing Trust Score for only the protocol fee. Patched by extending `VerificationResult` with `commitment_new`, `commitment_prev`, `threshold`, `min_distance` (bound-checked in `verify_proof` with high-byte-zero field-element safety). `update_anchor` now requires a matching `VerificationResult` PDA (verifier = authority, freshness, commitment_new matches submitted, commitment_prev matches stored) plus defense-in-depth discriminator + owner checks. Single-use enforced by commitment rotation. pulse-sdk 0.8.0 threads the new account + nonce through the wallet submission path. Fixed 2026-04-20.
-- [x] **`update_anchor` lacked ownership constraint** — Added `constraint = identity_state.owner == authority.key() @ IamAnchorError::Unauthorized` to UpdateAnchor context. Fixed 2026-03-23.
-- [x] **`compute_trust_score` writes nothing on-chain** — Moved trust score computation into `update_anchor` (iam-anchor). Trust score auto-computed from verification history and protocol config on every update. `update_anchor` reads ProtocolConfig via cross-program PDA. Removed `new_trust_score` parameter. `compute_trust_score` in iam-registry remains as a read-only preview instruction. Fixed 2026-03-23.
+- [x] **`update_anchor` lacked ownership constraint** — Added `constraint = identity_state.owner == authority.key() @ EntrosAnchorError::Unauthorized` to UpdateAnchor context. Fixed 2026-03-23.
+- [x] **`compute_trust_score` writes nothing on-chain** — Moved trust score computation into `update_anchor` (entros-anchor). Trust score auto-computed from verification history and protocol config on every update. `update_anchor` reads ProtocolConfig via cross-program PDA. Removed `new_trust_score` parameter. `compute_trust_score` in entros-registry remains as a read-only preview instruction. Fixed 2026-03-23.
 - [x] **Failed proofs don't revert transaction** — Replaced `.is_ok()` with `?` in verify_proof. Invalid proofs now revert the entire transaction — challenge nonce preserved, no VerificationResult PDA created, no SOL wasted. Executor simplified: tx confirmation implies proof validity. Fixed 2026-03-23.
 - [x] **Verification key conversion needs manual verification** — Manual byte-by-byte audit confirmed: all G1 points, G2 points with reversed coordinate ordering, and nr_pubinputs=4 match exactly between verification_key.json and verifying_key.rs. Conversion script is correct. Verified 2026-03-22.
 
@@ -100,9 +100,9 @@ not fix these in isolation.
 - [x] **`Vec::new()` heap allocation in trust score** — Replaced with fixed `[i64; 9]` array. Fixed 2026-03-23.
 - [x] **Vault PDA has no unstake instruction** — Added `unstake_validator` instruction. Transfers staked SOL from vault back to validator via System Program CPI with PDA signing. Closes ValidatorState account (returns rent, allows re-registration). Authority constraint prevents unauthorized unstaking. Fixed 2026-03-25.
 - [x] **Trust score rewarded burst over consistency** — Same-day verifications inflated recency score linearly. Fixed by deduplicating `recent_timestamps` by calendar day before computing recency and regularity scores. Fixed 2026-04-10.
-- [x] **`create_challenge` accepts zero nonces** — Added `require!(nonce != [0u8; 32])` check matching the commitment validation pattern in iam-anchor. Fixed 2026-04-10.
+- [x] **`create_challenge` accepts zero nonces** — Added `require!(nonce != [0u8; 32])` check matching the commitment validation pattern in entros-anchor. Fixed 2026-04-10.
 - [ ] **No integration tests for trust score or nonce validation** — Trust score deduplication and nonce zero-check have no anchor test coverage. Assigned to contributor.
-- [x] **3 iam-registry tests failing due to test ordering** — `initializes protocol config` wrapped in try/catch for idempotent initialization. Trust score tests updated to match current instruction signature. Fixed 2026-03-25.
+- [x] **3 entros-registry tests failing due to test ordering** — `initializes protocol config` wrapped in try/catch for idempotent initialization. Trust score tests updated to match current instruction signature. Fixed 2026-03-25.
 
 ### Medium
 
@@ -173,7 +173,7 @@ not fix these in isolation.
 
 ---
 
-## iam-validation (private service)
+## entros-validation (private service)
 
 Closed-source server-side validation microservice on Railway. Receives the
 134-dimensional feature vector plus cross-modal sensor data from the
@@ -185,10 +185,11 @@ kept private per responsible-disclosure convention.
 
 - [x] **Statistical gap surfaced during T3b campaign** — Feature-space optimization against the server-side validation pipeline found a narrow exploitable seam across a small subset of probes. Hardened via an additional consistency constraint in the validation service; subsequent campaign attempts rejected. Attack mechanism and specific constraint kept private. Fixed 2026-04-18.
 - [x] **Cross-modality correlation check removed** — Discovered 2026-04-20 during T4a Wave 1 log analysis: the check correlated feature-vector statistical summaries at matching index positions across modalities, which is a category error (correlating mean F0 in Hz against mean jerk in m/s³ has no semantic grounding). Observed range on unrelated inputs 0.004–0.881, threshold 0.01 was below noise floor — zero defense value. Removed in iam-validation 2026-04-21. Sound cross-modal defense remains via the temporal coupling check (Pearson on F0 contour × accel magnitude time-series, same-unit same-time). Semantic replacement checks deferred pending human-baseline calibration data.
+- [x] **Phrase content binding shipped** — Tier 1 validation now verifies that the audio content matches the server-issued challenge phrase, not just voice texture. Closes the pre-recorded-arbitrary-content attack class (T4a Wave 1 baseline). Combinatorial defense ≈ 4.7 × 10¹⁵ unique phrases per session via random sampling from a curated neutral-vocabulary dictionary. Calibrated discrimination gap ≈ 95 percentage points between right and wrong content across initial verifications; threshold tolerates one transcription word-error per phrase with margin. Fixed 2026-04-25.
 
 ---
 
-## Website (`iamprotocol.io`)
+## Website (`entros.io`)
 
 ### High
 
@@ -245,7 +246,7 @@ generative techniques. Attack code, per-attempt telemetry, and specific
 parameter values are kept private per responsible-disclosure convention.
 
 Public methodology, tier taxonomy, and current aggregate results are
-published at [iamprotocol.io/security](https://iamprotocol.io/security).
+published at [entros.io/security](https://entros.io/security).
 
 A public baseline test suite at `pulse-sdk/test/pentest.test.ts` exercises
 trivial attacker capability (procedural sine-wave synthesis) and is retained
@@ -256,7 +257,7 @@ private harness addresses.
 
 ## Responsible Disclosure
 
-Report vulnerabilities to contact@iamprotocol.io. We aim to acknowledge within
+Report vulnerabilities to contact@entros.io. We aim to acknowledge within
 48 hours and provide initial triage within 5 business days. Good-faith
 security research is welcome within the scope of the security program. We do
 not pursue legal action against researchers acting in good faith.

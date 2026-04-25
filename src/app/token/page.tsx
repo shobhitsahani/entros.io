@@ -6,14 +6,14 @@ import { TokenContent } from "@/components/sections/token-content";
 export const metadata: Metadata = {
   title: "Token",
   description:
-    "IAM Token economics. Protocol fees, revenue flywheel, validator staking, and fair launch details.",
+    "Entros Token economics. Protocol fees, revenue flywheel, validator staking, and fair launch details.",
 };
 
 export default function Token() {
   return (
     <>
       <SubpageHero
-        title="IAM Token"
+        title="Entros Token"
         subtitle="The economic layer of verified humanity."
       />
       <TokenHeroAnimation />

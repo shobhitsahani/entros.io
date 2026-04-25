@@ -1,7 +1,7 @@
 import { TextShimmer } from "@/components/ui/text-shimmer";
 
 const disclosureItems = [
-  { label: "Contact", value: "contact@iamprotocol.io", isEmail: true },
+  { label: "Contact", value: "contact@entros.io", isEmail: true },
   {
     label: "Scope",
     value:

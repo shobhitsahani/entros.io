@@ -141,9 +141,9 @@ export function FailedView({
         </p>
         <p className="mt-1 text-sm text-muted">
           {relayerDown
-            ? "The IAM relayer service is not running. Verification requires a live relayer connected to Solana devnet."
+            ? "The Entros relayer service is not running. Verification requires a live relayer connected to Solana devnet."
             : missingBaseline
-              ? "Your IAM Anchor exists on-chain, but the encrypted baseline that proves continuity is not on this device. You can reset your baseline to re-enroll from this device."
+              ? "Your Entros Anchor exists on-chain, but the encrypted baseline that proves continuity is not on this device. You can reset your baseline to re-enroll from this device."
               : error}
         </p>
         {relayerDown && (

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useConnection } from "@solana/wallet-adapter-react";
-import { type IdentityState, PROGRAM_IDS } from "@iam-protocol/pulse-sdk";
+import { type IdentityState, PROGRAM_IDS } from "@entros/pulse-sdk";
 import { PublicKey } from "@solana/web3.js";
 import { WalletConnectButton } from "@/components/ui/wallet-connect-button";
 import { GlowCard } from "@/components/ui/glow-card";
@@ -47,7 +47,7 @@ export function DashboardAnchorView() {
     setError(null);
 
     // Direct account read with manual deserialization (avoids IDL fetch issues)
-    const programId = new PublicKey(PROGRAM_IDS.iamAnchor);
+    const programId = new PublicKey(PROGRAM_IDS.entrosAnchor);
     const [identityPda] = PublicKey.findProgramAddressSync(
       [new TextEncoder().encode("identity"), publicKey.toBuffer()],
       programId
@@ -100,7 +100,7 @@ export function DashboardAnchorView() {
             Connect your wallet
           </p>
           <p className="mt-2 text-sm text-muted">
-            View your IAM Anchor, Trust Score,
+            View your Entros Anchor, Trust Score,
             <br className="md:hidden" />
             {" "}and verification history.
           </p>
@@ -158,10 +158,10 @@ export function DashboardAnchorView() {
         <ShieldAlert className="mx-auto h-12 w-12 text-muted" strokeWidth={1.5} />
         <div>
           <p className="font-sans text-xl font-semibold text-foreground">
-            No IAM Anchor found
+            No Entros Anchor found
           </p>
           <p className="mt-2 text-sm text-muted">
-            Complete your first verification to mint your IAM Anchor identity.
+            Complete your first verification to mint your Entros Anchor identity.
           </p>
         </div>
         <Link

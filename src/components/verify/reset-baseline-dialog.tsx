@@ -64,7 +64,7 @@ export function ResetBaselineDialog({
               Reset baseline?
             </h2>
             <p className="mt-2 text-sm text-foreground/70">
-              Your IAM Anchor stays. Your on-chain commitment and verification
+              Your Entros Anchor stays. Your on-chain commitment and verification
               history do not.
             </p>
           </div>
@@ -88,7 +88,7 @@ export function ResetBaselineDialog({
           <li className="flex gap-2.5">
             <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-foreground/40" />
             <span>
-              Your wallet, IAM Anchor token, and SAS attestation are preserved.
+              Your wallet, Entros Anchor token, and SAS attestation are preserved.
             </span>
           </li>
           <li className="flex gap-2.5">

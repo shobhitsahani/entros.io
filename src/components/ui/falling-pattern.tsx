@@ -7,7 +7,7 @@ const SQUARE_SIZE = 4;
 const GRID_GAP = 6;
 const FLICKER_CHANCE = 0.3;
 const OPACITY_BUCKETS = 32;
-const MOBILE_FRAME_INTERVAL = 50; // 20fps cap on mobile (vs 60fps desktop)
+const MOBILE_FRAME_INTERVAL = 120; // ~8fps cap on mobile (vs 60fps desktop) — slow enough to avoid compositor contention during scroll
 
 function buildPalette(maxOpacity: number): string[] {
   const isDark = document.documentElement.classList.contains("dark");
@@ -73,11 +73,10 @@ export function FallingPattern({ className }: { className?: string }) {
     }
 
     const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-    // On mobile, render one static frame and stop. The flicker effect
-    // is imperceptible at mobile sizes and the continuous rAF loop
-    // causes scroll stutter by competing with the compositor.
-    if (isMobile) {
+    // Honour reduced-motion preference: render one static frame and stop.
+    if (prefersReducedMotion) {
       setup();
       const step = (SQUARE_SIZE + GRID_GAP) * dpr;
       const size = SQUARE_SIZE * dpr;
@@ -102,6 +101,13 @@ export function FallingPattern({ className }: { className?: string }) {
 
     const animate = (time: number) => {
       if (!inView) return;
+
+      // Throttle aggressively on mobile so the rAF loop does not compete
+      // with the scroll compositor. Desktop runs at the browser's native rate.
+      if (isMobile && time - lastTime < MOBILE_FRAME_INTERVAL) {
+        animationFrameId = requestAnimationFrame(animate);
+        return;
+      }
 
       const deltaTime = Math.min((time - lastTime) / 1000, 0.1);
       lastTime = time;

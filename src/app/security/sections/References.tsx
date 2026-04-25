@@ -12,15 +12,15 @@ const externalLinks = [
   },
   {
     label: "AUDIT.md (public fix tracker)",
-    href: "https://github.com/iam-protocol/iamprotocol.io/blob/main/AUDIT.md",
+    href: "https://github.com/entros-protocol/entros.io/blob/main/AUDIT.md",
   },
   {
     label: "Public adversarial baseline tests",
-    href: "https://github.com/iam-protocol/pulse-sdk/blob/main/test/pentest.test.ts",
+    href: "https://github.com/entros-protocol/pulse-sdk/blob/main/test/pentest.test.ts",
   },
   {
     label: "GitHub organization",
-    href: "https://github.com/iam-protocol",
+    href: "https://github.com/entros-protocol",
   },
 ];
 

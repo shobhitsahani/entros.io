@@ -25,7 +25,7 @@ export function Navbar() {
           href="/"
           className="font-mono text-xl font-bold text-foreground tracking-tight"
         >
-          IAM<span className="text-cyan">.</span>
+          Entros<span className="text-cyan">.</span>
         </Link>
 
         <ul className="absolute left-1/2 -translate-x-1/2 hidden items-center gap-8 md:flex">

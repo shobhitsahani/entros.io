@@ -92,7 +92,7 @@ export const campaignResults: CampaignResult[] = [
 export const lastUpdated = "April 20, 2026";
 
 export const t4aNote =
-  "T4a was designed as a two-wave study to measure the cross-modal temporal coupling layer's specific contribution to the multi-layer defense. Wave 1 ran with temporal enforcement in log-only mode to establish the counterfactual baseline. Wave 2 ran with enforcement enabled. The 90 percentage-point reduction isolates that layer's contribution. The 10% Wave 2 residual motivates phrase-binding via server-side speech-to-text as the next defense layer.";
+  "T4a was designed as a two-wave study to measure the cross-modal temporal coupling layer's specific contribution to the multi-layer defense. Wave 1 ran with temporal enforcement in log-only mode to establish the counterfactual baseline. Wave 2 ran with enforcement enabled. The 90 percentage-point reduction isolates that layer's contribution. The 10% Wave 2 residual motivated server-side phrase content binding (shipped 2026-04-25) as the next defense layer; T4a Wave 3 is queued to measure the residual after that layer.";
 
 export const onChainBurstNote =
-  "The IAM Anchors currently visible on devnet include internal red team artifacts from T4a Waves 1–2 (documented above) alongside legitimate team and pilot-user verifications. All state is preserved on-chain for audit traceability; the public /stats page reads the full on-chain aggregate directly.";
+  "The Entros Anchors currently visible on devnet include internal red team artifacts from T4a Waves 1–2 (documented above) alongside legitimate team and pilot-user verifications. All state is preserved on-chain for audit traceability; the public /stats page reads the full on-chain aggregate directly.";

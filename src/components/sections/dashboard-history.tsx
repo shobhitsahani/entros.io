@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
-import { PROGRAM_IDS } from "@iam-protocol/pulse-sdk";
+import { PROGRAM_IDS } from "@entros/pulse-sdk";
 import { TextShimmer } from "@/components/ui/text-shimmer";
 import { CheckCircle, Loader2, Fingerprint, RotateCcw } from "lucide-react";
 
@@ -39,7 +39,7 @@ export function DashboardHistory() {
 
     // Build history entirely from the IdentityState PDA (authoritative source)
     (async () => {
-      const programId = new PublicKey(PROGRAM_IDS.iamAnchor);
+      const programId = new PublicKey(PROGRAM_IDS.entrosAnchor);
       const [identityPda] = PublicKey.findProgramAddressSync(
         [new TextEncoder().encode("identity"), publicKey.toBuffer()],
         programId
@@ -159,7 +159,7 @@ export function DashboardHistory() {
                 </p>
                 <p className="mt-0.5 text-xs text-muted">
                   {lastResetTimestamp > 0
-                    ? "IAM Anchor PDA and Token-2022 mint created on-chain"
+                    ? "Entros Anchor PDA and Token-2022 mint created on-chain"
                     : "Behavioral baseline established"}
                 </p>
               </div>

@@ -13,7 +13,7 @@ import { VerificationOrb } from "@/components/ui/verification-orb";
 export const metadata: Metadata = {
   title: "Technology",
   description:
-    "How IAM verification works. Seven steps from behavioral challenge to on-chain proof. Raw recordings never leave your device.",
+    "How Entros verification works. Seven steps from behavioral challenge to on-chain proof. Raw recordings never leave your device.",
 };
 
 export default function Technology() {

@@ -52,7 +52,7 @@ export function SecurityModelSection() {
       </TextShimmer>
 
       <h2 className="mt-4 font-mono text-2xl font-bold text-foreground md:text-3xl">
-        How IAM resists bots.
+        How Entros resists bots.
       </h2>
       <p className="mt-3 max-w-2xl text-foreground/70">
         Open protocol for trust. Private validation for security. Synthetic

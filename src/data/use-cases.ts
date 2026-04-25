@@ -23,6 +23,6 @@ export const useCases: UseCase[] = [
     problem:
       "Social feeds, marketplaces, and games overrun by automated accounts.",
     solution:
-      "Require IAM verification at signup. Kill bots without killing privacy.",
+      "Require Entros verification at signup. Kill bots without killing privacy.",
   },
 ];

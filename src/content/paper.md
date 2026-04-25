@@ -1,15 +1,15 @@
-# IAM Protocol: A Framework for Temporally-Consistent, Decentralized Proof-of-Personhood
+# Entros Protocol: A Framework for Temporally-Consistent, Decentralized Proof-of-Personhood
 
 **Document Version:** 3.0
 **Original Date:** June 27, 2025
-**Updated:** April 19, 2026
+**Updated:** April 25, 2026
 **Word Count:** Approx. 6300
 
 ---
 
 ## Abstract
 
-The proliferation of sophisticated AI and bot networks necessitates robust methods for verifying human uniqueness and liveness in digital ecosystems. Existing Proof-of-Personhood (PoP) solutions rely on centralized authorities, invasive static biometrics, or socially-correlatable data, creating vulnerabilities in privacy, security, and accessibility. We introduce the IAM Protocol, a decentralized framework for PoP and Self-Sovereign Identity built on Solana. The core innovation is *temporal consistency*: the assertion that human identity is best proven not by a static secret, but by the bounded, chaotic drift of biological and behavioral patterns over time. The framework captures multi-modal behavioral data (voice prosody, hand tremor, touch dynamics) during a configurable behavioral challenge, extracts a 134-dimensional feature vector, and produces a 256-bit locality-sensitive hash via SimHash. A Groth16 zero-knowledge proof verifies that consecutive fingerprints fall within a bounded Hamming distance without revealing either value. Attestations are anchored to non-transferable identity tokens (SPL Token-2022) with progressive Trust Scores. We provide formal security definitions, analyze the protocol against replay, synthesis, and Sybil attacks, introduce a graduated trust model distinguishing first-time liveness checks from sustained temporal consistency, and present benchmarks from a working implementation deployed on Solana devnet.
+The proliferation of sophisticated AI and bot networks necessitates robust methods for verifying human uniqueness and liveness in digital ecosystems. Existing Proof-of-Personhood (PoP) solutions rely on centralized authorities, invasive static biometrics, or socially-correlatable data, creating vulnerabilities in privacy, security, and accessibility. We introduce the Entros Protocol, a decentralized framework for PoP and Self-Sovereign Identity built on Solana. The core innovation is *temporal consistency*: the assertion that human identity is best proven not by a static secret, but by the bounded, chaotic drift of biological and behavioral patterns over time. The framework captures multi-modal behavioral data (voice prosody, hand tremor, touch dynamics) during a configurable behavioral challenge, extracts a 134-dimensional feature vector, and produces a 256-bit locality-sensitive hash via SimHash. A Groth16 zero-knowledge proof verifies that consecutive fingerprints fall within a bounded Hamming distance without revealing either value. Attestations are anchored to non-transferable identity tokens (SPL Token-2022) with progressive Trust Scores. We provide formal security definitions, analyze the protocol against replay, synthesis, and Sybil attacks, introduce a graduated trust model distinguishing first-time liveness checks from sustained temporal consistency, and present benchmarks from a working implementation deployed on Solana devnet.
 
 **Keywords:** *Proof-of-Personhood (PoP), Decentralized Identity (DID), Behavioral Biometrics, Zero-Knowledge Proofs, Groth16, SimHash, Liveness Detection, Temporal Consistency, Solana.*
 
@@ -19,9 +19,9 @@ The proliferation of sophisticated AI and bot networks necessitates robust metho
 
 The distinction between human and artificial actors in digital systems is increasingly blurred. Sybil attacks [1], where a single adversary creates numerous fake identities, undermine fair token distribution, democratic governance in DAOs, and the integrity of social platforms. The problem intensifies as generative AI produces increasingly realistic synthetic media.
 
-Most current PoP systems rely on a single, static biometric secret — iris (Worldcoin [5]), palm print (VeryAI), or face — that, once captured, serves as a permanent anatomical identifier. BrightID [6] takes a different approach using social graph analysis, which depends on coordinated verification events. These designs optimize for different properties: strong uniqueness guarantees at the cost of revocability, or social trust at the cost of coordination overhead. IAM explores a third axis: consistency of dynamic behavior over time, which is both bounded enough to uniquely identify and variable enough to be naturally revocable.
+Most current PoP systems rely on a single, static biometric secret — iris (Worldcoin [5]), palm print (VeryAI), or face — that, once captured, serves as a permanent anatomical identifier. BrightID [6] takes a different approach using social graph analysis, which depends on coordinated verification events. These designs optimize for different properties: strong uniqueness guarantees at the cost of revocability, or social trust at the cost of coordination overhead. Entros explores a third axis: consistency of dynamic behavior over time, which is both bounded enough to uniquely identify and variable enough to be naturally revocable.
 
-The IAM Protocol operates on a different principle. A human is not a static data point; they are a continuous, dynamic process. The behavioral signature of a living human—the micro-perturbations in voice, the involuntary tremor in hand movement, the idiosyncratic pressure patterns of touch—drifts over time in a bounded, chaotic pattern that is unique to each individual. AI can mimic a snapshot of this signature. Sustaining a temporally-consistent imitation across weeks and months is computationally prohibitive relative to the value extractable from most Sybil attacks.
+The Entros Protocol operates on a different principle. A human is not a static data point; they are a continuous, dynamic process. The behavioral signature of a living human—the micro-perturbations in voice, the involuntary tremor in hand movement, the idiosyncratic pressure patterns of touch—drifts over time in a bounded, chaotic pattern that is unique to each individual. AI can mimic a snapshot of this signature. Sustaining a temporally-consistent imitation across weeks and months is computationally prohibitive relative to the value extractable from most Sybil attacks.
 
 Instead of asking *"What is your secret?"*, the protocol asks *"Are you still you?"*.
 
@@ -30,13 +30,13 @@ Instead of asking *"What is your secret?"*, the protocol asks *"Are you still yo
 1. A multi-modal behavioral capture protocol (the *Liveness Interlock*) that extracts a 134-dimensional feature vector from voice, motion, and touch data captured simultaneously over a configurable window.
 2. A locality-sensitive hashing pipeline (*SimHash*) that produces a 256-bit *Temporal Fingerprint* where intra-person Hamming distance is bounded (~20–65 bits) while inter-person distance approaches random (~128 bits).
 3. A Groth16 zero-knowledge circuit that proves two Poseidon-committed fingerprints fall within a bounded Hamming distance, without revealing either fingerprint.
-4. A non-transferable on-chain identity token (the *IAM Anchor*) with a progressive Trust Score that rewards sustained temporal consistency over time.
+4. A non-transferable on-chain identity token (the *Entros Anchor*) with a progressive Trust Score that rewards sustained temporal consistency over time.
 5. A graduated trust model that honestly distinguishes first-time liveness checks from sustained behavioral consistency, with integrator-controlled trust thresholds.
 6. A working implementation deployed on Solana devnet with end-to-end browser-based verification.
 
 #### **1.2. Paper Organization**
 
-Section 2 defines the Temporal-Biometric Hash pipeline. Section 3 presents the ZK circuit and on-chain verification. Section 4 details the economic model. Section 5 describes the IAM Anchor and Trust Score. Section 6 provides formal security analysis including the graduated trust model. Section 7 surveys related work. Section 8 presents implementation status and benchmarks.
+Section 2 defines the Temporal-Biometric Hash pipeline. Section 3 presents the ZK circuit and on-chain verification. Section 4 details the economic model. Section 5 describes the Entros Anchor and Trust Score. Section 6 provides formal security analysis including the graduated trust model. Section 7 surveys related work. Section 8 presents implementation status and benchmarks.
 
 ---
 
@@ -58,9 +58,21 @@ The Temporal-Biometric Hash (TBH) pipeline must satisfy five properties:
 
 The protocol issues a nonce-seeded challenge consisting of two components:
 
-**Phonetic phrase.** A randomly-generated, phonetically-balanced nonsense phrase (e.g., *"Oro rura lamo ree see"*). Non-semantic phrases prevent dictionary-based audio deepfake attacks and elicit prosodic variation unique to each speaker.
+**Phonetic phrase.** A 5-word phrase drawn uniformly at random from a curated 1,357-word neutral-vocabulary English dictionary (e.g., *"elephant mountain coffee yellow bicycle"*). The vocabulary, combinatorial structure (1357⁵ ≈ 4.7 × 10¹⁵ phrases), and rationale for choosing real words over nonsense syllables are discussed in §2.2.1.
 
 **Lissajous curve.** A parametric curve `γ(t) = (A sin(at + δ), B sin(bt))` with random parameters `a, b, δ`. The user traces this curve on-screen, producing kinematic data shaped by involuntary motor control patterns.
+
+#### **2.2.1. Phrase Vocabulary Selection**
+
+The original protocol design (June 2025 – April 2026) specified a 70-syllable nonsense vocabulary on the theory that non-semantic phrases would (a) prevent dictionary-based audio deepfake attacks by enlarging the synthesis target space and (b) elicit distinctive prosodic variation that text-to-speech systems would struggle to reproduce. Empirical deployment in early 2026 forced a revision of both claims.
+
+**Threat-model evolution.** The "dictionary-based deepfake" model assumes adversaries pre-synthesize libraries of TTS audio for known phrases — a pattern that real-time streaming TTS has obsoleted. As of 2026, Cartesia Sonic Turbo and ElevenLabs Flash v2.5 generate arbitrary text at ≤100 ms time-to-first-audio for sub-cent unit cost, and self-hosted XTTS-v2 runs at RTF 0.3× on commodity GPUs. The ASVspoof 5 benchmark [28] abandoned the pre-synthesis library attack class entirely, focusing on real-time synthesis as the empirically dominant threat. Combinatorial vocabulary size (70⁵ vs. 1357⁵) does not affect an attacker who never needs to pre-compute.
+
+**Prosodic discrimination is vocabulary-independent.** Modern deepfake-detection literature [29] extracts the human-vs-synth signal from cycle-level perturbation statistics — jitter, shimmer, harmonic-to-noise ratio, and microtremor F0 — measured over voiced segments. These features are physical correlates of vocal-fold biomechanics and laryngeal control, independent of the lexical identity of the spoken content. The same prosodic asymmetry that distinguishes a human from a synthesizer on "elephant mountain coffee" also distinguishes them on "ba le fa ki te"; choosing nonsense provides no incremental discrimination on the prosodic axis the literature treats as load-bearing.
+
+**ASR accuracy is vocabulary-dependent and asymmetric in the defender's favor.** The protocol's content-binding check requires the validation server to verify that the audio matches the issued phrase. Both Whisper [30] and Wav2Vec2-Phoneme [31] exhibit substantially higher error rates on out-of-distribution input than on natural language. Whisper's autoregressive decoder hallucinates training-corpus filler ("Thanks for watching") on nonsense input — observed at ~30 % false-reject rate on clean human speech of nonsense syllables. Wav2Vec2-Phoneme operates in the right primitive (CTC forced alignment, not transcription) but its baseline phoneme error rate of 10–15 % on out-of-distribution phonotactics compounds against the per-phoneme matching metric, yielding a discrimination gap of only 10–15 percentage points between right and wrong content — too narrow to threshold reliably. On real English words, Whisper-tiny.en operates in its training distribution with WER ≈ 5–6 % on LibriSpeech test-clean, and word-level Levenshtein on a curated dictionary gives a discrete signal whose collision probability between two random 5-word phrases is < 0.1 %.
+
+**Curated real-word vocabulary.** The shipped implementation uses a 1,357-word neutral-vocabulary English dictionary curated by length (4–8 letters), syllable count (1–3), VADER-positive sentiment, hand-blocklist content safety filters, and homophone/substring-collision pruning. The combinatorial defense remains: 1,357⁵ ≈ 4.7 × 10¹⁵ unique 5-word phrases, infeasible to pre-synthesize. The discrimination gap on the shipped Whisper-tiny.en + word-level Levenshtein pipeline is approximately 95 percentage points (mean right-phrase distance 0.07 vs. mean wrong-content distance 1.0 across calibration trials) — an order-of-magnitude improvement over the v2 phoneme-level pipeline. Per-session unpredictability is preserved by uniform random sampling from the public dictionary; per Kerckhoffs's principle, the protocol's security depends on nonce freshness, the content-binding check itself, and the orthogonal Tier 1 acoustic and Tier 2 cross-modal defenses (§6.3, §5.2.4) — not on the secrecy of the vocabulary.
 
 #### **2.3. Multi-Modal Data Acquisition**
 
@@ -111,9 +123,9 @@ for `i ∈ {1, …, 256}`. By the properties of SimHash, `Pr[F_T^(A)[i] ≠ F_T^
 
 The problem of protecting biometric templates while enabling matching has a substantial academic history. *Fuzzy extractors* [14] derive cryptographic keys from noisy biometric inputs by correcting errors within a tolerance threshold. *Cancelable biometrics* [15] apply non-invertible transforms to biometric templates so that a compromised template can be revoked and replaced. Both approaches assume the biometric signal is fundamentally static—the same fingerprint or iris captured repeatedly with sensor noise.
 
-IAM's behavioral biometrics present a different challenge. The signal is inherently non-stationary: voice prosody shifts with health, touch dynamics change with device, kinematic patterns evolve with habit. The "errors" between sessions are not noise to be corrected but genuine temporal variation that carries identity information. Fuzzy extractors' error-correction model does not apply because the variation is structured, not random. Cancelable transforms do not apply because the template itself drifts by design.
+Entros's behavioral biometrics present a different challenge. The signal is inherently non-stationary: voice prosody shifts with health, touch dynamics change with device, kinematic patterns evolve with habit. The "errors" between sessions are not noise to be corrected but genuine temporal variation that carries identity information. Fuzzy extractors' error-correction model does not apply because the variation is structured, not random. Cancelable transforms do not apply because the template itself drifts by design.
 
-IAM addresses this through a different construction: SimHash produces a locality-sensitive fingerprint where bounded drift maps to bounded Hamming distance, and a Groth16 circuit proves that this distance falls within the expected range. The Poseidon commitment provides the revocability property—a user can generate a new salt to produce a fresh commitment without changing their behavioral profile. Recent work on practical fuzzy extractors for iris biometrics [16] achieves 105 bits of entropy with 92% true accept rate, providing a useful benchmark: IAM's 256-bit SimHash must be evaluated not by bit-length but by effective entropy under adversarial feature distributions, a question we identify as future work.
+Entros addresses this through a different construction: SimHash produces a locality-sensitive fingerprint where bounded drift maps to bounded Hamming distance, and a Groth16 circuit proves that this distance falls within the expected range. The Poseidon commitment provides the revocability property—a user can generate a new salt to produce a fresh commitment without changing their behavioral profile. Recent work on practical fuzzy extractors for iris biometrics [16] achieves 105 bits of entropy with 92% true accept rate, providing a useful benchmark: Entros's 256-bit SimHash must be evaluated not by bit-length but by effective entropy under adversarial feature distributions, a question we identify as future work.
 
 #### **2.7. Poseidon Commitment**
 
@@ -145,7 +157,7 @@ The Hamming distance is computed via bitwise XOR and popcount, expressed as R1CS
 
 The minimum distance constraint (`δ_min = 3`) prevents exact replay attacks. The threshold (`δ_max = 96`) rejects fingerprints from different people.
 
-**Soundness guarantees.** Groth16 provides computational knowledge soundness under the Generic Group Model and the q-Power Knowledge of Exponent assumption [4]. For IAM's circuit, this means no probabilistic polynomial-time adversary can produce a valid proof for a false statement—wrong Hamming distance or wrong Poseidon preimage—except with negligible probability. The structured reference string introduces a trust assumption: an adversary who knows the toxic waste from *all* Phase 2 ceremony contributors can forge proofs. The multi-party ceremony ensures this requires universal collusion among independent participants.
+**Soundness guarantees.** Groth16 provides computational knowledge soundness under the Generic Group Model and the q-Power Knowledge of Exponent assumption [4]. For Entros's circuit, this means no probabilistic polynomial-time adversary can produce a valid proof for a false statement—wrong Hamming distance or wrong Poseidon preimage—except with negligible probability. The structured reference string introduces a trust assumption: an adversary who knows the toxic waste from *all* Phase 2 ceremony contributors can forge proofs. The multi-party ceremony ensures this requires universal collusion among independent participants.
 
 #### **3.2. On-Chain Verification**
 
@@ -166,21 +178,21 @@ Groth16 requires a structured reference string (SRS) from a trusted setup ceremo
 
 ### **4. Economic Model**
 
-#### **4.1. The IAM Token**
+#### **4.1. The Entros Token**
 
 The protocol's economic security is anchored by a native utility token (SPL Token-2022 with Confidential Balances [13]):
 
-1. **Staking.** Validators stake IAM tokens to participate in the Anonymity Ring.
-2. **Verification capacity.** Integrators stake IAM for discounted or unlimited verifications via capacity tiers.
+1. **Staking.** Validators stake Entros tokens to participate in the Anonymity Ring.
+2. **Verification capacity.** Integrators stake Entros for discounted or unlimited verifications via capacity tiers.
 3. **Governance.** Token holders vote on protocol parameters.
 
 #### **4.2. User-Pays Model**
 
-In wallet-connected mode, the user pays a small protocol fee (~0.005 SOL) per verification. This is trivial for any Solana user but creates real economic cost for bot farms attempting to maintain thousands of identities. Integrators read on-chain verification state for free via `verifyIAMAttestation()`—no escrow, no API keys, no billing relationship. For walletless mode (liveness-check tier), the integrating application optionally funds verifications via the relayer API.
+In wallet-connected mode, the user pays a small protocol fee (~0.005 SOL) per verification. This is trivial for any Solana user but creates real economic cost for bot farms attempting to maintain thousands of identities. Integrators read on-chain verification state for free via `verifyEntrosAttestation()`—no escrow, no API keys, no billing relationship. For walletless mode (liveness-check tier), the integrating application optionally funds verifications via the relayer API.
 
 #### **4.3. Validation Cycle**
 
-The protocol fee from each verification is collected into the protocol treasury. The treasury purchases IAM from the open market and distributes rewards to honest validators, creating buy pressure proportional to real verification volume.
+The protocol fee from each verification is collected into the protocol treasury. The treasury purchases Entros from the open market and distributes rewards to honest validators, creating buy pressure proportional to real verification volume.
 
 #### **4.4. Slashing**
 
@@ -188,11 +200,11 @@ The design specifies a probabilistic audit mechanism: a configurable fraction of
 
 ---
 
-### **5. The IAM Anchor**
+### **5. The Entros Anchor**
 
 #### **5.1. Non-Transferable Identity Token**
 
-The IAM Anchor is implemented using SPL Token-2022 with the `NonTransferable` mint extension. Each wallet maps to exactly one Anchor via a Program Derived Address (PDA).
+The Entros Anchor is implemented using SPL Token-2022 with the `NonTransferable` mint extension. Each wallet maps to exactly one Anchor via a Program Derived Address (PDA).
 
 The on-chain data structure stores: `owner` (Pubkey), `creation_timestamp` (i64), `last_verification_timestamp` (i64), `verification_count` (u32), `trust_score` (u16), `current_commitment` ([u8;32]), and a rolling window of the 10 most recent verification timestamps for Trust Score computation.
 
@@ -210,7 +222,7 @@ The score is capped at a configurable maximum (currently 10,000) and computed on
 
 #### **5.3. Walletless Mode**
 
-Wallet-connected mode is the primary flow. The user pays a small protocol fee, signs the transaction, mints an IAM Anchor, and builds an on-chain Trust Score queryable by any integrator. This creates economic cost for bot farms: each fake identity requires a funded wallet and per-verification fees.
+Wallet-connected mode is the primary flow. The user pays a small protocol fee, signs the transaction, mints an Entros Anchor, and builds an on-chain Trust Score queryable by any integrator. This creates economic cost for bot farms: each fake identity requires a funded wallet and per-verification fees.
 
 Walletless mode is a secondary liveness-check tier. The user completes the behavioral challenge; the Pulse SDK generates the ZK proof; the relayer submits it on-chain. The behavioral fingerprint is stored locally (encrypted with AES-256-GCM, key as non-extractable `CryptoKey` in IndexedDB) for future re-verification. The identity is device-bound and ephemeral—clearing storage resets it. No on-chain Anchor, no portable Trust Score.
 
@@ -248,13 +260,13 @@ The defense is layered:
 
 We do not claim synthesis is impossible. We claim it is expensive relative to the value extractable from most Sybil attacks, and that this cost increases with the number of identities maintained over time.
 
-**Empirical context.** Serwadda and Phoha [17] demonstrated that spoofing mouse dynamics—even with full knowledge of the target's behavioral profile—required extensive per-target training and achieved limited success rates. IAM requires spoofing three modalities simultaneously. Under an independence assumption, if single-modality spoofing succeeds with probability p_v (voice), p_m (motion), and p_t (touch), the joint success rate is p_v · p_m · p_t. Even generous estimates of 0.3 per modality yield ~2.7% joint success per attempt.
+**Empirical context.** Serwadda and Phoha [17] demonstrated that spoofing mouse dynamics—even with full knowledge of the target's behavioral profile—required extensive per-target training and achieved limited success rates. Entros requires spoofing three modalities simultaneously. Under an independence assumption, if single-modality spoofing succeeds with probability p_v (voice), p_m (motion), and p_t (touch), the joint success rate is p_v · p_m · p_t. Even generous estimates of 0.3 per modality yield ~2.7% joint success per attempt.
 
-**Voice modality resilience.** Modern text-to-speech systems can clone voice timbre from seconds of reference audio. However, IAM's voice features specifically target involuntary laryngeal micro-perturbations (jitter, shimmer, HNR) rather than perceptual voice quality. ASVspoof challenge results [11] confirm that TTS outputs exhibit unnaturally low jitter variance and unnaturally high HNR compared to natural speech. While this gap is narrowing as synthesis quality improves, the multi-modal fusion ensures that voice is one signal among three, not a single point of failure. Behavioral biometric systems using ZK verification have independently demonstrated practical false accept rates below 1% [18].
+**Voice modality resilience.** Modern text-to-speech systems can clone voice timbre from seconds of reference audio. However, Entros's voice features specifically target involuntary laryngeal micro-perturbations (jitter, shimmer, HNR) rather than perceptual voice quality. ASVspoof challenge results [11] confirm that TTS outputs exhibit unnaturally low jitter variance and unnaturally high HNR compared to natural speech. While this gap is narrowing as synthesis quality improves, the multi-modal fusion ensures that voice is one signal among three, not a single point of failure. Behavioral biometric systems using ZK verification have independently demonstrated practical false accept rates below 1% [18].
 
 #### **6.4. Sybil Attacks**
 
-Each wallet maps to exactly one IAM Anchor (enforced by PDA derivation). Creating k fake identities requires:
+Each wallet maps to exactly one Entros Anchor (enforced by PDA derivation). Creating k fake identities requires:
 
 1. k funded Solana wallets (SOL cost)
 2. k independent behavioral profiles, each sustained across regular re-verifications
@@ -264,7 +276,7 @@ The Trust Score penalizes new accounts (age bonus starts at 0) and irregular pat
 
 #### **6.4.1. Layered Sybil Resistance**
 
-IAM's Sybil resistance operates through three independent layers, each raising the cost of maintaining duplicate identities:
+Entros's Sybil resistance operates through three independent layers, each raising the cost of maintaining duplicate identities:
 
 * **Economic deterrence.** Each verification costs the user SOL. Each wallet requires funding. Maintaining thousands of fake identities over months requires sustained capital expenditure that scales linearly with the attack surface.
 * **Temporal deterrence.** Trust Score rewards consistency over time. Weekly re-verifications across months carry more weight than bulk verifications in a single session. A bot farm must maintain each identity's behavioral signature across sessions and days, compounding the operational cost per identity.
@@ -280,7 +292,7 @@ These layers are complementary. Economic cost makes Sybil farming expensive. Tem
 
 Raw biometric data is destroyed after feature extraction. On-chain, only the Poseidon commitment is stored—computationally hiding under standard assumptions.
 
-**SimHash reversibility.** Recent work has demonstrated pre-image attacks on locality-sensitive hashes [21], showing that SimHash fingerprints contain recoverable information about the original input. IAM's architecture addresses this at two levels: (1) the SimHash fingerprint is never transmitted or stored on-chain—only the Poseidon commitment is public, and the ZK proof reveals nothing beyond the Hamming distance range; (2) the fingerprint stored locally for re-verification is encrypted with AES-256-GCM using a non-extractable `CryptoKey` in IndexedDB, requiring device-level compromise to access. SimHash is not relied upon as a privacy-preserving representation; the Poseidon commitment provides that property.
+**SimHash reversibility.** Recent work has demonstrated pre-image attacks on locality-sensitive hashes [21], showing that SimHash fingerprints contain recoverable information about the original input. Entros's architecture addresses this at two levels: (1) the SimHash fingerprint is never transmitted or stored on-chain—only the Poseidon commitment is public, and the ZK proof reveals nothing beyond the Hamming distance range; (2) the fingerprint stored locally for re-verification is encrypted with AES-256-GCM using a non-extractable `CryptoKey` in IndexedDB, requiring device-level compromise to access. SimHash is not relied upon as a privacy-preserving representation; the Poseidon commitment provides that property.
 
 #### **6.6. Economic Sustainability of Attacks**
 
@@ -350,27 +362,27 @@ T1 exercises trivial procedural synthesis (sine-wave harmonics with additive noi
 
 T3b applies distributional constraints derived from published voice science norms, maintaining physiologically plausible feature values throughout the optimization. Inter-feature consistency checks (e.g., perturbation measure ratios inherent to vocal fold mechanics) prevent the optimizer from producing individually plausible but structurally impossible feature combinations.
 
-T4 (modern voice cloning via XTTS-v2, F5-TTS), T5 (coupled cross-modal synthesis), and T6–T8 (identity theft, replay perturbation, adaptive probing) are planned. Aggregate results are published at iamprotocol.io/security. Attack implementation code remains private per responsible-disclosure convention.
+T4 (modern voice cloning via XTTS-v2, F5-TTS), T5 (coupled cross-modal synthesis), and T6–T8 (identity theft, replay perturbation, adaptive probing) are planned. Aggregate results are published at entros.io/security. Attack implementation code remains private per responsible-disclosure convention.
 
 ---
 
 ### **7. Related Work**
 
-**Worldcoin** [5] uses iris scanning to create a unique biometric identifier per person. The approach provides strong uniqueness guarantees through a dedicated hardware device (the Orb), which enforces a controlled capture environment. The tradeoff is a permanent anatomical template: because an iris scan cannot be changed, it cannot be revoked if the template is ever exposed. IAM's behavioral signature drifts naturally over time, making re-verification both the consistency check and the revocation mechanism.
+**Worldcoin** [5] uses iris scanning to create a unique biometric identifier per person. The approach provides strong uniqueness guarantees through a dedicated hardware device (the Orb), which enforces a controlled capture environment. The tradeoff is a permanent anatomical template: because an iris scan cannot be changed, it cannot be revoked if the template is ever exposed. Entros's behavioral signature drifts naturally over time, making re-verification both the consistency check and the revocation mechanism.
 
-**BrightID** [6] verifies uniqueness through social graph analysis, where users vouch for each other in verification parties. The approach trades hardware cost for coordination overhead — users must attend verification events, and the trust model assumes non-colluding participants. IAM's approach requires neither coordination nor hardware: verification happens on a single device in 12 seconds.
+**BrightID** [6] verifies uniqueness through social graph analysis, where users vouch for each other in verification parties. The approach trades hardware cost for coordination overhead — users must attend verification events, and the trust model assumes non-colluding participants. Entros's approach requires neither coordination nor hardware: verification happens on a single device in 12 seconds.
 
-**Reclaim Protocol** [7] proves ownership of existing web2 accounts via TLS session proofs. It answers "do you control this account?"—not "are you human?" IAM and Reclaim are complementary: Reclaim proves account ownership, IAM proves the account owner is human.
+**Reclaim Protocol** [7] proves ownership of existing web2 accounts via TLS session proofs. It answers "do you control this account?"—not "are you human?" Entros and Reclaim are complementary: Reclaim proves account ownership, Entros proves the account owner is human.
 
-**Traditional CAPTCHA** (reCAPTCHA [8], hCaptcha, Turnstile) provides session-level bot detection using behavioral signals, browser fingerprinting, and centralized machine learning classifiers. The advantages are maturity and a vast training dataset (Google processes billions of sessions). The disadvantages are privacy concerns (behavioral data sent to Google), lack of identity persistence (no concept of "the same human returning"), binary output (pass/fail with no graduated trust), and vulnerability to captcha-solving services. IAM's first walletless verification provides comparable liveness detection; its graduated trust model provides capabilities CAPTCHA fundamentally cannot.
+**Traditional CAPTCHA** (reCAPTCHA [8], hCaptcha, Turnstile) provides session-level bot detection using behavioral signals, browser fingerprinting, and centralized machine learning classifiers. The advantages are maturity and a vast training dataset (Google processes billions of sessions). The disadvantages are privacy concerns (behavioral data sent to Google), lack of identity persistence (no concept of "the same human returning"), binary output (pass/fail with no graduated trust), and vulnerability to captcha-solving services. Entros's first walletless verification provides comparable liveness detection; its graduated trust model provides capabilities CAPTCHA fundamentally cannot.
 
-**VeryAI** uses palm print biometrics with on-device processing, sharing IAM's commitment to keeping raw biometric data on the device. Its palm print is a static identifier, which provides strong one-shot uniqueness but does not capture behavioral drift across sessions. IAM's behavioral temporal consistency model is complementary to this kind of static-biometric design: a palm print proves you exist; IAM proves you're the same human returning over months.
+**VeryAI** uses palm print biometrics with on-device processing, sharing Entros's commitment to keeping raw biometric data on the device. Its palm print is a static identifier, which provides strong one-shot uniqueness but does not capture behavioral drift across sessions. Entros's behavioral temporal consistency model is complementary to this kind of static-biometric design: a palm print proves you exist; Entros proves you're the same human returning over months.
 
 **Behavioral biometrics with ZK proofs.** Hamm et al. [18] demonstrate continuous authentication using interactive and non-interactive ZK proofs over behavioral features, achieving a false accept rate of 0.65% and false reject rate of 0.48%. Their system validates that ZK verification of behavioral biometrics is practical, though their architecture targets session-level continuous authentication rather than cross-session identity persistence. Multi-modal fusion approaches for behavioral authentication [20] confirm that combining touch, keystroke, and accelerometer data improves both accuracy and spoofing resistance over single-modality systems.
 
-**Formal frameworks for proof of personhood.** Choudhuri et al. [19] provide the first rigorous cryptographic formalization of proof of personhood, defining ideal functionalities for Sybil-resistance, authenticated personhood, and unlinkability. Their framework assumes trusted authorities issue personhood credentials. IAM derives personhood from behavioral biometrics without a trusted issuer, which is more decentralized but harder to formalize under their model. Mapping IAM's security properties to this framework is identified as future work.
+**Formal frameworks for proof of personhood.** Choudhuri et al. [19] provide the first rigorous cryptographic formalization of proof of personhood, defining ideal functionalities for Sybil-resistance, authenticated personhood, and unlinkability. Their framework assumes trusted authorities issue personhood credentials. Entros derives personhood from behavioral biometrics without a trusted issuer, which is more decentralized but harder to formalize under their model. Mapping Entros's security properties to this framework is identified as future work.
 
-**Regulatory positioning.** Proof-of-personhood systems that transmit or store biometric data have faced enforcement actions under GDPR and regional biometric-data laws, with cited concerns including collection, storage, and cross-border transfer of biometric templates. IAM's architecture is designed to avoid these triggers by construction: raw biometric data never leaves the user's device, and only a 134-dimensional statistical summary and a zero-knowledge proof are transmitted. This places IAM's data flows closer to a standard web analytics fingerprint than to a biometric collection pipeline.
+**Regulatory positioning.** Proof-of-personhood systems that transmit or store biometric data have faced enforcement actions under GDPR and regional biometric-data laws, with cited concerns including collection, storage, and cross-border transfer of biometric templates. Entros's architecture is designed to avoid these triggers by construction: raw biometric data never leaves the user's device, and only a 134-dimensional statistical summary and a zero-knowledge proof are transmitted. This places Entros's data flows closer to a standard web analytics fingerprint than to a biometric collection pipeline.
 
 ---
 
@@ -402,7 +414,7 @@ Desktop verification operates with reduced sensor modalities. Mouse pointer dyna
 
 Published research quantifies the gap. Multi-modal touch and IMU fusion on mobile devices reports EER below 1% [27]. Desktop-only behavioral authentication (keystroke dynamics and mouse movement) reports EER in the 6–13% range across multiple studies. The difference reflects the richer sensor environment available on mobile: accelerometer, gyroscope, magnetometer, and capacitive touch digitizer with pressure sensitivity.
 
-IAM accepts desktop verification as a valid but weaker signal. The verification produces a legitimate behavioral fingerprint and ZK proof regardless of device. Trust Score accumulates identically. The server-side validation applies the same checks. The practical difference is that desktop fingerprints have lower inter-person discriminability, and the Sybil registry threshold may need to be more conservative for desktop-only users.
+Entros accepts desktop verification as a valid but weaker signal. The verification produces a legitimate behavioral fingerprint and ZK proof regardless of device. Trust Score accumulates identically. The server-side validation applies the same checks. The practical difference is that desktop fingerprints have lower inter-person discriminability, and the Sybil registry threshold may need to be more conservative for desktop-only users.
 
 The mobile application, targeting the Solana dApp Store, is the production target for strongest verification signal. Native sensor APIs provide sub-millisecond accelerometer timestamps, touch pressure data, and persistent background access without per-session permission prompts.
 
@@ -410,7 +422,7 @@ The mobile application, targeting the Solana dApp Store, is the production targe
 
 ### **9. Conclusion and Future Work**
 
-The IAM Protocol presents a framework for Proof-of-Personhood through temporal behavioral consistency. By measuring bounded, chaotic drift in multi-modal biometric signals over time, it provides graduated trust guarantees that static biometrics and session-level captcha cannot.
+The Entros Protocol presents a framework for Proof-of-Personhood through temporal behavioral consistency. By measuring bounded, chaotic drift in multi-modal biometric signals over time, it provides graduated trust guarantees that static biometrics and session-level captcha cannot.
 
 The protocol is honest about its limitations. First-time verification is a liveness check, not a temporal consistency proof. The graduated trust model makes this explicit rather than presenting a false binary. The defense against sophisticated synthesis attacks is economic, not absolute—sustained spoofing at scale costs more than it extracts.
 
@@ -418,7 +430,7 @@ The protocol is honest about its limitations. First-time verification is a liven
 
 * Multi-contributor trusted setup ceremony for Groth16 Phase 2 before mainnet.
 * External security audit of all on-chain programs, the ZK circuit, and the executor node.
-* IAM utility token: SPL Token-2022 with Confidential Balances for validator staking, capacity tiers, and governance.
+* Entros utility token: SPL Token-2022 with Confidential Balances for validator staking, capacity tiers, and governance.
 * Cross-chain deployment to Ethereum L2s after Solana mainnet stabilizes.
 * Formal analysis of SimHash collision probability bounds under adversarial feature distributions.
 * Cross-wallet fingerprint comparison is implemented in the server-side validation layer. The executor maintains a registry of SimHash fingerprints and compares each new verification against existing entries. If the Hamming distance between a new fingerprint and any existing entry falls below δ_max, the verification is flagged as a potential duplicate identity. Empirical investigation of the persistence of involuntary behavioral features across deliberate behavioral modification is ongoing.
@@ -426,7 +438,7 @@ The protocol is honest about its limitations. First-time verification is a liven
 * Adversarial testing was conducted across eight phases: exact replay (blocked by δ_min), naive synthesis (passes client-side pipeline), sustained re-verification (100% success rate without server-side validation), human-to-bot handoff, cross-modality correlation analysis, Sybil cost modeling, feature-level optimization (converges in 251 iterations), and full-pipeline random search (90% success rate without server-side validation). These results motivated the implementation of server-side validation as a required defense layer.
 * Device attestation via native application. Hardware integrity verification before behavioral capture, implementing a positive security model as described in Section 6.9.
 
-The protocol is open source and published as a defensive disclosure to establish prior art. Source code, circuit definitions, and SDK are available at `github.com/iam-protocol`.
+The protocol is open source and published as a defensive disclosure to establish prior art. Source code, circuit definitions, and SDK are available at `github.com/entros-protocol`.
 
 ---
 
@@ -459,3 +471,7 @@ The protocol is open source and published as a defensive disclosure to establish
 25. Chen, Y., et al. "VoiceRadar: A New Paradigm of Voice Deepfake Detection via Micro-Frequency Estimation." *Proc. NDSS*, 2025.
 26. Pouw, W., et al. "The human voice aligns with whole-body kinetics." *Proc. Royal Society B*, 2025.
 27. Stragapede, G., et al. "BioMoTouch: Touch-Based Behavioral Authentication Using Motion and Touch Sensor Fusion." *arXiv:2604.07071*, 2025.
+28. Wang, X., Delgado, H., Tak, H., et al. "ASVspoof 5: Crowdsourced speech data, deepfakes, and adversarial attacks at scale." *arXiv:2408.08739*, 2024.
+29. Verma, K., et al. "Pitch Imperfect: Detecting Audio Deepfakes Through Acoustic Prosody Analysis." *arXiv:2502.14726*, 2025.
+30. Radford, A., Kim, J. W., Xu, T., Brockman, G., McLeavey, C., and Sutskever, I. "Robust speech recognition via large-scale weak supervision." *arXiv:2212.04356*, 2022.
+31. Baevski, A., Zhou, H., Mohamed, A., and Auli, M. "wav2vec 2.0: A framework for self-supervised learning of speech representations." *Proc. NeurIPS*, 2020.

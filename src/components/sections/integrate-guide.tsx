@@ -11,10 +11,10 @@ import { IntegratePlayground } from "./integrate-playground";
 const CONFIG_OPTIONS = [
   { name: "cluster", type: '"devnet" | "mainnet-beta"', description: "Solana cluster to connect to" },
   { name: "rpcEndpoint", type: "string", description: "Custom RPC URL (optional)" },
-  { name: "relayerUrl", type: "string", description: "IAM relayer endpoint (walletless mode only)" },
+  { name: "relayerUrl", type: "string", description: "Entros relayer endpoint (walletless mode only)" },
   { name: "relayerApiKey", type: "string", description: "API key for walletless mode (optional)" },
-  { name: "wasmUrl", type: "string", description: "Path to iam_hamming.wasm circuit artifact" },
-  { name: "zkeyUrl", type: "string", description: "Path to iam_hamming_final.zkey proving key" },
+  { name: "wasmUrl", type: "string", description: "Path to entros_hamming.wasm circuit artifact" },
+  { name: "zkeyUrl", type: "string", description: "Path to entros_hamming_final.zkey proving key" },
   { name: "threshold", type: "number", description: "Hamming distance threshold (default: 96)" },
 ];
 
@@ -36,7 +36,7 @@ export function IntegrateGuide() {
               Install
             </p>
             <CodeBlock
-              code="npm install @iam-protocol/pulse-sdk"
+              code="npm install @entros/pulse-sdk"
                           />
           </GlowCard>
         </div>
@@ -68,7 +68,7 @@ export function IntegrateGuide() {
         </h2>
         <p className="mt-3 text-sm text-foreground/70 leading-relaxed max-w-2xl">
           This is what your integration reads. Paste any wallet address to see
-          its IAM verification status, Trust Score, and history directly from
+          its Entros verification status, Trust Score, and history directly from
           Solana devnet.
         </p>
 
@@ -113,7 +113,7 @@ export function IntegrateGuide() {
         </h2>
         <p className="mt-3 text-sm text-foreground/70 leading-relaxed max-w-2xl">
           Copy the source, paste into your Tailwind project, render anywhere. No
-          custom UI dependencies, no IAM backend. Each component reads directly
+          custom UI dependencies, no Entros backend. Each component reads directly
           from Solana via your existing wallet connection.
         </p>
 
@@ -123,7 +123,7 @@ export function IntegrateGuide() {
               <BadgeCheck className="h-6 w-6 text-cyan shrink-0 mt-0.5" strokeWidth={1.5} />
               <div>
                 <p className="font-mono text-base font-semibold text-foreground">
-                  &lt;IAMBadge /&gt;
+                  &lt;EntrosBadge /&gt;
                 </p>
                 <p className="mt-1 text-sm text-muted">
                   Pill that displays any wallet&apos;s Trust Score. Use in profiles,
@@ -144,7 +144,7 @@ export function IntegrateGuide() {
               <ShieldCheck className="h-6 w-6 text-cyan shrink-0 mt-0.5" strokeWidth={1.5} />
               <div>
                 <p className="font-mono text-base font-semibold text-foreground">
-                  &lt;IAMGate minTrustScore=&#123;N&#125;&gt;
+                  &lt;EntrosGate minTrustScore=&#123;N&#125;&gt;
                 </p>
                 <p className="mt-1 text-sm text-muted">
                   Route guard. Wrap any content, set a threshold, the gate
@@ -220,7 +220,7 @@ export function IntegrateGuide() {
           <p className="text-sm text-foreground/80 leading-relaxed">
             Wallet-connected users pay a small protocol fee per verification
             (~0.005 SOL). Your application reads on-chain state for free via{" "}
-            <code className="text-cyan">verifyIAMAttestation()</code>. No escrow,
+            <code className="text-cyan">verifyEntrosAttestation()</code>. No escrow,
             no API keys, no billing relationship. You get verified humans.
             The user pays to prove they&apos;re human.
           </p>

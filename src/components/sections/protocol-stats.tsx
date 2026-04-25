@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
-import { PROGRAM_IDS } from "@iam-protocol/pulse-sdk";
+import { PROGRAM_IDS } from "@entros/pulse-sdk";
 import { GlowCard } from "@/components/ui/glow-card";
 import { TextShimmer } from "@/components/ui/text-shimmer";
 import { ArrowRight, Loader2, ShieldAlert } from "lucide-react";
@@ -14,7 +14,7 @@ const IDENTITY_STATE_DISC_B58 = "T7d2447Yv5U";
 
 // SAS program IDs (Solana Attestation Service on devnet)
 const SAS_PROGRAM_ID = "22zoJMtdu4tQc2PzL74ZUT7FrwgB1Udec8DdW4yw4BdG";
-const IAM_CREDENTIAL_PDA = "GaPTkZC6JEGds1G5h645qyUrogx7NWghR2JgjvKQwTDo";
+const ENTROS_CREDENTIAL_PDA = "GaPTkZC6JEGds1G5h645qyUrogx7NWghR2JgjvKQwTDo";
 
 interface OnChainStats {
   totalAnchors: number;
@@ -69,7 +69,7 @@ export function ProtocolStats() {
     setError(null);
 
     (async () => {
-      const programId = new PublicKey(PROGRAM_IDS.iamAnchor);
+      const programId = new PublicKey(PROGRAM_IDS.entrosAnchor);
       const sasProgramId = new PublicKey(SAS_PROGRAM_ID);
 
       const [accounts, attestations] = await Promise.all([
@@ -82,7 +82,7 @@ export function ProtocolStats() {
         // SAS attestation layout: 1 byte disc + 32 bytes nonce + 32 bytes credential = offset 33
         connection.getProgramAccounts(sasProgramId, {
           filters: [
-            { memcmp: { offset: 33, bytes: IAM_CREDENTIAL_PDA } },
+            { memcmp: { offset: 33, bytes: ENTROS_CREDENTIAL_PDA } },
           ],
           dataSlice: { offset: 0, length: 0 },
         }),
@@ -195,7 +195,7 @@ export function ProtocolStats() {
           </div>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
             <StatCard
-              label="IAM Anchors minted"
+              label="Entros Anchors minted"
               value={stats.totalAnchors.toLocaleString()}
               sub="Total IdentityState PDAs on devnet"
             />
@@ -252,7 +252,7 @@ export function ProtocolStats() {
               <span className="text-cyan">
                 GZYwTp2o…q4b2
               </span>{" "}
-              · iam-anchor program
+              · entros-anchor program
             </p>
           </div>
           <p className="font-mono text-xs text-muted">Solana devnet</p>

@@ -9,7 +9,7 @@ import {
   getAgentHumanOperator,
   PROGRAM_IDS,
   type AgentHumanOperator,
-} from "@iam-protocol/pulse-sdk";
+} from "@entros/pulse-sdk";
 import { TextShimmer } from "@/components/ui/text-shimmer";
 import { GlowCard } from "@/components/ui/glow-card";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
@@ -18,7 +18,7 @@ import { explorerUrl } from "@/lib/explorer";
 import { fetchAgentsByOwner, type OwnedAgent } from "@/lib/agent-indexer";
 
 interface OwnedAgentWithStatus extends OwnedAgent {
-  iamOperator: AgentHumanOperator | null;
+  entrosOperator: AgentHumanOperator | null;
   liveTrustScore: number | null;
   queryFailed: boolean;
 }
@@ -28,7 +28,7 @@ async function fetchLiveTrustScore(
   connection: Connection,
 ): Promise<number | null> {
   try {
-    const programId = new PublicKey(PROGRAM_IDS.iamAnchor);
+    const programId = new PublicKey(PROGRAM_IDS.entrosAnchor);
     const walletPubkey = new PublicKey(walletAddress);
     const [identityPda] = PublicKey.findProgramAddressSync(
       [new TextEncoder().encode("identity"), walletPubkey.toBuffer()],
@@ -110,13 +110,13 @@ export function DashboardAgents() {
       const withStatus = await Promise.all(
         agents.map(async (agent): Promise<OwnedAgentWithStatus> => {
           try {
-            const iamOperator = await getAgentHumanOperator(agent.asset, connection);
-            const liveTrustScore = iamOperator
-              ? await fetchLiveTrustScore(iamOperator.wallet, connection)
+            const entrosOperator = await getAgentHumanOperator(agent.asset, connection);
+            const liveTrustScore = entrosOperator
+              ? await fetchLiveTrustScore(entrosOperator.wallet, connection)
               : null;
-            return { ...agent, iamOperator, liveTrustScore, queryFailed: false };
+            return { ...agent, entrosOperator, liveTrustScore, queryFailed: false };
           } catch {
-            return { ...agent, iamOperator: null, liveTrustScore: null, queryFailed: true };
+            return { ...agent, entrosOperator: null, liveTrustScore: null, queryFailed: true };
           }
         }),
       );
@@ -195,7 +195,7 @@ export function DashboardAgents() {
         setOwnedAgents((prev) =>
           prev.map((a) =>
             a.asset === asset
-              ? { ...a, iamOperator: updated, liveTrustScore, queryFailed: false }
+              ? { ...a, entrosOperator: updated, liveTrustScore, queryFailed: false }
               : a,
           ),
         );
@@ -221,7 +221,7 @@ export function DashboardAgents() {
       </TextShimmer>
 
       <p className="mt-4 text-sm text-muted max-w-2xl">
-        Link your IAM identity to your registered AI agents on the Solana Agent
+        Link your Entros identity to your registered AI agents on the Solana Agent
         Registry. Immutable, on-chain proof that a verified human operates the
         agent.
       </p>
@@ -255,7 +255,7 @@ export function DashboardAgents() {
           {!loadingAgents && ownedAgents.length > 0 && (
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {ownedAgents.map((agent) => {
-                const attested = agent.iamOperator !== null;
+                const attested = agent.entrosOperator !== null;
                 return (
                   <div
                     key={agent.asset}
@@ -284,19 +284,19 @@ export function DashboardAgents() {
                         <ExternalLink className="h-3.5 w-3.5" />
                       </a>
                     </div>
-                    {attested && agent.iamOperator && (
+                    {attested && agent.entrosOperator && (
                       <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
                         <div>
                           <p className="font-mono uppercase tracking-widest text-muted">
                             Trust Score (Live)
                           </p>
                           <p className="mt-0.5 font-mono font-bold text-foreground">
-                            {agent.liveTrustScore ?? agent.iamOperator.trustScore}
+                            {agent.liveTrustScore ?? agent.entrosOperator.trustScore}
                           </p>
                           {agent.liveTrustScore !== null &&
-                            agent.liveTrustScore !== agent.iamOperator.trustScore && (
+                            agent.liveTrustScore !== agent.entrosOperator.trustScore && (
                               <p className="mt-0.5 text-[10px] text-muted">
-                                {agent.iamOperator.trustScore} at agent registration
+                                {agent.entrosOperator.trustScore} at agent registration
                               </p>
                             )}
                         </div>
@@ -305,7 +305,7 @@ export function DashboardAgents() {
                             Verified
                           </p>
                           <p className="mt-0.5 font-mono text-foreground">
-                            {formatTimestamp(agent.iamOperator.verifiedAt)}
+                            {formatTimestamp(agent.entrosOperator.verifiedAt)}
                           </p>
                         </div>
                       </div>
@@ -326,7 +326,7 @@ export function DashboardAgents() {
                         ) : (
                           <Link2 className="h-3.5 w-3.5" />
                         )}
-                        {attestingAsset === agent.asset ? "Attesting…" : "Attest with IAM"}
+                        {attestingAsset === agent.asset ? "Attesting…" : "Attest with Entros"}
                       </button>
                     )}
                     {attestErrorAsset?.asset === agent.asset && (
@@ -392,10 +392,10 @@ export function DashboardAgents() {
                 <Bot className="h-6 w-6 text-muted" strokeWidth={1.5} />
                 <div>
                   <p className="text-sm font-medium text-foreground">
-                    No IAM attestation found
+                    No Entros attestation found
                   </p>
                   <p className="text-xs text-muted mt-0.5">
-                    This agent has no verified human operator linked via IAM.
+                    This agent has no verified human operator linked via Entros.
                   </p>
                 </div>
               </div>
@@ -410,7 +410,7 @@ export function DashboardAgents() {
                   ) : (
                     <Link2 className="h-4 w-4" />
                   )}
-                  {attesting ? "Attesting..." : "Attest with IAM"}
+                  {attesting ? "Attesting..." : "Attest with Entros"}
                 </span>
               </ShimmerButton>
             </div>
@@ -425,7 +425,7 @@ export function DashboardAgents() {
                     Verified Human Operator
                   </p>
                   <p className="text-xs text-muted mt-0.5">
-                    This agent is attested with an immutable IAM identity link.
+                    This agent is attested with an immutable Entros identity link.
                   </p>
                 </div>
               </div>

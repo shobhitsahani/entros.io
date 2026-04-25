@@ -1,7 +1,7 @@
 import { TextShimmer } from "@/components/ui/text-shimmer";
 
 const openSource = [
-  "On-chain programs (iam-anchor, iam-verifier, iam-registry)",
+  "On-chain programs (entros-anchor, entros-verifier, entros-registry)",
   "ZK circuits and trusted setup artifacts",
   "Client SDK (pulse-sdk on npm)",
   "Executor node",
@@ -11,8 +11,8 @@ const openSource = [
 ];
 
 const privateComponents = [
-  "Server-side validation service (iam-validation): check thresholds and parameter values",
-  "Red-team harness (iam-redteam): attack code, per-attempt telemetry, captured baseline fixtures",
+  "Server-side validation service (entros-validation): check thresholds and parameter values",
+  "Red-team harness (entros-redteam): attack code, per-attempt telemetry, captured baseline fixtures",
   "Pre-disclosure vulnerability reports (per standard responsible-disclosure practice)",
 ];
 
@@ -29,7 +29,7 @@ export function OpenSourcePosture() {
         What we open-source, and why
       </h2>
       <p className="mt-8 text-foreground/80 leading-relaxed">
-        IAM Protocol is open-source where open-source matters for user trust,
+        Entros Protocol is open-source where open-source matters for user trust,
         and deliberately private where privacy protects users. This follows
         the same disclosure convention used across crypto infrastructure
         projects. Not a departure from crypto&apos;s open-source values. A

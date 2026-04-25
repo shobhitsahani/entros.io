@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { PulseSession } from "@iam-protocol/pulse-sdk";
+import type { PulseSession } from "@entros/pulse-sdk";
 import type { VerifyState, VerifyAction } from "@/components/verify/types";
 import { PulseChallenge } from "@/components/verify/pulse-challenge";
 import { ProvingView, VerifiedView, FailedView } from "@/components/verify/step-views";
@@ -210,7 +210,7 @@ export function VerifyWalletless({
     return (
       <VerifiedView
         commitment={state.commitment}
-        subtitle="Proof submitted via IAM relayer"
+        subtitle="Proof submitted via Entros relayer"
         onReset={handleReset}
       />
     );

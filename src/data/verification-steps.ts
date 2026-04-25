@@ -4,9 +4,9 @@ export const verificationSteps: VerificationStep[] = [
   {
     title: "01—Challenge",
     description:
-      "A random nonsense phrase and Lissajous curve generated fresh for each session. No two sessions share the same challenge.",
+      "A random word phrase and Lissajous curve generated fresh for each session. No two sessions share the same challenge.",
     detail:
-      "Each session generates a unique phrase from phonetic syllables and a unique Lissajous curve from random mathematical parameters. The user speaks the phrase while tracing the curve for 12 seconds. The challenge elicits natural behavioral data (voice prosody, hand tremor, touch pressure) rather than testing memory or speed.",
+      "Each session generates a unique 5-word phrase from a curated English vocabulary and a unique Lissajous curve from random mathematical parameters. The user speaks the phrase while tracing the curve for 12 seconds. The challenge elicits natural behavioral data (voice prosody, hand tremor, touch pressure) rather than testing memory or speed.",
     icon: "mic",
   },
   {

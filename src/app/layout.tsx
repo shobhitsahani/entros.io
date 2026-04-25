@@ -18,10 +18,10 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://iamprotocol.io"),
+  metadataBase: new URL("https://entros.io"),
   title: {
-    default: "IAM Protocol — Proof of Personhood on Solana",
-    template: "%s | IAM Protocol",
+    default: "Entros Protocol — Proof of Personhood on Solana",
+    template: "%s | Entros Protocol",
   },
   description:
     "Prove you're human without revealing who you are. Solana-native identity verification through the dynamic signature of liveness — voice, motion, and touch, verified with zero-knowledge proofs.",
@@ -38,19 +38,28 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: "IAM Protocol — Proof of Personhood on Solana",
+    title: "Entros Protocol — Proof of Personhood on Solana",
     description:
       "Solana-native identity verification through behavioral liveness. Privacy by architecture.",
-    url: "https://iamprotocol.io",
-    siteName: "IAM Protocol",
+    url: "https://entros.io",
+    siteName: "Entros Protocol",
     type: "website",
+    images: [
+      {
+        url: "/logos/og-card.png",
+        width: 1200,
+        height: 630,
+        alt: "Entros Protocol",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "IAM Protocol — Proof of Personhood on Solana",
+    title: "Entros Protocol — Proof of Personhood on Solana",
     description:
       "Prove you're human without revealing who you are. Built on Solana.",
-    creator: "@iam_protocol",
+    creator: "@entros_protocol",
+    images: ["/logos/og-card.png"],
   },
   robots: {
     index: true,

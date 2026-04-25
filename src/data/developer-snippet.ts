@@ -3,7 +3,7 @@ import type { DeveloperSnippet } from "./types";
 export const sdkSnippet: DeveloperSnippet = {
   language: "typescript",
   title: "5 lines to verify a human",
-  code: `import { PulseSDK } from '@iam-protocol/pulse-sdk';
+  code: `import { PulseSDK } from '@entros/pulse-sdk';
 
 const pulse = new PulseSDK({ cluster: 'devnet' });
 const result = await pulse.verify();
@@ -11,5 +11,5 @@ const result = await pulse.verify();
 if (result.success) {
   grantAccess(result.commitment);
 }`,
-  installCommand: "npm install @iam-protocol/pulse-sdk",
+  installCommand: "npm install @entros/pulse-sdk",
 };

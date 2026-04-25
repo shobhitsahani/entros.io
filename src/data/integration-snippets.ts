@@ -5,12 +5,12 @@ export const integrationSnippets: IntegrationSnippet[] = [
     mode: "walletless",
     title: "Walletless verification",
     description:
-      "Liveness-check tier for non-crypto users. The Pulse SDK generates a proof and submits via the IAM relayer. No wallet needed. The integrator optionally funds verifications via API key.",
-    code: `import { PulseSDK } from '@iam-protocol/pulse-sdk';
+      "Liveness-check tier for non-crypto users. The Pulse SDK generates a proof and submits via the Entros relayer. No wallet needed. The integrator optionally funds verifications via API key.",
+    code: `import { PulseSDK } from '@entros/pulse-sdk';
 
 const pulse = new PulseSDK({
   cluster: 'devnet',
-  relayerUrl: 'https://relayer.iam-protocol.org',
+  relayerUrl: 'https://relayer.entros-protocol.org',
 });
 
 // User completes Pulse challenge on your site
@@ -26,7 +26,7 @@ if (result.success) {
     title: "Wallet-connected verification",
     description:
       "The primary verification flow. The user pays a small protocol fee (~0.005 SOL) and signs the transaction with their wallet. Your app reads the result on-chain for free.",
-    code: `import { PulseSDK } from '@iam-protocol/pulse-sdk';
+    code: `import { PulseSDK } from '@entros/pulse-sdk';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 
 const pulse = new PulseSDK({ cluster: 'devnet' });
@@ -48,8 +48,8 @@ if (result.success) {
 export const useCaseSnippets = [
   {
     title: "Check if a wallet is human",
-    description: "Use this to verify if a wallet has a valid IAM attestation on-chain.",
-    code: `import { verifyIAMAttestation } from '@iam-protocol/pulse-sdk';
+    description: "Use this to verify if a wallet has a valid Entros attestation on-chain.",
+    code: `import { verifyEntrosAttestation } from '@entros/pulse-sdk';
 import { useConnection } from '@solana/wallet-adapter-react';
 
 // Inside your component or API route
@@ -57,7 +57,7 @@ const { connection } = useConnection();
 
 try {
   // attestation: { isHuman: boolean, trustScore: number, verifiedAt: number, mode: string, expired: boolean } | null
-  const attestation = await verifyIAMAttestation(walletAddress, connection);
+  const attestation = await verifyEntrosAttestation(walletAddress, connection);
 
   if (!attestation || !attestation.isHuman || attestation.expired) {
     throw new Error("Access Denied: User is not verified.");
@@ -66,29 +66,29 @@ try {
   // Proceed securely
   grantAccess();
 } catch (e) {
-  console.error("IAM Verification failed:", e);
+  console.error("Entros Verification failed:", e);
 }`
   },
   {
     title: "Gate access on Trust Score",
     description:
       "Drop-in React component. Renders children only if the connected wallet meets your Trust Score threshold. Source and live preview at /gate-demo.",
-    code: `import { IAMGate } from "@/components/ui/iam-gate";
+    code: `import { EntrosGate } from "@/components/ui/entros-gate";
 
 export function PremiumPage() {
   return (
-    <IAMGate minTrustScore={100}>
+    <EntrosGate minTrustScore={100}>
       {/* Children render only when the connected wallet
-          has an IAM Anchor with trust score >= 100 */}
+          has an Entros Anchor with trust score >= 100 */}
       <h1>Welcome, verified human.</h1>
-    </IAMGate>
+    </EntrosGate>
   );
 }`
   },
   {
     title: "Display verification status",
     description: "Use the drop-in React component to show identity status.",
-    code: `import { IAMBadge } from "@/components/ui/iam-badge";
+    code: `import { EntrosBadge } from "@/components/ui/entros-badge";
 import { useConnection } from "@solana/wallet-adapter-react";
 
 export function ProfileHeader({ walletAddress }) {
@@ -97,7 +97,7 @@ export function ProfileHeader({ walletAddress }) {
     <div className="flex items-center gap-4">
       <h2 className="text-xl font-bold">{walletAddress}</h2>
       {/* Renders a verified pill with the trust score */}
-      <IAMBadge walletAddress={walletAddress} connection={connection} />
+      <EntrosBadge walletAddress={walletAddress} connection={connection} />
     </div>
   );
 }`

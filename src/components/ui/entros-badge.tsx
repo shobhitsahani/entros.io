@@ -2,20 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { Connection, PublicKey } from "@solana/web3.js";
-import { PROGRAM_IDS } from "@iam-protocol/pulse-sdk";
+import { PROGRAM_IDS } from "@entros/pulse-sdk";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const EXPECTED_SIZE = 62;
-const IAM_PROGRAM_ID = new PublicKey(PROGRAM_IDS.iamAnchor);
+const ENTROS_PROGRAM_ID = new PublicKey(PROGRAM_IDS.entrosAnchor);
 
-interface IAMBadgeProps {
+interface EntrosBadgeProps {
   walletAddress: string;
   connection?: Connection;
   className?: string;
 }
 
-export function IAMBadge({ walletAddress, connection, className }: IAMBadgeProps) {
+export function EntrosBadge({ walletAddress, connection, className }: EntrosBadgeProps) {
   const [loading, setLoading] = useState(true);
   const [trustScore, setTrustScore] = useState<number | null>(null);
   const [invalid, setInvalid] = useState(false);
@@ -47,7 +47,7 @@ export function IAMBadge({ walletAddress, connection, className }: IAMBadgeProps
         try {
           const [identityPda] = PublicKey.findProgramAddressSync(
             [new TextEncoder().encode("identity"), pubkey.toBuffer()],
-            IAM_PROGRAM_ID
+            ENTROS_PROGRAM_ID
           );
 
           // If no connection prop is passed, use a default devnet connection
@@ -108,7 +108,7 @@ export function IAMBadge({ walletAddress, connection, className }: IAMBadgeProps
       ) : loading ? (
         <>
           <Loader2 className="h-3.5 w-3.5 animate-spin text-muted" />
-          <span>Verifying IAM...</span>
+          <span>Verifying Entros...</span>
         </>
       ) : trustScore !== null ? (
         <>

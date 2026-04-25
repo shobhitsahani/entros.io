@@ -24,17 +24,17 @@ const steps = [
     icon: ShieldCheck,
     title: "Verify",
     description:
-      "Each voter completes a behavioral verification through IAM Protocol. Their Trust Score grows with each re-verification over time.",
+      "Each voter completes a behavioral verification through Entros Protocol. Their Trust Score grows with each re-verification over time.",
   },
   {
     icon: Vote,
     title: "Vote",
     description:
-      "Before any governance action, the plugin reads the voter's IAM Anchor on-chain. Verified and recent: vote counted. Unverified or expired: vote blocked.",
+      "Before any governance action, the plugin reads the voter's Entros Anchor on-chain. Verified and recent: vote counted. Unverified or expired: vote blocked.",
   },
 ];
 
-const REGISTRAR_CODE = `// DAO admin configures the IAM voter weight plugin
+const REGISTRAR_CODE = `// DAO admin configures the Entros voter weight plugin
 await program.methods
   .createRegistrar(
     100,      // min_trust_score (at least one re-verification)
@@ -103,7 +103,7 @@ export function GovernanceContent() {
                 <div className="border-t border-border" />
                 <div>
                   <p className="font-mono text-xs uppercase tracking-widest text-muted text-center mb-5">
-                    With IAM
+                    With Entros
                   </p>
                   <div className="flex items-center justify-center gap-4 sm:gap-6">
                     <div className="flex flex-col items-center gap-2">
@@ -184,8 +184,8 @@ export function GovernanceContent() {
               Verified vote.
             </h2>
             <p className="mt-4 text-foreground/70 leading-relaxed">
-              IAM&apos;s voter weight plugin reads the voter&apos;s Trust Score
-              and verification recency from their IAM Anchor before every
+              Entros&apos;s voter weight plugin reads the voter&apos;s Trust Score
+              and verification recency from their Entros Anchor before every
               governance action. Voters must prove they are a real, live human
               with sustained behavioral history. Bots, scripts, and dormant
               wallets are excluded from governance.
@@ -244,8 +244,8 @@ export function GovernanceContent() {
               Layer on top. Don&apos;t replace.
             </h2>
             <p className="mt-3 text-sm text-foreground/70 leading-relaxed">
-              IAM isn&apos;t meant to replace token-based governance. It layers
-              human verification on top of existing plugins. Chain IAM with
+              Entros isn&apos;t meant to replace token-based governance. It layers
+              human verification on top of existing plugins. Chain Entros with
               token-voter to require both token holdings and proof of human
               presence. Chain with quadratic voting for verified-human quadratic
               weights.
@@ -257,7 +257,7 @@ export function GovernanceContent() {
                 <Layers className="h-5 w-5 text-cyan shrink-0" />
                 <div>
                   <p className="text-sm font-medium text-foreground">
-                    IAM + Token Voter
+                    Entros + Token Voter
                   </p>
                   <p className="text-xs text-foreground/50 mt-0.5">
                     Hold tokens AND prove you&apos;re human to vote
@@ -269,7 +269,7 @@ export function GovernanceContent() {
                 <Layers className="h-5 w-5 text-cyan shrink-0" />
                 <div>
                   <p className="text-sm font-medium text-foreground">
-                    IAM + Quadratic
+                    Entros + Quadratic
                   </p>
                   <p className="text-xs text-foreground/50 mt-0.5">
                     Quadratic voting weight, but only for verified humans
@@ -281,7 +281,7 @@ export function GovernanceContent() {
                 <Layers className="h-5 w-5 text-cyan shrink-0" />
                 <div>
                   <p className="text-sm font-medium text-foreground">
-                    IAM + NFT Voter
+                    Entros + NFT Voter
                   </p>
                   <p className="text-xs text-foreground/50 mt-0.5">
                     NFT-gated governance with human liveness checks
@@ -384,7 +384,7 @@ export function GovernanceContent() {
               99nwXzcugse3x8kxE9v6mxZiq8T9gHDoznaaG6qcw534
             </p>
             <a
-              href="https://github.com/iam-protocol/iam-governance-plugin"
+              href="https://github.com/entros-protocol/entros-governance-plugin"
               target="_blank"
               rel="noopener noreferrer"
               className="mt-3 inline-flex items-center gap-1.5 text-xs text-muted hover:text-foreground transition-colors"
