@@ -1,10 +1,12 @@
 import { SubpageHero } from "@/components/sections/subpage-hero";
 import { IntegrateGuide } from "@/components/sections/integrate-guide";
+import { pageMetadata } from "@/lib/page-metadata";
 
-export const metadata = {
+export const metadata = pageMetadata({
   title: "Integrate",
   description: "Add Entros proof-of-personhood verification to your app in 5 lines of code.",
-};
+  path: "/integrate",
+});
 
 export default function Integrate() {
   return (

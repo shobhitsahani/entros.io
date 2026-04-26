@@ -1,12 +1,13 @@
-import type { Metadata } from "next";
 import { SubpageHero } from "@/components/sections/subpage-hero";
 import { ProtocolStats } from "@/components/sections/protocol-stats";
+import { pageMetadata } from "@/lib/page-metadata";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Protocol Stats",
   description:
     "Live on-chain metrics for the Entros Protocol—total anchors minted, trust scores, and verification activity on Solana devnet.",
-};
+  path: "/stats",
+});
 
 export default function Stats() {
   return (

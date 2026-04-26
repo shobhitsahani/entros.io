@@ -53,8 +53,24 @@ export const campaignResults: CampaignResult[] = [
     note: "Cross-program binding gap in update_anchor discovered during cross-analysis, patched same day — see AUDIT.md protocol-core Critical.",
   },
   {
+    tier: "T4a — Wave 3",
+    description: "Pre-recorded human voice + procedural motion/touch (temporal enforcement ON + phrase content binding ON)",
+    attempts: "20",
+    passRate: "0%",
+    status: "phrase binding closes the residual",
+    note: "Whisper-based content matching against the server-issued challenge phrase rejects every attempt where the spoken audio doesn't match. Combined three-layer stack drops T4a from 100% → 10% → 0%.",
+  },
+  {
+    tier: "T4a — Wave 4",
+    description: "Wave 3 methodology at scale (N=1000) to tighten the statistical bound on the closed attack class",
+    attempts: "1,000",
+    passRate: "0%",
+    status: "definitively closed",
+    note: "1,000 of 1,000 attempts rejected at server-side validation by phrase content binding. 95% CI on the pass rate: [0%, 0.37%]. The pre-recorded-arbitrary-content attack class is closed at production scale.",
+  },
+  {
     tier: "T4b",
-    description: "Modern voice cloning (XTTS-v2, F5-TTS)",
+    description: "Real-time synthesized voice (XTTS-v2, F5-TTS, streaming TTS)",
     attempts: "—",
     passRate: "queued",
     status: "next-phase",
@@ -89,10 +105,10 @@ export const campaignResults: CampaignResult[] = [
   },
 ];
 
-export const lastUpdated = "April 20, 2026";
+export const lastUpdated = "April 26, 2026";
 
 export const t4aNote =
-  "T4a was designed as a two-wave study to measure the cross-modal temporal coupling layer's specific contribution to the multi-layer defense. Wave 1 ran with temporal enforcement in log-only mode to establish the counterfactual baseline. Wave 2 ran with enforcement enabled. The 90 percentage-point reduction isolates that layer's contribution. The 10% Wave 2 residual motivated server-side phrase content binding (shipped 2026-04-25) as the next defense layer; T4a Wave 3 is queued to measure the residual after that layer.";
+  "T4a was designed as a multi-wave study to measure each defense layer's specific contribution against one canonical attack class. Wave 1 ran with temporal enforcement in log-only mode to establish the counterfactual baseline (100% pass). Wave 2 enabled cross-modal temporal coupling enforcement (10% pass — the 90 percentage-point reduction isolates that layer's contribution). Wave 3 enabled phrase content binding on top of temporal enforcement (0% pass — the final closure of the pre-recorded-arbitrary-content attack class). Wave 4 confirmed the result at scale (1,000 attempts, 0% pass, 95% CI [0%, 0.37%]). Combined defense stack drops T4a from 100% to 0%.";
 
 export const onChainBurstNote =
-  "The Entros Anchors currently visible on devnet include internal red team artifacts from T4a Waves 1–2 (documented above) alongside legitimate team and pilot-user verifications. All state is preserved on-chain for audit traceability; the public /stats page reads the full on-chain aggregate directly.";
+  "The Entros Anchors currently visible on devnet include internal red team artifacts from T4a Waves 1–4 (documented above) alongside legitimate team and pilot-user verifications. All state is preserved on-chain for audit traceability; the public /stats page reads the full on-chain aggregate directly.";

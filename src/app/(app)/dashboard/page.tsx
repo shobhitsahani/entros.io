@@ -1,14 +1,15 @@
-import type { Metadata } from "next";
 import { SubpageHero } from "@/components/sections/subpage-hero";
 import { DashboardAnchorView } from "@/components/sections/dashboard-anchor-view";
 import { DashboardHistory } from "@/components/sections/dashboard-history";
 import { DashboardAgents } from "@/components/sections/dashboard-agents";
+import { pageMetadata } from "@/lib/page-metadata";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Dashboard",
   description:
     "Your Entros Anchor details, Trust Score, and verification history.",
-};
+  path: "/dashboard",
+});
 
 export default function Dashboard() {
   return (

@@ -1,13 +1,14 @@
-import type { Metadata } from "next";
 import { SubpageHero } from "@/components/sections/subpage-hero";
 import { TokenHeroAnimation } from "@/components/sections/token-hero-animation";
 import { TokenContent } from "@/components/sections/token-content";
+import { pageMetadata } from "@/lib/page-metadata";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Token",
   description:
     "Entros Token economics. Protocol fees, revenue flywheel, validator staking, and fair launch details.",
-};
+  path: "/token",
+});
 
 export default function Token() {
   return (

@@ -1,13 +1,14 @@
-import type { Metadata } from "next";
 import { SubpageHero } from "@/components/sections/subpage-hero";
 import { AgentsContent } from "@/components/sections/agents-content";
 import { AgentsCheckSection } from "@/components/sections/agents-check-section";
+import { pageMetadata } from "@/lib/page-metadata";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Entros Agent Anchor",
   description:
     "Verify the human behind every AI agent on Solana. Link your Entros identity to your registered agents with immutable on-chain attestation.",
-};
+  path: "/agents",
+});
 
 export default function Agents() {
   return (

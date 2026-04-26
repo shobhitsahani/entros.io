@@ -1,12 +1,13 @@
-import type { Metadata } from "next";
 import { SubpageHero } from "@/components/sections/subpage-hero";
 import { VerifyFlow } from "@/components/sections/verify-flow";
+import { pageMetadata } from "@/lib/page-metadata";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Verify",
   description:
     "Prove you are human with Entros Protocol. Walletless or wallet-connected verification on Solana devnet.",
-};
+  path: "/verify",
+});
 
 export default function Verify() {
   return (

@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { SubpageHero } from "@/components/sections/subpage-hero";
 import { SolutionsHeroAnimation } from "@/components/sections/solutions-hero-animation";
@@ -6,12 +5,14 @@ import { SolutionCasesSection } from "@/components/sections/solution-cases-secti
 import { IntegrationSection } from "@/components/sections/integration-section";
 import { PartnersSection } from "@/components/sections/partners-section";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
+import { pageMetadata } from "@/lib/page-metadata";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Solutions",
   description:
     "Entros Protocol use cases: Sybil-resistant airdrops, human-verified governance, fair gaming mints, creator verification, bot prevention.",
-};
+  path: "/solutions",
+});
 
 export default function Solutions() {
   return (

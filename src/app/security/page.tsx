@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { SubpageHero } from "@/components/sections/subpage-hero";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
@@ -9,12 +8,14 @@ import { LatestResults } from "./sections/LatestResults";
 import { OpenSourcePosture } from "./sections/OpenSourcePosture";
 import { ResponsibleDisclosure } from "./sections/ResponsibleDisclosure";
 import { References } from "./sections/References";
+import { pageMetadata } from "@/lib/page-metadata";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Security Program",
   description:
     "Continuous adversarial testing against state-level synthesis attacks. Methodology public, defenses layered, results measured.",
-};
+  path: "/security",
+});
 
 export default function Security() {
   return (

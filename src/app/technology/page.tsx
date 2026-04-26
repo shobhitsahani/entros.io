@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { SubpageHero } from "@/components/sections/subpage-hero";
 import { VerificationTimelineSection } from "@/components/sections/verification-timeline-section";
@@ -9,12 +8,14 @@ import { VerificationModesSection } from "@/components/sections/verification-mod
 import { ResearchValidationSection } from "@/components/sections/research-validation-section";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { VerificationOrb } from "@/components/ui/verification-orb";
+import { pageMetadata } from "@/lib/page-metadata";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Technology",
   description:
     "How Entros verification works. Seven steps from behavioral challenge to on-chain proof. Raw recordings never leave your device.",
-};
+  path: "/technology",
+});
 
 export default function Technology() {
   return (

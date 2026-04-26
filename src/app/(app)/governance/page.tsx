@@ -1,12 +1,13 @@
-import type { Metadata } from "next";
 import { SubpageHero } from "@/components/sections/subpage-hero";
 import { GovernanceContent } from "@/components/sections/governance-content";
+import { pageMetadata } from "@/lib/page-metadata";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Entros Governance Plugin",
   description:
     "Human-verified governance for Solana DAOs. Every vote backed by a live, recently verified human.",
-};
+  path: "/governance",
+});
 
 export default function Governance() {
   return (
