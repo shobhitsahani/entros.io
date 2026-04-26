@@ -1,8 +1,17 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { StructuredData } from "@/components/seo/structured-data";
+import {
+  BRAND_COLOR_DARK,
+  BRAND_COLOR_LIGHT,
+  OG_IMAGE_PATH,
+  SITE_NAME,
+  SITE_URL,
+  TWITTER_HANDLE,
+} from "@/lib/site";
 import "./globals.css";
 
 const inter = Inter({
@@ -17,14 +26,22 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
+const ROOT_TITLE = `${SITE_NAME} — Proof of Personhood on Solana`;
+const ROOT_DESCRIPTION =
+  "Prove you're human without revealing who you are. Solana-native identity verification through the dynamic signature of liveness — voice, motion, and touch, verified with zero-knowledge proofs.";
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://entros.io"),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "Entros Protocol — Proof of Personhood on Solana",
-    template: "%s | Entros Protocol",
+    default: ROOT_TITLE,
+    template: `%s | ${SITE_NAME}`,
   },
-  description:
-    "Prove you're human without revealing who you are. Solana-native identity verification through the dynamic signature of liveness — voice, motion, and touch, verified with zero-knowledge proofs.",
+  description: ROOT_DESCRIPTION,
+  applicationName: SITE_NAME,
+  manifest: "/manifest.webmanifest",
+  alternates: {
+    canonical: "/",
+  },
   icons: {
     icon: [
       { url: "/favicons/icon-32x32.png", sizes: "32x32", type: "image/png" },
@@ -38,33 +55,42 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: "Entros Protocol — Proof of Personhood on Solana",
+    title: ROOT_TITLE,
     description:
       "Solana-native identity verification through behavioral liveness. Privacy by architecture.",
-    url: "https://entros.io",
-    siteName: "Entros Protocol",
+    url: "/",
+    siteName: SITE_NAME,
     type: "website",
     images: [
       {
-        url: "/logos/og-card.png",
+        url: OG_IMAGE_PATH,
         width: 1200,
         height: 630,
-        alt: "Entros Protocol",
+        alt: SITE_NAME,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Entros Protocol — Proof of Personhood on Solana",
+    title: ROOT_TITLE,
     description:
       "Prove you're human without revealing who you are. Built on Solana.",
-    creator: "@entros_protocol",
-    images: ["/logos/og-card.png"],
+    site: TWITTER_HANDLE,
+    creator: TWITTER_HANDLE,
+    images: [OG_IMAGE_PATH],
   },
   robots: {
     index: true,
     follow: true,
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: BRAND_COLOR_DARK },
+    { media: "(prefers-color-scheme: light)", color: BRAND_COLOR_LIGHT },
+  ],
+  colorScheme: "dark light",
 };
 
 export default function RootLayout({
@@ -79,6 +105,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-[100svh] overflow-x-clip bg-background text-foreground font-sans antialiased">
+        <StructuredData />
         <ThemeProvider>
           <Navbar />
           <main className="flex-1">{children}</main>
