@@ -1,4 +1,5 @@
-// @ts-nocheck—animation math with guaranteed-bounds array access
+// @ts-nocheck
+// animation math with guaranteed-bounds array access
 "use client";
 
 import { useRef, useEffect } from "react";
