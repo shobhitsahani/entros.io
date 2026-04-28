@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 const TARGET = "entros";
@@ -10,30 +11,22 @@ function randomChar() {
   return HASH_CHARS[Math.floor(Math.random() * HASH_CHARS.length)];
 }
 
-function scrambleAll() {
-  let s = "";
-  for (let i = 0; i < TARGET.length; i++) s += randomChar();
-  return s;
-}
-
 /**
- * Wordmark with a one-shot hash-shuffle reveal. Fires only on the very
- * first mount of the navbar in a session, and only if that mount is on
- * the home route. Client-side route changes don't remount the navbar
- * (it lives in the root layout), so this naturally never replays on
- * internal navigation.
+ * Wordmark with a one-shot hash-shuffle reveal. Plays the first time
+ * the navbar lands on the home route; on every other route the display
+ * derives back to the canonical target. The animation can no longer
+ * get stranded mid-decrypt: cleanup clears the interval on any path
+ * change, and the rendered string is computed from pathname rather
+ * than imperatively reset.
  */
 export function NavbarWordmark() {
-  const [display, setDisplay] = useState(TARGET);
-  const startedRef = useRef(false);
+  const pathname = usePathname();
+  const [animFrame, setAnimFrame] = useState<string | null>(null);
+  const playedRef = useRef(false);
 
   useEffect(() => {
-    if (startedRef.current) return;
-    startedRef.current = true;
-
-    if (window.location.pathname !== "/") return;
-
-    setDisplay(scrambleAll());
+    if (pathname !== "/" || playedRef.current) return;
+    playedRef.current = true;
 
     const TOTAL_FRAMES = 36;
     const FRAME_MS = 38;
@@ -47,12 +40,14 @@ export function NavbarWordmark() {
       for (let i = 0; i < TARGET.length; i++) {
         next += frame >= settleAt(i) ? TARGET[i] : randomChar();
       }
-      setDisplay(next);
+      setAnimFrame(next);
       if (frame >= TOTAL_FRAMES) window.clearInterval(id);
     }, FRAME_MS);
 
     return () => window.clearInterval(id);
-  }, []);
+  }, [pathname]);
+
+  const display = pathname === "/" && animFrame !== null ? animFrame : TARGET;
 
   return (
     <Link
