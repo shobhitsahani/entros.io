@@ -1,13 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { ArrowRight, CheckCircle } from "lucide-react";
 import { useWallet } from "@solana/wallet-adapter-react";
-import { SubpageHero } from "@/components/sections/subpage-hero";
 import { EntrosGate } from "@/components/ui/entros-gate";
-import { GlowCard } from "@/components/ui/glow-card";
 import { CodeBlock } from "@/components/ui/code-block";
 import { WalletConnectButton } from "@/components/ui/wallet-connect-button";
-import { CheckCircle } from "lucide-react";
 
 const USAGE_CODE = `import { EntrosGate } from "@/components/ui/entros-gate";
 
@@ -20,6 +19,13 @@ export function PremiumPage() {
     </EntrosGate>
   );
 }`;
+
+const FALLBACK_CODE = `<EntrosGate
+  minTrustScore={100}
+  fallback={<YourCustomPrompt />}
+>
+  <PremiumContent />
+</EntrosGate>`;
 
 const COMPONENT_CODE = `"use client";
 
@@ -35,7 +41,7 @@ const COMPONENT_CODE = `"use client";
  *   - React + Next.js Link
  *   - @solana/web3.js (PublicKey, Connection)
  *   - @solana/wallet-adapter-react (useWallet, useConnection)
- *   - @solana/wallet-adapter-react-ui (WalletMultiButton—the universal Solana wallet UI)
+ *   - @solana/wallet-adapter-react-ui (WalletMultiButton)
  *   - @entros/pulse-sdk (PROGRAM_IDS constant)
  *   - lucide-react (icons)
  *   - Tailwind CSS for styling (no custom design system imports)
@@ -133,8 +139,6 @@ export function EntrosGate({
     };
   }, [publicKey, connected, connection]);
 
-  // Threshold comparison happens at render time, not in the fetch effect.
-  // Changing minTrustScore re-renders without triggering a new RPC call.
   if (fetchState.status === "ready" && fetchState.trustScore >= minTrustScore) {
     return <>{children}</>;
   }
@@ -162,93 +166,6 @@ export function EntrosGate({
       verifyHref={verifyHref}
     />
   );
-}
-
-type FallbackState =
-  | { status: "disconnected" }
-  | { status: "no-identity" }
-  | { status: "below-threshold"; trustScore: number };
-
-function DefaultFallback({
-  state,
-  minTrustScore,
-  verifyHref,
-}: {
-  state: FallbackState;
-  minTrustScore: number;
-  verifyHref: string;
-}) {
-  return (
-    <div className="mx-auto max-w-md rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 shadow-sm">
-      <div className="flex flex-col items-center text-center gap-4 py-4">
-        {state.status === "disconnected" ? (
-          <Wallet className="h-12 w-12 text-zinc-400" strokeWidth={1.5} />
-        ) : (
-          <ShieldAlert className="h-12 w-12 text-zinc-400" strokeWidth={1.5} />
-        )}
-
-        {state.status === "disconnected" && (
-          <>
-            <div>
-              <p className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                Connect your wallet
-              </p>
-              <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                This content requires a verified Entros identity.
-              </p>
-            </div>
-            <WalletMultiButton />
-          </>
-        )}
-
-        {state.status === "no-identity" && (
-          <>
-            <div>
-              <p className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                Verify your humanness
-              </p>
-              <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                This content requires an Entros Anchor with Trust Score{" "}
-                <span className="font-mono text-zinc-900 dark:text-zinc-100">{minTrustScore}</span>{" "}
-                or higher.
-              </p>
-            </div>
-            <Link
-              href={verifyHref}
-              className="inline-flex items-center gap-2 rounded-md bg-cyan-500 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-600 transition-colors"
-            >
-              Verify now
-            </Link>
-          </>
-        )}
-
-        {state.status === "below-threshold" && (
-          <>
-            <div>
-              <p className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                Trust Score too low
-              </p>
-              <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                Your Trust Score is{" "}
-                <span className="font-mono text-zinc-900 dark:text-zinc-100">
-                  {state.trustScore}
-                </span>
-                . This content requires{" "}
-                <span className="font-mono text-zinc-900 dark:text-zinc-100">{minTrustScore}</span>
-                . Re-verify across multiple days to grow your score.
-              </p>
-            </div>
-            <Link
-              href={verifyHref}
-              className="inline-flex items-center gap-2 rounded-md bg-cyan-500 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-600 transition-colors"
-            >
-              Re-verify
-            </Link>
-          </>
-        )}
-      </div>
-    </div>
-  );
 }`;
 
 export default function GateDemo() {
@@ -256,7 +173,6 @@ export default function GateDemo() {
   const [copied, setCopied] = useState(false);
   const { publicKey, connected, disconnect } = useWallet();
 
-  // Allow the input to be empty while typing, but clamp the value passed to the gate.
   const threshold = Math.min(10000, Math.max(0, parseInt(thresholdInput, 10) || 0));
 
   const truncatedAddress = publicKey
@@ -271,139 +187,344 @@ export default function GateDemo() {
 
   return (
     <>
-      <SubpageHero
-        title="Entros Gate"
-        subtitle={
-          "A drop-in React component to gate content by Trust Score.\n" +
-          "Wraps any children, renders only when the connected wallet meets your threshold."
-        }
-      />
-      <div className="mx-auto max-w-5xl px-6 pb-24">
-        <div className="mb-8 flex justify-center">
-          {connected ? (
-            <div className="inline-flex items-center gap-2 rounded-full border border-cyan/30 bg-cyan/5 px-4 py-1.5">
-              <span className="h-2 w-2 rounded-full bg-cyan animate-pulse" />
-              <span className="font-mono text-xs text-cyan">{truncatedAddress}</span>
-              <button
-                onClick={() => disconnect()}
-                className="ml-1 text-xs text-foreground/40 hover:text-foreground transition-colors"
-                aria-label="Disconnect wallet"
-              >
-                &times;
-              </button>
-            </div>
-          ) : (
-            <WalletConnectButton />
-          )}
-        </div>
+      {/* Hero—asymmetric split. Left: wide h1 + copy + CTAs. Right:
+          two stacked state cards showing the gate's branching output. */}
+      <section>
+        <div className="mx-auto max-w-7xl px-6 pt-32 pb-20 md:pt-40 md:pb-28">
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+            // ENTROS GATE
+          </span>
 
-        <GlowCard className="mb-12">
-          <div className="flex flex-col gap-8 md:flex-row md:items-start">
-            <div className="w-full space-y-4 md:w-1/2">
-              <label
-                htmlFor="threshold-input"
-                className="block text-sm font-mono text-muted uppercase tracking-widest"
-              >
-                Required Trust Score
-              </label>
-              <input
-                id="threshold-input"
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                className="w-full bg-surface border border-border rounded-lg px-4 py-3 text-sm font-mono text-foreground focus:outline-none focus:border-cyan/50 transition-colors"
-                value={thresholdInput}
-                onChange={(e) => setThresholdInput(e.target.value.replace(/[^0-9]/g, ""))}
-              />
-              <p className="text-xs text-muted">
-                Adjust the threshold to test the gate against your connected wallet&apos;s Trust Score.
-                Try 0 to allow any verified human, or a high number to block.
+          <div className="mt-8 grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
+            <div className="lg:col-span-7">
+              <h1 className="font-display text-5xl font-medium leading-[1.02] tracking-[-0.02em] text-foreground md:text-6xl lg:text-7xl">
+                Trust<span className="text-cyan">,</span>
+                <br />
+                as a gate<span className="text-cyan">.</span>
+              </h1>
+
+              <p className="mt-8 max-w-xl text-base leading-relaxed text-foreground/70 md:text-lg">
+                A drop-in React component that gates content by Entros
+                Trust Score. Wrap any children, set a threshold, the gate
+                handles wallet connection, identity lookup, and
+                verification prompts.
               </p>
+
+              <div className="mt-10 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+                <Link
+                  href="/integrate"
+                  className="
+                    group inline-flex items-center justify-center gap-2
+                    rounded-full bg-foreground px-6 py-3
+                    text-sm font-medium text-background
+                    transition-colors hover:bg-foreground/90
+                  "
+                >
+                  All components
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </Link>
+                <Link
+                  href="/verify"
+                  className="
+                    group inline-flex items-center justify-center gap-2
+                    rounded-full border border-foreground/20 px-6 py-3
+                    text-sm font-medium text-foreground
+                    transition-colors hover:border-foreground/40 hover:bg-foreground/5
+                  "
+                >
+                  Try the demo
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </Link>
+              </div>
             </div>
 
-            <div className="w-full md:w-1/2">
-              <p className="text-xs font-mono text-muted uppercase tracking-widest mb-4">
-                Live preview
-              </p>
-              <EntrosGate minTrustScore={threshold}>
-                <div className="rounded-xl border border-solana-green/30 bg-solana-green/5 p-6 text-center">
-                  <CheckCircle className="mx-auto h-8 w-8 text-solana-green mb-3" />
-                  <p className="font-sans text-lg font-semibold text-foreground">
-                    Protected content visible
-                  </p>
-                  <p className="mt-1 text-sm text-muted">
-                    Your Trust Score meets the threshold of {threshold}.
+            {/* Two stacked state cards—the gate's branching output */}
+            <div className="lg:col-span-5">
+              <div className="space-y-6">
+                {/* PASS state */}
+                <div className="relative border border-cyan/40 bg-cyan/[0.03] p-6 md:p-7">
+                  <div className="flex items-center justify-between">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan/80">
+                      // PASS
+                    </p>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan/70">
+                      482 ≥ 100
+                    </span>
+                  </div>
+                  <div className="mt-6 flex items-center gap-3">
+                    <CheckCircle className="h-5 w-5 shrink-0 text-cyan" />
+                    <p className="font-display text-base font-medium tracking-tight text-foreground md:text-lg">
+                      Welcome, verified human.
+                    </p>
+                  </div>
+                  <p className="mt-2 font-mono text-[11px] text-foreground/45">
+                    {"<children />"} rendered
                   </p>
                 </div>
-              </EntrosGate>
+
+                {/* BLOCK state */}
+                <div className="relative border border-border p-6 md:p-7">
+                  <div className="flex items-center justify-between">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+                      // BLOCK
+                    </p>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+                      0 &lt; 100
+                    </span>
+                  </div>
+                  <div className="mt-6 flex items-center gap-3">
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-foreground/30 text-foreground/40">
+                      <span className="h-1 w-1 rounded-full bg-foreground/40" />
+                    </span>
+                    <p className="font-display text-base font-medium tracking-tight text-foreground/55 md:text-lg">
+                      Verify your humanness.
+                    </p>
+                  </div>
+                  <p className="mt-2 font-mono text-[11px] text-foreground/35">
+                    {"<fallback />"} rendered
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
-        </GlowCard>
+        </div>
+      </section>
 
-        <div className="space-y-8">
-          <section>
-            <h2 className="text-lg font-mono font-bold text-foreground mb-4">1. Usage</h2>
-            <p className="text-sm text-foreground/70 leading-relaxed mb-4">
-              Wrap any component tree. The gate handles wallet connection state, identity lookup,
-              and Trust Score comparison. A default fallback prompts the user to connect, verify,
-              or improve their score.
-            </p>
-            <CodeBlock code={USAGE_CODE} />
-          </section>
+      {/* Live preview */}
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+            // LIVE PREVIEW
+          </span>
 
-          <section>
-            <h2 className="text-lg font-mono font-bold text-foreground mb-4">
-              2. Component Source
-            </h2>
-            <p className="text-sm text-foreground/70 leading-relaxed mb-4">
-              Copy this code into your project at{" "}
-              <code className="text-cyan bg-surface px-1.5 py-0.5 rounded">
-                components/ui/entros-gate.tsx
-              </code>
-              . It requires{" "}
-              <code className="text-cyan bg-surface px-1.5 py-0.5 rounded">
-                @entros/pulse-sdk
-              </code>
-              ,{" "}
-              <code className="text-cyan bg-surface px-1.5 py-0.5 rounded">
-                @solana/web3.js
-              </code>
-              , and{" "}
-              <code className="text-cyan bg-surface px-1.5 py-0.5 rounded">
-                @solana/wallet-adapter-react
-              </code>
-              .
-            </p>
-            <div className="relative">
-              <div className="absolute right-4 top-4 z-10">
+          <h2 className="mt-6 max-w-3xl font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+            Try it now<span className="text-cyan">.</span>
+          </h2>
+
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-foreground/65 md:text-lg">
+            Connect your wallet, dial the Trust Score threshold, and watch
+            the gate decide what your wallet can see.
+          </p>
+
+          {/* Wallet status pill */}
+          <div className="mt-10 flex justify-start">
+            {connected ? (
+              <div className="inline-flex items-center gap-3 border border-cyan/30 bg-cyan/[0.04] px-4 py-2">
+                <span className="h-1.5 w-1.5 rounded-full bg-cyan" />
+                <span className="font-mono text-xs text-cyan">
+                  {truncatedAddress}
+                </span>
                 <button
-                  onClick={copySource}
-                  className="text-xs font-mono text-muted hover:text-cyan transition-colors"
+                  onClick={() => disconnect()}
+                  className="ml-1 text-xs text-foreground/40 transition-colors hover:text-foreground"
+                  aria-label="Disconnect wallet"
                 >
-                  {copied ? "COPIED" : "COPY"}
+                  &times;
                 </button>
               </div>
-              <CodeBlock code={COMPONENT_CODE} className="max-h-[600px] overflow-y-auto" />
-            </div>
-          </section>
+            ) : (
+              <WalletConnectButton align="start" />
+            )}
+          </div>
 
-          <section>
-            <h2 className="text-lg font-mono font-bold text-foreground mb-4">3. Custom Fallback</h2>
-            <p className="text-sm text-foreground/70 leading-relaxed mb-4">
-              Pass a <code className="text-cyan bg-surface px-1.5 py-0.5 rounded">fallback</code>{" "}
-              prop to override the default verification prompt entirely.
-            </p>
-            <CodeBlock
-              code={`<EntrosGate
-  minTrustScore={100}
-  fallback={<YourCustomPrompt />}
->
-  <PremiumContent />
-</EntrosGate>`}
-            />
-          </section>
+          <div className="mt-8 border border-border p-6 md:p-8">
+            <div className="flex items-center justify-between">
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+                // GATE
+              </p>
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan/60" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-cyan" />
+                </span>
+                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+                  Devnet
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-8 grid grid-cols-1 items-start gap-8 md:grid-cols-2 md:gap-12">
+              <div>
+                <label
+                  htmlFor="threshold-input"
+                  className="mb-2 block font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40"
+                >
+                  Required Trust Score
+                </label>
+                <input
+                  id="threshold-input"
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  className="w-full border border-border bg-background px-4 py-3 font-mono text-sm text-foreground transition-colors focus:border-cyan/50 focus:outline-none"
+                  value={thresholdInput}
+                  onChange={(e) =>
+                    setThresholdInput(e.target.value.replace(/[^0-9]/g, ""))
+                  }
+                />
+                <p className="mt-3 text-xs leading-relaxed text-foreground/50">
+                  Try 0 to allow any verified human, or a high number to
+                  block. Adjust to test the gate against your connected
+                  wallet's Trust Score.
+                </p>
+              </div>
+
+              <div>
+                <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+                  Output
+                </p>
+                <div className="border border-border bg-surface p-6">
+                  <EntrosGate minTrustScore={threshold}>
+                    <div className="border border-cyan/30 bg-cyan/[0.05] p-6 text-center">
+                      <CheckCircle className="mx-auto mb-3 h-7 w-7 text-cyan" />
+                      <p className="font-display text-base font-medium tracking-tight text-foreground md:text-lg">
+                        Protected content visible
+                      </p>
+                      <p className="mt-1 text-xs text-foreground/55">
+                        Your Trust Score meets the threshold of {threshold}.
+                      </p>
+                    </div>
+                  </EntrosGate>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
+
+      {/* Usage */}
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+            // USAGE
+          </span>
+
+          <div className="mt-6 grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-16">
+            <div className="lg:col-span-5">
+              <h2 className="font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+                Wrap<span className="text-cyan">.</span> Set
+                <span className="text-cyan">.</span> Render
+                <span className="text-cyan">.</span>
+              </h2>
+              <p className="mt-8 text-base leading-relaxed text-foreground/70 md:text-lg">
+                Wrap any component tree. The gate handles wallet
+                connection state, identity lookup, and Trust Score
+                comparison. A default fallback prompts the user to
+                connect, verify, or improve their score.
+              </p>
+            </div>
+
+            <div className="lg:col-span-7">
+              <CodeBlock code={USAGE_CODE} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Custom fallback */}
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+            // CUSTOM FALLBACK
+          </span>
+
+          <div className="mt-6 grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-16">
+            <div className="lg:col-span-5">
+              <h2 className="font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+                Override the prompt<span className="text-cyan">.</span>
+              </h2>
+              <p className="mt-8 text-base leading-relaxed text-foreground/70 md:text-lg">
+                Pass a{" "}
+                <code className="font-mono text-cyan">fallback</code> prop
+                to override the default verification prompt. Useful for
+                paywalls, branded gates, or progressive disclosure flows.
+              </p>
+            </div>
+
+            <div className="lg:col-span-7">
+              <CodeBlock code={FALLBACK_CODE} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Component source */}
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+            // COMPONENT SOURCE
+          </span>
+
+          <h2 className="mt-6 max-w-3xl font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+            Copy. Paste. Ship<span className="text-cyan">.</span>
+          </h2>
+
+          <p className="mt-6 max-w-3xl text-base leading-relaxed text-foreground/70 md:text-lg">
+            Paste this file at{" "}
+            <code className="font-mono text-cyan">
+              components/ui/entros-gate.tsx
+            </code>
+            . Requires{" "}
+            <code className="font-mono text-cyan">@entros/pulse-sdk</code>,{" "}
+            <code className="font-mono text-cyan">@solana/web3.js</code>,
+            and{" "}
+            <code className="font-mono text-cyan">
+              @solana/wallet-adapter-react
+            </code>
+            .
+          </p>
+
+          <div className="relative mt-12">
+            <button
+              onClick={copySource}
+              className="absolute right-4 top-4 z-10 font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40 transition-colors hover:text-cyan"
+            >
+              {copied ? "COPIED" : "COPY"}
+            </button>
+            <CodeBlock
+              code={COMPONENT_CODE}
+              className="max-h-[600px] overflow-y-auto"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Footer CTA */}
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-5xl px-6 py-32 text-center md:py-40">
+          <h2 className="font-display text-4xl font-medium tracking-tight text-foreground md:text-6xl md:leading-[1.05]">
+            One wrapper<span className="text-cyan">.</span>
+            <br />
+            Every gated route<span className="text-cyan">.</span>
+          </h2>
+          <div className="mt-12 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              href="/integrate"
+              className="
+                group inline-flex items-center justify-center gap-2
+                rounded-full bg-foreground px-6 py-3
+                text-sm font-medium text-background
+                transition-colors hover:bg-foreground/90
+              "
+            >
+              All components
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+            <Link
+              href="/badge-demo"
+              className="
+                group inline-flex items-center justify-center gap-2
+                rounded-full border border-foreground/20 px-6 py-3
+                text-sm font-medium text-foreground
+                transition-colors hover:border-foreground/40 hover:bg-foreground/5
+              "
+            >
+              See &lt;EntrosBadge /&gt;
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+          </div>
+        </div>
+      </section>
     </>
   );
 }
