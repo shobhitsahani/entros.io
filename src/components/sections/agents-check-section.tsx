@@ -6,8 +6,6 @@ import {
   getAgentHumanOperator,
   type AgentHumanOperator,
 } from "@entros/pulse-sdk";
-import { TextShimmer } from "@/components/ui/text-shimmer";
-import { GlowCard } from "@/components/ui/glow-card";
 import { Bot, CheckCircle, ExternalLink, Loader2, Search } from "lucide-react";
 import { explorerUrl } from "@/lib/explorer";
 
@@ -83,7 +81,6 @@ export function AgentsCheckSection() {
     }
   }
 
-  // Auto-check the test agent on mount so judges see a live result immediately
   useEffect(() => {
     if (autoChecked.current) return;
     autoChecked.current = true;
@@ -94,25 +91,27 @@ export function AgentsCheckSection() {
   }, [connection]);
 
   return (
-    <section>
-      <TextShimmer
-        as="span"
-        className="font-mono text-base tracking-widest uppercase"
-      >
-        {"// CHECK AN AGENT"}
-      </TextShimmer>
-      <p className="mt-4 text-sm text-foreground/70 max-w-2xl">
-        Enter any agent&apos;s asset address to check if it has a verified human
-        operator via Entros.
-      </p>
+    <section id="check" className="border-t border-border">
+      <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+        <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+          // CHECK AN AGENT
+        </span>
 
-      <div className="mt-6">
-        <GlowCard>
+        <h2 className="mt-6 max-w-3xl font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+          Verify any agent on Solana<span className="text-cyan">.</span>
+        </h2>
+
+        <p className="mt-6 max-w-2xl text-base leading-relaxed text-foreground/65 md:text-lg">
+          Enter any agent's asset address to check if it has a verified
+          human operator via Entros.
+        </p>
+
+        <div className="mt-12 border border-border p-6 md:p-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
             <div className="flex-1">
               <label
                 htmlFor="check-agent-asset"
-                className="block text-xs font-mono uppercase tracking-widest text-muted mb-2"
+                className="mb-2 block font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40"
               >
                 Agent Asset Address
               </label>
@@ -120,7 +119,7 @@ export function AgentsCheckSection() {
                 id="check-agent-asset"
                 type="text"
                 placeholder="Paste a Solana Agent Registry asset address..."
-                className="w-full bg-background border border-border rounded-lg px-4 py-3 text-sm font-mono text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-cyan/50 transition-colors"
+                className="w-full border border-border bg-background px-4 py-3 font-mono text-sm text-foreground placeholder:text-foreground/30 transition-colors focus:border-cyan/50 focus:outline-none"
                 value={agentAsset}
                 onChange={(e) => {
                   requestId.current++;
@@ -135,7 +134,7 @@ export function AgentsCheckSection() {
             <button
               onClick={() => runCheck(agentAsset)}
               disabled={checking || !agentAsset.trim()}
-              className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-5 py-3 text-sm font-mono text-foreground transition-colors hover:border-cyan/50 hover:text-cyan disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center justify-center gap-2 border border-foreground/20 bg-foreground px-6 py-3 font-mono text-sm text-background transition-colors hover:bg-foreground/90 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {checking ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
@@ -149,79 +148,80 @@ export function AgentsCheckSection() {
           {error && <p className="mt-4 text-sm text-danger">{error}</p>}
 
           {checked && !operator && !error && (
-            <div className="mt-6 flex items-center gap-3 rounded-xl border border-border bg-surface/30 p-5">
-              <Bot className="h-6 w-6 text-muted" strokeWidth={1.5} />
+            <div className="mt-8 flex items-center gap-3 border border-border p-5">
+              <Bot className="h-6 w-6 text-foreground/50" strokeWidth={1.5} />
               <div>
                 <p className="text-sm font-medium text-foreground">
                   No Entros attestation
                 </p>
-                <p className="text-xs text-muted mt-0.5">
-                  This agent has no verified human operator linked via Entros
-                  Protocol.
+                <p className="mt-0.5 text-xs text-foreground/50">
+                  This agent has no verified human operator linked via
+                  Entros Protocol.
                 </p>
               </div>
             </div>
           )}
 
           {operator && (
-            <div className="mt-6 rounded-xl border border-solana-green/20 bg-solana-green/5 p-6">
-              <div className="flex items-center gap-3 mb-5">
+            <div className="mt-8 border border-solana-green/30 bg-solana-green/[0.04] p-6 md:p-8">
+              <div className="mb-8 flex items-center gap-3">
                 <CheckCircle className="h-6 w-6 text-solana-green" />
                 <div>
                   <p className="text-sm font-medium text-foreground">
                     Verified Human Operator
                   </p>
-                  <p className="text-xs text-muted mt-0.5">
+                  <p className="mt-0.5 text-xs text-foreground/50">
                     Immutable on-chain attestation via{" "}
-                    <span className="text-cyan font-mono">
+                    <span className="font-mono text-cyan">
                       entros:human-operator
                     </span>
                   </p>
                 </div>
               </div>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div>
-                  <p className="text-xs font-mono uppercase tracking-widest text-muted">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
                     Trust Score (Live)
                   </p>
-                  <p className="mt-1 text-3xl font-mono font-bold text-foreground">
+                  <p className="mt-2 font-display text-4xl font-medium tracking-tight text-foreground">
                     {liveTrustScore !== null ? liveTrustScore : operator.trustScore}
                   </p>
                   {liveTrustScore !== null && liveTrustScore !== operator.trustScore && (
-                    <p className="mt-1 text-xs text-muted">
+                    <p className="mt-1 text-xs text-foreground/50">
                       {operator.trustScore} at attestation
                     </p>
                   )}
                 </div>
                 <div>
-                  <p className="text-xs font-mono uppercase tracking-widest text-muted">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
                     Attested At
                   </p>
-                  <p className="mt-1 text-sm font-mono text-foreground">
+                  <p className="mt-2 font-mono text-sm text-foreground">
                     {formatTimestamp(operator.verifiedAt)}
                   </p>
                 </div>
                 <div className="sm:col-span-2">
-                  <p className="text-xs font-mono uppercase tracking-widest text-muted">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
                     Operator Wallet
                   </p>
-                  <p className="mt-1 text-xs font-mono text-foreground/70 break-all">
+                  <p className="mt-2 break-all font-mono text-xs text-foreground/70">
                     {operator.wallet}
                   </p>
                 </div>
                 <div className="sm:col-span-2">
-                  <p className="text-xs font-mono uppercase tracking-widest text-muted">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
                     Entros Anchor PDA
                   </p>
-                  <div className="mt-1 flex items-center gap-2">
-                    <p className="text-xs font-mono text-foreground/70 break-all">
+                  <div className="mt-2 flex items-center gap-2">
+                    <p className="break-all font-mono text-xs text-foreground/70">
                       {operator.anchorPda}
                     </p>
                     <a
                       href={explorerUrl(operator.anchorPda)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="shrink-0 text-cyan hover:text-foreground transition-colors"
+                      className="shrink-0 text-cyan transition-colors hover:text-foreground"
                       aria-label="View on Solana Explorer"
                     >
                       <ExternalLink className="h-3.5 w-3.5" />
@@ -231,22 +231,22 @@ export function AgentsCheckSection() {
               </div>
             </div>
           )}
-        </GlowCard>
-      </div>
+        </div>
 
-      <p className="mt-6 text-xs text-muted text-center">
-        Try with:{" "}
-        <button
-          onClick={() => {
-            setAgentAsset(TEST_AGENT);
-            runCheck(TEST_AGENT);
-          }}
-          className="text-cyan hover:text-foreground transition-colors font-mono"
-        >
-          CW9ogj...LMW1M
-        </button>{" "}
-        (Entros test agent on devnet)
-      </p>
+        <p className="mt-6 text-xs text-foreground/50">
+          Try with{" "}
+          <button
+            onClick={() => {
+              setAgentAsset(TEST_AGENT);
+              runCheck(TEST_AGENT);
+            }}
+            className="font-mono text-cyan transition-colors hover:text-foreground"
+          >
+            CW9ogj…LMW1M
+          </button>{" "}
+         —Entros test agent on devnet.
+        </p>
+      </div>
     </section>
   );
 }

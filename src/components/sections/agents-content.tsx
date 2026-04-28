@@ -1,25 +1,20 @@
-import { TextShimmer } from "@/components/ui/text-shimmer";
-import { GlowCard } from "@/components/ui/glow-card";
-import { AgentNetworkAnimation } from "@/components/ui/agent-network-animation";
-import { ShieldCheck, Bot, Link2 } from "lucide-react";
-import Link from "next/link";
-import { ShimmerButton } from "@/components/ui/shimmer-button";
+import { ShieldCheck, Bot } from "lucide-react";
 
 const steps = [
   {
-    icon: ShieldCheck,
+    number: "01",
     title: "Verify as human",
     description:
       "Complete a behavioral verification to prove you're human. Your Entros Anchor is minted on Solana with a Trust Score that grows over time.",
   },
   {
-    icon: Bot,
+    number: "02",
     title: "Register your agent",
     description:
       "Register your AI agent on the Solana Agent Registry. Your agent gets a Metaplex Core NFT identity on-chain.",
   },
   {
-    icon: Link2,
+    number: "03",
     title: "Attest with Agent Anchor",
     description:
       "Link your Entros Anchor to your agent with one transaction. The attestation is immutable and on-chain. Any platform can verify the link.",
@@ -28,195 +23,253 @@ const steps = [
 
 export function AgentsContent() {
   return (
-    <div className="space-y-32">
-      {/* Problem section with animation */}
-      <section className="relative">
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 items-center">
-          <div>
-            <TextShimmer
-              as="span"
-              className="font-mono text-base tracking-widest uppercase"
-            >
-              {"// THE PROBLEM"}
-            </TextShimmer>
-            <h2 className="mt-4 font-mono text-2xl font-bold text-foreground md:text-3xl">
-              AI agents have no human accountability.
-            </h2>
-            <p className="mt-4 text-foreground/70 leading-relaxed">
-              Thousands of AI agents are registered on Solana. They trade, vote,
-              execute transactions, and interact with protocols autonomously. But
-              none of them can prove a real human operates them. Anyone can
-              register unlimited anonymous agents with no link between the
-              agent&apos;s on-chain identity and a verified person.
+    <>
+      {/* Problem */}
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+            // THE PROBLEM
+          </span>
+
+          <h2 className="mt-6 max-w-3xl font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+            AI agents have no human accountability<span className="text-cyan">.</span>
+          </h2>
+
+          <div className="mt-12 grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-16">
+            <p className="text-base leading-relaxed text-foreground/70 md:text-lg">
+              Thousands of AI agents are registered on Solana. They trade,
+              vote, execute transactions, and interact with protocols
+              autonomously. None of them can prove a real human operates
+              them.
             </p>
-          </div>
-          <div className="flex justify-center lg:justify-end">
-            <AgentNetworkAnimation className="w-full max-w-[460px] h-auto" />
+            <p className="text-base leading-relaxed text-foreground/65 md:text-lg">
+              Anyone can register unlimited anonymous agents with no link
+              between the agent's on-chain identity and a verified person.
+              Platforms gating access by agent count have nothing to count
+              against.
+            </p>
           </div>
         </div>
       </section>
 
       {/* Solution */}
-      <section>
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2 items-center">
-          <div className="order-2 lg:order-1">
-            <GlowCard>
-              <div className="py-4">
-                <p className="font-mono text-sm uppercase tracking-widest text-muted text-center mb-8">
-                  On-chain attestation
-                </p>
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+            // THE SOLUTION
+          </span>
 
-                {/* Diagram: circles + connecting line */}
-                <div className="flex items-center px-4 sm:px-8">
-                  <div className="h-16 w-16 rounded-full border border-cyan/30 bg-cyan/10 flex items-center justify-center shrink-0">
-                    <ShieldCheck className="h-7 w-7 text-cyan" />
-                  </div>
+          <h2 className="mt-6 max-w-3xl font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+            One person<span className="text-cyan">.</span> One identity<span className="text-cyan">.</span>
+            <br />
+            All their agents<span className="text-cyan">.</span>
+          </h2>
 
-                  <div className="flex-1 relative mx-3">
-                    <div className="border-t-2 border-dashed border-cyan/30" />
-                    <span className="absolute -top-5 left-1/2 -translate-x-1/2 font-mono text-sm text-cyan whitespace-nowrap">
-                      entros:human-operator
+          <div className="mt-16 grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
+            <div className="lg:col-span-6">
+              <p className="text-base leading-relaxed text-foreground/70 md:text-lg">
+                Agent Anchor writes immutable metadata on a registered
+                agent linking it to its verified human operator's Entros
+                Anchor. One human, one Trust Score. Register 100 agents
+                and all 100 trace back to the same verified identity.
+              </p>
+              <p className="mt-6 text-base leading-relaxed text-foreground/65 md:text-lg">
+                Platforms set their own policies—minimum Trust Score
+                to register, maximum agents per operator, age requirements
+                on the operator's Anchor.
+              </p>
+            </div>
+
+            {/* Attestation diagram—hairline frame, concentric-ringed
+                nodes connected by a signal-dot channel. Cyan corner
+                brackets tie it to the Placeholder design language. */}
+            <div className="lg:col-span-6">
+              <div className="relative border border-border p-8 md:p-12">
+                {/* Corner brackets */}
+                <span className="absolute left-0 top-0 h-3 w-3 border-l border-t border-cyan/70" aria-hidden />
+                <span className="absolute right-0 top-0 h-3 w-3 border-r border-t border-cyan/70" aria-hidden />
+                <span className="absolute bottom-0 left-0 h-3 w-3 border-b border-l border-cyan/70" aria-hidden />
+                <span className="absolute bottom-0 right-0 h-3 w-3 border-b border-r border-cyan/70" aria-hidden />
+
+                {/* Header row—eyebrow + status pill */}
+                <div className="flex items-center justify-between">
+                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+                    // ON-CHAIN ATTESTATION
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <span className="relative flex h-1.5 w-1.5">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-solana-green/60" />
+                      <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-solana-green" />
                     </span>
-                  </div>
-
-                  <div className="h-16 w-16 rounded-full border border-foreground/20 bg-foreground/5 flex items-center justify-center shrink-0">
-                    <Bot className="h-7 w-7 text-foreground/60" />
+                    <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+                      Devnet
+                    </span>
                   </div>
                 </div>
 
-                {/* Labels under circles */}
-                <div className="flex justify-between px-4 sm:px-8 mt-3">
-                  <span className="text-sm font-mono text-muted w-16 text-center">
+                {/* Diagram */}
+                <div className="mt-14 flex items-center px-2">
+                  {/* Human—animated ripple rings */}
+                  <div className="relative flex h-20 w-20 shrink-0 items-center justify-center">
+                    <span className="absolute inset-0 rounded-full border border-cyan/35 animate-ripple" aria-hidden />
+                    <span className="absolute inset-0 rounded-full border border-cyan/35 animate-ripple [animation-delay:1.8s]" aria-hidden />
+                    <div className="relative flex h-12 w-12 items-center justify-center rounded-full border border-cyan/50 bg-cyan/[0.04]">
+                      <ShieldCheck className="h-5 w-5 text-cyan" strokeWidth={1.5} />
+                    </div>
+                  </div>
+
+                  {/* Connection channel */}
+                  <div className="relative mx-3 flex-1">
+                    {/* Top label */}
+                    <span className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap font-mono text-[11px] tracking-[0.15em] text-cyan">
+                      entros:human-operator
+                    </span>
+
+                    {/* Channel—gradient hairline + 3 signal dots */}
+                    <div className="relative h-px bg-gradient-to-r from-cyan/15 via-cyan/55 to-cyan/15">
+                      <span className="absolute left-[20%] top-1/2 h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan/60" aria-hidden />
+                      <span className="absolute left-1/2 top-1/2 h-[5px] w-[5px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan shadow-[0_0_8px_rgba(34,211,230,0.6)]" aria-hidden />
+                      <span className="absolute left-[80%] top-1/2 h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan/60" aria-hidden />
+                    </div>
+
+                    {/* Below the line—direction arrow */}
+                    <span className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-[1px] text-cyan">
+                      <svg width="6" height="6" viewBox="0 0 6 6" fill="none" aria-hidden>
+                        <path d="M0 0L6 3L0 6V0Z" fill="currentColor" />
+                      </svg>
+                    </span>
+                  </div>
+
+                  {/* Agent—animated ripple rings */}
+                  <div className="relative flex h-20 w-20 shrink-0 items-center justify-center">
+                    <span className="absolute inset-0 rounded-full border border-foreground/25 animate-ripple [animation-delay:0.9s]" aria-hidden />
+                    <span className="absolute inset-0 rounded-full border border-foreground/25 animate-ripple [animation-delay:2.7s]" aria-hidden />
+                    <div className="relative flex h-12 w-12 items-center justify-center rounded-full border border-foreground/30 bg-foreground/[0.03]">
+                      <Bot className="h-5 w-5 text-foreground/60" strokeWidth={1.5} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Node labels */}
+                <div className="mt-4 flex items-center justify-between px-2">
+                  <span className="w-20 text-center font-mono text-[10px] uppercase tracking-[0.2em] text-cyan/80">
                     Human
                   </span>
-                  <span className="text-sm font-mono text-muted w-16 text-center">
+                  <span className="w-20 text-center font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/55">
                     Agent
                   </span>
                 </div>
 
-                <p className="text-sm text-muted text-center mt-6 font-mono tracking-wide">
-                  Immutable. Verifiable. On-chain.
-                </p>
+                {/* Property strip—3 cells, hairline dividers */}
+                <div className="mt-12 grid grid-cols-3 border-t border-border">
+                  {[
+                    { label: "Immutable" },
+                    { label: "Verifiable" },
+                    { label: "On-chain" },
+                  ].map((p, i) => (
+                    <div
+                      key={p.label}
+                      className={`flex items-center justify-center gap-2 py-4 ${
+                        i > 0 ? "border-l border-border" : ""
+                      }`}
+                    >
+                      <span className="h-1 w-1 rounded-full bg-cyan" aria-hidden />
+                      <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/55">
+                        {p.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </GlowCard>
-          </div>
-          <div className="order-1 lg:order-2">
-            <TextShimmer
-              as="span"
-              className="font-mono text-base tracking-widest uppercase"
-            >
-              {"// THE SOLUTION"}
-            </TextShimmer>
-            <h2 className="mt-4 font-mono text-2xl font-bold text-foreground md:text-3xl">
-              One person. One identity.
-              <br />
-              All their agents.
-            </h2>
-            <p className="mt-4 text-foreground/70 leading-relaxed">
-              Agent Anchor writes immutable metadata on a registered agent
-              linking it to its verified human operator&apos;s Entros Anchor. One
-              human, one Trust Score. Register 100 agents and all 100 trace back
-              to the same verified identity. Platforms can set policies: minimum
-              Trust Score to register, maximum agents per operator.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section>
-        <div className="text-center mb-10">
-          <TextShimmer
-            as="span"
-            className="font-mono text-base tracking-widest uppercase"
-          >
-            {"// HOW IT WORKS"}
-          </TextShimmer>
-          <h2 className="mt-4 font-mono text-2xl font-bold text-foreground md:text-3xl">
-            Three steps to human accountability.
-          </h2>
-        </div>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          {steps.map((step, i) => (
-            <GlowCard key={step.title}>
-              <div className="flex items-center gap-3 mb-4">
-                <span className="text-cyan font-mono text-2xl font-bold">
-                  {i + 1}
-                </span>
-                <step.icon
-                  className="h-6 w-6 text-foreground/50"
-                  strokeWidth={1.5}
-                />
-              </div>
-              <h3 className="font-sans text-lg font-semibold text-foreground">
-                {step.title}
-              </h3>
-              <p className="mt-2 text-sm text-foreground/60 leading-relaxed">
-                {step.description}
-              </p>
-            </GlowCard>
-          ))}
-        </div>
-      </section>
-
-      {/* For integrators */}
-      <section>
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 items-start">
-          <div>
-            <TextShimmer
-              as="span"
-              className="font-mono text-base tracking-widest uppercase"
-            >
-              {"// FOR INTEGRATORS"}
-            </TextShimmer>
-            <h2 className="mt-4 font-mono text-xl font-bold text-foreground">
-              One function call.
-            </h2>
-            <p className="mt-3 text-sm text-foreground/70 leading-relaxed">
-              Check if any agent has a verified human operator. Returns the
-              operator&apos;s Trust Score, verification timestamp, and wallet
-              address. Works on devnet and mainnet.
-            </p>
-            <div className="mt-6">
-              <Link href="/verify">
-                <ShimmerButton className="text-sm font-medium">
-                  <span className="flex items-center gap-2">
-                    Verify Now
-                    <span aria-hidden="true">&rarr;</span>
-                  </span>
-                </ShimmerButton>
-              </Link>
             </div>
           </div>
-          <div className="rounded-lg border border-border bg-code-bg p-6 font-mono text-sm overflow-x-auto">
-            <pre className="text-foreground leading-relaxed">
-              <span className="text-cyan">{"import"}</span>
-              {" { getAgentHumanOperator } "}
-              <span className="text-cyan">{"from"}</span>
-              {" "}
-              <span className="text-solana-green">
-                {"'@entros/pulse-sdk'"}
-              </span>
-              {";\n\n"}
-              <span className="text-cyan">{"const"}</span>
-              {" operator = "}
-              <span className="text-cyan">{"await"}</span>
-              {" "}
-              <span className="text-[#C084FC]">{"getAgentHumanOperator"}</span>
-              {"(agentAsset);\n\n"}
-              <span className="text-cyan">{"if"}</span>
-              {" (operator) {\n"}
-              {"  "}
-              <span className="text-[#9090A0]">
-                {"// { anchorPda, trustScore, verifiedAt, wallet }"}
-              </span>
-              {"\n  console."}
-              <span className="text-[#C084FC]">{"log"}</span>
-              {"('Trust Score:', operator.trustScore);\n}"}
-            </pre>
+        </div>
+      </section>
+
+      {/* How it works—3-step hairline grid */}
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+            // HOW IT WORKS
+          </span>
+
+          <h2 className="mt-6 max-w-2xl font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+            Three steps to human accountability<span className="text-cyan">.</span>
+          </h2>
+
+          <div className="mt-16 grid grid-cols-1 gap-px border-y border-border bg-border md:grid-cols-3">
+            {steps.map((step) => (
+              <div key={step.number} className="flex flex-col bg-background p-8 md:p-10">
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-xs tracking-[0.2em] text-cyan">
+                    {step.number}
+                  </span>
+                  <span className="h-px flex-1 bg-border" />
+                </div>
+
+                <h3 className="mt-8 font-display text-xl font-medium tracking-tight text-foreground md:text-2xl">
+                  {step.title}
+                </h3>
+
+                <p className="mt-4 text-sm leading-relaxed text-foreground/65">
+                  {step.description}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
-    </div>
+
+      {/* For integrators—split with code block */}
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+            // FOR INTEGRATORS
+          </span>
+
+          <h2 className="mt-6 max-w-3xl font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+            One function call<span className="text-cyan">.</span>
+          </h2>
+
+          <div className="mt-12 grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-16">
+            <div className="lg:col-span-5">
+              <p className="text-base leading-relaxed text-foreground/70 md:text-lg">
+                Check if any agent has a verified human operator. Returns
+                the operator's Trust Score, verification timestamp, and
+                wallet address. Works on devnet and mainnet.
+              </p>
+            </div>
+
+            <div className="lg:col-span-7">
+              <div className="overflow-x-auto border border-border bg-surface p-6 font-mono text-sm md:p-8">
+                <pre className="leading-relaxed text-foreground">
+                  <span className="text-cyan">{"import"}</span>
+                  {" { getAgentHumanOperator } "}
+                  <span className="text-cyan">{"from"}</span>
+                  {" "}
+                  <span className="text-solana-green">{"'@entros/pulse-sdk'"}</span>
+                  {";\n\n"}
+                  <span className="text-cyan">{"const"}</span>
+                  {" operator = "}
+                  <span className="text-cyan">{"await"}</span>
+                  {" "}
+                  <span className="text-[#C084FC]">{"getAgentHumanOperator"}</span>
+                  {"(agentAsset);\n\n"}
+                  <span className="text-cyan">{"if"}</span>
+                  {" (operator) {\n"}
+                  {"  "}
+                  <span className="text-foreground/40">
+                    {"// { anchorPda, trustScore, verifiedAt, wallet }"}
+                  </span>
+                  {"\n  console."}
+                  <span className="text-[#C084FC]">{"log"}</span>
+                  {"('Trust Score:', operator.trustScore);\n}"}
+                </pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }
