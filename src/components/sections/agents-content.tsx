@@ -82,7 +82,8 @@ export function AgentsContent() {
 
             {/* Attestation diagram—hairline frame, concentric-ringed
                 nodes connected by a signal-dot channel. Cyan corner
-                brackets tie it to the Placeholder design language. */}
+                brackets match the framing used by the ASCII scenes
+                elsewhere on the site. */}
             <div className="lg:col-span-6">
               <div className="relative border border-border p-8 md:p-12">
                 {/* Corner brackets */}
