@@ -1,5 +1,8 @@
 import { Fragment } from "react";
-import { Placeholder } from "@/components/ui/placeholder";
+import {
+  AsciiFrontierScene,
+  AsciiSolvedScene,
+} from "@/components/ui/ascii-scenes";
 import {
   campaignResults,
   lastUpdated,
@@ -8,10 +11,9 @@ import {
 } from "@/data/security-metrics";
 
 /**
- * Latest Results—the centerpiece data moment of the page. Placeholder
- * above the table for a campaign-timeline chart (image to be dropped
- * in later). Table itself reskinned: monospace numbers, hairline rows,
- * cyan tier labels.
+ * Latest Results—the centerpiece data moment of the page. ASCII
+ * scenes flanking the campaign table: monospace numbers, hairline
+ * rows, cyan tier labels.
  */
 export function LatestResults() {
   return (
@@ -32,22 +34,22 @@ export function LatestResults() {
           challenge fetch, proof generation, or transaction submission.
         </p>
 
-        {/* Mobile-only: SOLVED placeholder slotted directly below the
-            subheading. On desktop the same image lives in the
+        {/* Mobile-only: SOLVED scene slotted directly below the
+            subheading. On desktop the same scene lives in the
             side-by-side grid below. */}
         <div className="mt-10 lg:hidden">
-          <Placeholder label="SOLVED ATTACK CLASSES" aspect="4/5" />
+          <AsciiSolvedScene label="SOLVED ATTACK CLASSES" aspect="4/5" />
         </div>
 
         <div className="mt-12 grid grid-cols-1 gap-12 lg:grid-cols-3 lg:items-stretch lg:gap-16">
-          {/* Desktop-only: stacked placeholder column. Stretches to match
-              the right column's full height (table + footer). lg:pt
-              offsets past the thead so SLOT 1 starts at the first data
-              row; lg:pb offsets past the "Last updated" footer so SLOT 2
+          {/* Desktop-only: stacked scene column. Stretches to match the
+              right column's full height (table + footer). lg:pt offsets
+              past the thead so SLOT 1 starts at the first data row;
+              lg:pb offsets past the "Last updated" footer so SLOT 2
               ends at the last data row. */}
           <div className="hidden lg:col-span-1 lg:flex lg:flex-col lg:gap-8 lg:pt-[3.25rem] lg:pb-[2.5rem]">
-            <Placeholder label="SOLVED ATTACK CLASSES" fill className="flex-1" />
-            <Placeholder label="FRONTIER—NEXT WAVES" fill className="flex-1" />
+            <AsciiSolvedScene label="SOLVED ATTACK CLASSES" fill className="flex-1" />
+            <AsciiFrontierScene label="FRONTIER—NEXT WAVES" fill className="flex-1" />
           </div>
 
           <div className="lg:col-span-2">
@@ -114,15 +116,15 @@ export function LatestResults() {
                           </td>
                         </tr>
                       )}
-                      {/* Mobile-only: FRONTIER placeholder marks the seam
+                      {/* Mobile-only: FRONTIER scene marks the seam
                           between the closed T4a study (Waves 1–4) and
                           the next-phase queued tiers starting at T4b.
-                          Hidden on desktop where the same image lives
+                          Hidden on desktop where the same scene lives
                           stacked beside the table. */}
                       {row.tier === "T4a—Wave 4" && (
                         <tr className="lg:hidden">
                           <td colSpan={5} className="py-6">
-                            <Placeholder
+                            <AsciiFrontierScene
                               label="FRONTIER—NEXT WAVES"
                               aspect="4/5"
                             />
