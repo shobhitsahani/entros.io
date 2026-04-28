@@ -43,21 +43,22 @@ export function VerificationTimelineSection() {
   return (
     <section className="border-t border-border">
       <div className="mx-auto max-w-7xl px-6 pt-12 pb-24 md:pt-16 md:pb-32">
-        <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
-          // VERIFICATION FLOW
-        </span>
+        <div className="text-center">
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+            // VERIFICATION FLOW
+          </span>
 
-        <h2 className="mt-6 max-w-4xl font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
-          <span className="text-cyan">12</span> seconds
-          <span className="text-cyan">.</span> The rest is automatic
-          <span className="text-cyan">.</span>
-        </h2>
+          <h2 className="mx-auto mt-6 max-w-4xl font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+            <span className="text-cyan">12</span> seconds
+            <span className="text-cyan">.</span> The rest is automatic
+            <span className="text-cyan">.</span>
+          </h2>
 
-        <p className="mt-6 max-w-2xl text-base leading-relaxed text-foreground/65 md:text-lg">
-          You speak a short phrase while tracing a curve. Feature
-          extraction, ZK proof generation, and on-chain verification
-          run automatically. No raw biometric data leaves your device.
-        </p>
+          <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-foreground/65 md:text-lg">
+            Speak a phrase, trace a curve. Feature extraction, proof
+            generation, and on-chain verification run automatically.
+          </p>
+        </div>
 
         <div className="mt-16">
           <Timeline data={timelineData} />
