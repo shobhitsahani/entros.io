@@ -15,6 +15,7 @@ const sections = [
   {
     items: [
       { label: "Token", href: "/token" },
+      { label: "Docs", href: "/docs" },
       { label: "Paper", href: "/paper" },
     ],
   },
@@ -62,7 +63,7 @@ export function MobileNav() {
                       <Link
                         href={item.href}
                         onClick={() => setOpen(false)}
-                        className="block py-2 text-sm text-muted transition-colors hover:text-foreground"
+                        className="block py-2.5 text-base text-muted transition-colors hover:text-foreground"
                       >
                         {item.label}
                       </Link>
@@ -71,19 +72,19 @@ export function MobileNav() {
                 </ul>
               </div>
             ))}
-            <hr className="my-2 border-border/50" />
-            <div className="flex gap-3 pt-1 pb-1">
+            <hr className="my-3 border-border/50" />
+            <div className="flex gap-4 pt-2 pb-2">
               <Link
                 href="/dashboard"
                 onClick={() => setOpen(false)}
-                className="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium text-foreground/70 transition-colors hover:bg-foreground/5 hover:text-foreground"
+                className="inline-flex items-center rounded-full px-5 py-2.5 text-base font-medium text-foreground/70 transition-colors hover:bg-foreground/5 hover:text-foreground"
               >
                 Dashboard
               </Link>
               <Link
                 href="/verify"
                 onClick={() => setOpen(false)}
-                className="inline-flex items-center rounded-full bg-foreground px-4 py-1.5 text-sm font-medium text-background transition-colors hover:bg-foreground/90"
+                className="inline-flex items-center rounded-full bg-foreground px-6 py-2.5 text-base font-medium text-background transition-colors hover:bg-foreground/90"
               >
                 Verify
               </Link>
