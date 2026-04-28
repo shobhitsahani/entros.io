@@ -1,11 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { useConnection } from "@solana/wallet-adapter-react";
+import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
 import { PROGRAM_IDS } from "@entros/pulse-sdk";
-import { TextShimmer } from "@/components/ui/text-shimmer";
 import { CheckCircle, Loader2, Fingerprint, RotateCcw } from "lucide-react";
 
 function formatTimestamp(unixSeconds: number): string {
@@ -37,7 +35,6 @@ export function DashboardHistory() {
     setLoading(true);
     setError(null);
 
-    // Build history entirely from the IdentityState PDA (authoritative source)
     (async () => {
       const programId = new PublicKey(PROGRAM_IDS.entrosAnchor);
       const [identityPda] = PublicKey.findProgramAddressSync(
@@ -54,13 +51,8 @@ export function DashboardHistory() {
 
       const view = new DataView(account.data.buffer, account.data.byteOffset, account.data.byteLength);
       setMintTimestamp(Number(view.getBigInt64(40, true)));
-
-      // verification_count: u32 at offset 56
-      //   (8 disc + 32 owner + 8 created + 8 last_verified = 56)
       setVerificationCount(view.getUint32(56, true));
 
-      // recent_timestamps: 52 x i64 at offset 127 (newest at index 0)
-      // Only written by successful updateAnchor calls
       const timestamps: number[] = [];
       const slotCount = account.data.length >= 543 ? 52 : 10;
       for (let i = 0; i < slotCount; i++) {
@@ -69,8 +61,6 @@ export function DashboardHistory() {
       }
       setReVerifications(timestamps);
 
-      // last_reset_timestamp: i64 at offset 543 (after the 52-slot array).
-      // Pre-reset-feature accounts are shorter; guard on length.
       setLastResetTimestamp(
         account.data.length >= 551 ? Number(view.getBigInt64(543, true)) : 0
       );
@@ -82,96 +72,91 @@ export function DashboardHistory() {
   if (!connected) return null;
 
   return (
-    <section className="mt-12">
-      <TextShimmer
-        as="span"
-        className="font-mono text-base tracking-widest uppercase"
-        duration={3}
-      >
-        {"// VERIFICATION HISTORY"}
-      </TextShimmer>
+    <section>
+      <div className="mx-auto max-w-7xl px-6 py-16 md:py-24">
+        <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+          // VERIFICATION HISTORY
+        </span>
 
-      {loading && (
-        <div className="mt-6 flex items-center justify-center py-8">
-          <Loader2 className="h-6 w-6 text-cyan animate-spin" />
-        </div>
-      )}
+        <h2 className="mt-6 max-w-3xl font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+          Every session on-chain<span className="text-cyan">.</span>
+        </h2>
 
-      {error && (
-        <p className="mt-6 text-sm text-muted">{error}</p>
-      )}
+        {loading && (
+          <div className="mt-12 flex items-center justify-center border border-border py-16">
+            <Loader2 className="h-6 w-6 animate-spin text-cyan" />
+          </div>
+        )}
 
-      {!loading && !error && !mintTimestamp && (
-        <p className="mt-6 text-sm text-muted">
-          No verification history found. Complete a verification to see entries here.
-        </p>
-      )}
+        {error && (
+          <p className="mt-12 text-sm text-foreground/55">{error}</p>
+        )}
 
-      {!loading && !error && mintTimestamp && (
-        <div className="mt-6 space-y-3 max-h-[600px] overflow-y-auto pr-1">
-          {reVerifications.map((ts, i) => (
-            <div
-              key={ts}
-              className="flex items-center gap-4 rounded-xl border border-border bg-surface/30 px-5 py-4"
-            >
-              <CheckCircle className="h-5 w-5 shrink-0 text-solana-green" />
-              <div className="flex-1 min-w-0">
-                <span className="text-sm font-medium text-foreground">
-                  Re-verification #{verificationCount - i}
-                </span>
-                <p className="mt-0.5 text-xs text-muted">
-                  Behavioral consistency confirmed within threshold
-                </p>
-              </div>
-              <div className="text-right shrink-0">
-                <p className="text-xs text-muted">
+        {!loading && !error && !mintTimestamp && (
+          <p className="mt-12 text-sm text-foreground/55">
+            No verification history found. Complete a verification to see
+            entries here.
+          </p>
+        )}
+
+        {!loading && !error && mintTimestamp && (
+          <div className="mt-12 max-h-[600px] space-y-px overflow-y-auto border-y border-border bg-border">
+            {reVerifications.map((ts, i) => (
+              <div
+                key={ts}
+                className="flex items-center gap-4 bg-background px-6 py-5"
+              >
+                <CheckCircle className="h-5 w-5 shrink-0 text-cyan" />
+                <div className="min-w-0 flex-1">
+                  <p className="font-display text-base font-medium tracking-tight text-foreground">
+                    Re-verification #{verificationCount - i}
+                  </p>
+                  <p className="mt-1 text-xs text-foreground/55">
+                    Behavioral consistency confirmed within threshold
+                  </p>
+                </div>
+                <p className="shrink-0 font-mono text-xs text-foreground/55">
                   {formatTimestamp(ts)}
                 </p>
               </div>
-            </div>
-          ))}
+            ))}
 
-          {lastResetTimestamp > 0 && (
-            <div className="flex items-center justify-between rounded-lg border border-danger/20 bg-danger/5 px-5 py-4">
-              <div className="flex items-center gap-3">
-                <RotateCcw className="h-5 w-5 text-danger" strokeWidth={1.5} />
-                <div>
-                  <p className="text-sm font-medium text-foreground">Baseline reset</p>
-                  <p className="mt-0.5 text-xs text-muted">
+            {lastResetTimestamp > 0 && (
+              <div className="flex items-center gap-4 bg-background px-6 py-5">
+                <RotateCcw className="h-5 w-5 shrink-0 text-danger" strokeWidth={1.5} />
+                <div className="min-w-0 flex-1">
+                  <p className="font-display text-base font-medium tracking-tight text-foreground">
+                    Baseline reset
+                  </p>
+                  <p className="mt-1 text-xs text-foreground/55">
                     Fingerprint re-enrolled from this device
                   </p>
                 </div>
-              </div>
-              <div className="text-right shrink-0">
-                <p className="text-xs text-muted">
+                <p className="shrink-0 font-mono text-xs text-foreground/55">
                   {formatTimestamp(lastResetTimestamp)}
                 </p>
               </div>
-            </div>
-          )}
+            )}
 
-          <div className="flex items-center justify-between rounded-lg border border-cyan/20 bg-cyan/5 px-5 py-4">
-            <div className="flex items-center gap-3">
-              <Fingerprint className="h-5 w-5 text-cyan" strokeWidth={1.5} />
-              <div>
-                <p className="text-sm font-medium text-foreground">
+            <div className="flex items-center gap-4 bg-background px-6 py-5">
+              <Fingerprint className="h-5 w-5 shrink-0 text-cyan" strokeWidth={1.5} />
+              <div className="min-w-0 flex-1">
+                <p className="font-display text-base font-medium tracking-tight text-foreground">
                   {lastResetTimestamp > 0 ? "Anchor minted" : "Initial verification"}
                 </p>
-                <p className="mt-0.5 text-xs text-muted">
+                <p className="mt-1 text-xs text-foreground/55">
                   {lastResetTimestamp > 0
                     ? "Entros Anchor PDA and Token-2022 mint created on-chain"
                     : "Behavioral baseline established"}
                 </p>
               </div>
-            </div>
-            <div className="text-right shrink-0">
-              <p className="text-xs text-muted">
+              <p className="shrink-0 font-mono text-xs text-foreground/55">
                 {formatTimestamp(mintTimestamp)}
               </p>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </section>
   );
 }

@@ -86,9 +86,19 @@ function DevnetHint() {
   );
 }
 
-export function WalletConnectButton({ className }: { className?: string }) {
+export function WalletConnectButton({
+  className,
+  align = "center",
+}: {
+  className?: string;
+  align?: "start" | "center";
+}) {
   return (
-    <div className="flex flex-col items-center">
+    <div
+      className={`flex flex-col ${
+        align === "start" ? "items-start" : "items-center"
+      }`}
+    >
       <WalletMultiButton className={className} />
       <MobileWalletHint />
       <DevnetHint />

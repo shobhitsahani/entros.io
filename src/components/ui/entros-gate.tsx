@@ -155,22 +155,40 @@ function DefaultFallback({
   minTrustScore: number;
   verifyHref: string;
 }) {
+  const statusLabel =
+    state.status === "disconnected"
+      ? "WALLET"
+      : state.status === "no-identity"
+        ? "UNVERIFIED"
+        : "BELOW THRESHOLD";
+
   return (
-    <div className="mx-auto max-w-md rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-6 shadow-sm">
-      <div className="flex flex-col items-center text-center gap-4 py-4">
+    <div className="w-full">
+      <div className="flex items-center justify-between">
+        <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+          // {statusLabel}
+        </p>
+        {state.status === "below-threshold" && (
+          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+            {state.trustScore} &lt; {minTrustScore}
+          </span>
+        )}
+      </div>
+
+      <div className="mt-8 flex flex-col items-start gap-6">
         {state.status === "disconnected" ? (
-          <Wallet className="h-12 w-12 text-zinc-400" strokeWidth={1.5} />
+          <Wallet className="h-7 w-7 text-cyan/80" strokeWidth={1.5} />
         ) : (
-          <ShieldAlert className="h-12 w-12 text-zinc-400" strokeWidth={1.5} />
+          <ShieldAlert className="h-7 w-7 text-cyan/80" strokeWidth={1.5} />
         )}
 
         {state.status === "disconnected" && (
           <>
             <div>
-              <p className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+              <p className="text-base font-medium text-foreground">
                 Connect your wallet
               </p>
-              <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+              <p className="mt-2 text-sm leading-relaxed text-foreground/60">
                 This content requires a verified Entros identity.
               </p>
             </div>
@@ -181,18 +199,18 @@ function DefaultFallback({
         {state.status === "no-identity" && (
           <>
             <div>
-              <p className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+              <p className="text-base font-medium text-foreground">
                 Verify your humanness
               </p>
-              <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+              <p className="mt-2 text-sm leading-relaxed text-foreground/60">
                 This content requires an Entros Anchor with Trust Score{" "}
-                <span className="font-mono text-zinc-900 dark:text-zinc-100">{minTrustScore}</span>{" "}
+                <span className="font-mono text-cyan">{minTrustScore}</span>{" "}
                 or higher.
               </p>
             </div>
             <Link
               href={verifyHref}
-              className="inline-flex items-center gap-2 rounded-md bg-cyan-500 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-600 transition-colors"
+              className="inline-flex items-center gap-2 border border-cyan/40 bg-cyan/[0.08] px-4 py-2 font-mono text-xs uppercase tracking-[0.2em] text-cyan transition-colors hover:border-cyan/70 hover:bg-cyan/[0.15]"
             >
               Verify now
             </Link>
@@ -202,22 +220,20 @@ function DefaultFallback({
         {state.status === "below-threshold" && (
           <>
             <div>
-              <p className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+              <p className="text-base font-medium text-foreground">
                 Trust Score too low
               </p>
-              <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+              <p className="mt-2 text-sm leading-relaxed text-foreground/60">
                 Your Trust Score is{" "}
-                <span className="font-mono text-zinc-900 dark:text-zinc-100">
-                  {state.trustScore}
-                </span>
-                . This content requires{" "}
-                <span className="font-mono text-zinc-900 dark:text-zinc-100">{minTrustScore}</span>
-                . Re-verify across multiple days to grow your score.
+                <span className="font-mono text-cyan">{state.trustScore}</span>.
+                This content requires{" "}
+                <span className="font-mono text-cyan">{minTrustScore}</span>.
+                Re-verify across multiple days to grow your score.
               </p>
             </div>
             <Link
               href={verifyHref}
-              className="inline-flex items-center gap-2 rounded-md bg-cyan-500 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-600 transition-colors"
+              className="inline-flex items-center gap-2 border border-cyan/40 bg-cyan/[0.08] px-4 py-2 font-mono text-xs uppercase tracking-[0.2em] text-cyan transition-colors hover:border-cyan/70 hover:bg-cyan/[0.15]"
             >
               Re-verify
             </Link>

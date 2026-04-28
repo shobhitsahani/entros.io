@@ -6,13 +6,13 @@ export function Footer() {
       <div className="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-6 py-12 md:grid-cols-3">
         <div>
           <p className="font-mono text-sm font-bold text-foreground">
-            Entros<span className="text-cyan">.</span>
+            entros<span className="text-cyan">.</span>
           </p>
           <p className="mt-2 text-xs text-foreground/60">
             Proof of Personhood on Solana
           </p>
           <p className="mt-1 text-xs text-foreground/40">
-            Entros Protocol
+            entros protocol
           </p>
         </div>
 

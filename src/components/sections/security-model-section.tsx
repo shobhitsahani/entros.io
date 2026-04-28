@@ -1,6 +1,3 @@
-import { TextShimmer } from "@/components/ui/text-shimmer";
-import { GlowCard } from "@/components/ui/glow-card";
-
 const DEFENSES = [
   {
     title: "Minimum Distance Constraint",
@@ -39,44 +36,52 @@ const DEFENSES = [
   },
 ];
 
-
+/**
+ * Security Model—vertical numbered list. Each defense is a full-width
+ * row: number on the left rail, title + body on the right. Removes the
+ * orphan-cell problem that a 7-item grid creates and gives the section
+ * a different geometry from grid-based sections elsewhere on the page.
+ */
 export function SecurityModelSection() {
   return (
-    <section className="mx-auto max-w-5xl px-6 py-20">
-      <TextShimmer
-        as="span"
-        className="font-mono text-base tracking-widest uppercase"
-        duration={3}
-      >
-        {"// SECURITY MODEL"}
-      </TextShimmer>
+    <section className="border-t border-border">
+      <div className="mx-auto max-w-5xl px-6 py-24 md:py-32">
+        <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+          // SECURITY MODEL
+        </span>
 
-      <h2 className="mt-4 font-mono text-2xl font-bold text-foreground md:text-3xl">
-        How Entros resists bots.
-      </h2>
-      <p className="mt-3 max-w-2xl text-foreground/70">
-        Open protocol for trust. Private validation for security. Synthetic
-        data is rejected server-side before reaching the chain. Users pay a
-        small protocol fee per verification. Bots pay real money at scale.
-      </p>
+        <h2 className="mt-6 max-w-2xl font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+          How Entros resists bots<span className="text-cyan">.</span>
+        </h2>
 
-      <div className="mt-10 grid gap-4 md:grid-cols-6">
-        {DEFENSES.map((d, i) => {
-          const isLast = i === DEFENSES.length - 1;
-          const colSpan = isLast ? "md:col-span-6" : "md:col-span-3";
-          return (
-            <GlowCard key={d.title} className={colSpan}>
-              <p className="font-mono text-sm font-semibold text-foreground">
-                {d.title}
-              </p>
-              <p className="mt-2 text-sm text-foreground/70 leading-relaxed">
+        <p className="mt-6 max-w-2xl text-base leading-relaxed text-foreground/65 md:text-lg">
+          Open protocol for trust. Private validation for security.
+          Synthetic data is rejected server-side before reaching the
+          chain. Users pay a small protocol fee per verification. Bots
+          pay real money at scale.
+        </p>
+
+        <div className="mt-16 border-t border-border">
+          {DEFENSES.map((d, idx) => (
+            <div
+              key={d.title}
+              className="grid grid-cols-1 gap-y-4 border-b border-border py-8 md:grid-cols-[1fr_1.4fr] md:gap-x-12 md:gap-y-0 md:py-10"
+            >
+              <div className="flex items-center gap-5">
+                <span className="shrink-0 font-mono text-xs tracking-[0.2em] text-cyan">
+                  {String(idx + 1).padStart(2, "0")}
+                </span>
+                <h3 className="font-display text-xl font-medium tracking-tight text-foreground md:text-2xl md:leading-[1.15]">
+                  {d.title}
+                </h3>
+              </div>
+              <p className="text-sm leading-relaxed text-foreground/60 md:text-base md:leading-relaxed">
                 {d.description}
               </p>
-            </GlowCard>
-          );
-        })}
+            </div>
+          ))}
+        </div>
       </div>
-
     </section>
   );
 }

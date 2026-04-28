@@ -5,14 +5,9 @@ import Link from "next/link";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
 import { PROGRAM_IDS } from "@entros/pulse-sdk";
-import { GlowCard } from "@/components/ui/glow-card";
-import { TextShimmer } from "@/components/ui/text-shimmer";
-import { ArrowRight, Loader2, ShieldAlert } from "lucide-react";
+import { ArrowRight, ExternalLink, Loader2, ShieldAlert } from "lucide-react";
 
-// sha256("account:IdentityState")[0..8] encoded as base58
 const IDENTITY_STATE_DISC_B58 = "T7d2447Yv5U";
-
-// SAS program IDs (Solana Attestation Service on devnet)
 const SAS_PROGRAM_ID = "22zoJMtdu4tQc2PzL74ZUT7FrwgB1Udec8DdW4yw4BdG";
 const ENTROS_CREDENTIAL_PDA = "GaPTkZC6JEGds1G5h645qyUrogx7NWghR2JgjvKQwTDo";
 
@@ -35,26 +30,12 @@ function formatTimestamp(unix: number): string {
   });
 }
 
-function StatCard({
-  label,
-  value,
-  sub,
-}: {
-  label: string;
-  value: React.ReactNode;
-  sub?: string;
-}) {
-  return (
-    <GlowCard>
-      <p className="text-xs font-mono uppercase tracking-widest text-muted">
-        {label}
-      </p>
-      <p className="mt-3 text-4xl font-mono font-bold text-foreground break-all">
-        {value}
-      </p>
-      {sub && <p className="mt-2 text-xs text-muted">{sub}</p>}
-    </GlowCard>
-  );
+function timeAgo(unix: number): string {
+  const seconds = Math.floor(Date.now() / 1000 - unix);
+  if (seconds < 60) return `${seconds}s ago`;
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+  return `${Math.floor(seconds / 86400)}d ago`;
 }
 
 export function ProtocolStats() {
@@ -74,16 +55,11 @@ export function ProtocolStats() {
 
       const [accounts, attestations] = await Promise.all([
         connection.getProgramAccounts(programId, {
-          filters: [
-            { memcmp: { offset: 0, bytes: IDENTITY_STATE_DISC_B58 } },
-          ],
-          dataSlice: { offset: 48, length: 14 }, // lastVerif(8) + count(4) + trust(2)
+          filters: [{ memcmp: { offset: 0, bytes: IDENTITY_STATE_DISC_B58 } }],
+          dataSlice: { offset: 48, length: 14 },
         }),
-        // SAS attestation layout: 1 byte disc + 32 bytes nonce + 32 bytes credential = offset 33
         connection.getProgramAccounts(sasProgramId, {
-          filters: [
-            { memcmp: { offset: 33, bytes: ENTROS_CREDENTIAL_PDA } },
-          ],
+          filters: [{ memcmp: { offset: 33, bytes: ENTROS_CREDENTIAL_PDA } }],
           dataSlice: { offset: 0, length: 0 },
         }),
       ]);
@@ -113,12 +89,7 @@ export function ProtocolStats() {
         const data = account.data;
         if (data.length < 14) continue;
 
-        const view = new DataView(
-          data.buffer,
-          data.byteOffset,
-          data.byteLength
-        );
-
+        const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
         const lastVerif = Number(view.getBigInt64(0, true));
         const count = view.getUint32(8, true);
         const trust = view.getUint16(12, true);
@@ -134,130 +105,169 @@ export function ProtocolStats() {
       setStats({
         totalAnchors: accounts.length,
         averageTrustScore:
-          accounts.length > 0
-            ? Math.round(totalTrust / accounts.length)
-            : 0,
+          accounts.length > 0 ? Math.round(totalTrust / accounts.length) : 0,
         highestTrustScore: highestTrust,
         totalVerifications,
         mostRecentTimestamp: mostRecentTimestamp > 0 ? mostRecentTimestamp : null,
         attestationCount,
       });
     })()
-      .catch(() => { if (!cancelled) setError("Failed to fetch on-chain stats. The RPC may be rate-limited—try again shortly."); })
-      .finally(() => { if (!cancelled) setLoading(false); });
+      .catch(() => {
+        if (!cancelled)
+          setError(
+            "Failed to fetch on-chain stats. The RPC may be rate-limited—try again shortly."
+          );
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [connection]);
 
   return (
-    <div>
-      <TextShimmer
-        as="span"
-        className="font-mono text-base tracking-widest uppercase"
-        duration={3}
-      >
-        {"// PROTOCOL METRICS"}
-      </TextShimmer>
-
-      {loading && (
-        <div className="mt-12 flex flex-col items-center justify-center gap-4 py-16">
-          <Loader2 className="h-8 w-8 text-cyan animate-spin" />
-          <p className="font-mono text-xs text-muted tracking-widest uppercase">
-            Reading from Solana devnet…
-          </p>
+    <section>
+      <div className="mx-auto max-w-7xl px-6 pb-24 md:pb-32">
+        {/* Devnet pilot banner */}
+        <div className="flex flex-col items-start justify-between gap-6 border border-cyan/30 bg-cyan/[0.03] p-6 md:flex-row md:items-center md:p-8">
+          <div className="max-w-4xl">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan">
+              // DEVNET PILOT · OPEN TO ALL
+            </p>
+            <p className="mt-3 text-base leading-relaxed text-foreground/75 md:text-lg">
+              The pilot is open. Verify your humanness and join the first
+              wave of Entros Anchors.
+            </p>
+          </div>
+          <Link
+            href="/verify"
+            className="group inline-flex shrink-0 items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-colors hover:bg-foreground/90"
+          >
+            Verify now
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          </Link>
         </div>
-      )}
 
-      {error && (
-        <div className="mt-12 flex flex-col items-center justify-center gap-4 py-16">
-          <ShieldAlert className="h-8 w-8 text-danger" strokeWidth={1.5} />
-          <p className="text-sm text-muted text-center max-w-sm">{error}</p>
-        </div>
-      )}
+        {loading && (
+          <div className="mt-12 flex flex-col items-center justify-center gap-4 border border-border py-24">
+            <Loader2 className="h-6 w-6 animate-spin text-cyan" />
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+              Reading from Solana devnet…
+            </p>
+          </div>
+        )}
 
-      {!loading && !error && stats && (
-        <div className="mt-8 space-y-6">
-          <div className="rounded-xl border border-cyan/20 bg-cyan/5 px-6 py-4 flex items-center justify-between gap-4 flex-wrap">
-            <div>
-              <p className="font-mono text-xs uppercase tracking-widest text-cyan">
-                Devnet pilot · open to all
-              </p>
-              <p className="mt-1 text-sm text-foreground/70">
-                Every metric below is on-chain truth, queried live from Solana devnet. The pilot is open—verify your humanness and join.
+        {error && (
+          <div className="mt-12 flex flex-col items-center justify-center gap-4 border border-border py-24">
+            <ShieldAlert className="h-6 w-6 text-danger" strokeWidth={1.5} />
+            <p className="max-w-sm text-center text-sm text-foreground/65">
+              {error}
+            </p>
+          </div>
+        )}
+
+        {!loading && !error && stats && (
+          <div className="mt-12">
+            {/* 5-card hairline grid */}
+            <div className="grid grid-cols-1 gap-px border-y border-border bg-border sm:grid-cols-2 lg:grid-cols-5">
+              {[
+                {
+                  label: "Anchors minted",
+                  value: stats.totalAnchors.toLocaleString(),
+                  sub: "IdentityState PDAs on devnet",
+                },
+                {
+                  label: "Verifications",
+                  value: stats.totalVerifications.toLocaleString(),
+                  sub: "Cumulative across all anchors",
+                },
+                {
+                  label: "Avg. trust score",
+                  value: stats.averageTrustScore.toLocaleString(),
+                  sub: "Mean across active anchors",
+                },
+                {
+                  label: "Top trust score",
+                  value: stats.highestTrustScore.toLocaleString(),
+                  sub: "Highest on the network",
+                },
+                {
+                  label: "SAS attestations",
+                  value: stats.attestationCount.toLocaleString(),
+                  sub: "Issued via Solana Attestation Service",
+                },
+              ].map((stat) => (
+                <div
+                  key={stat.label}
+                  className="flex flex-col bg-background p-6 md:p-8"
+                >
+                  <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+                    {stat.label}
+                  </p>
+                  <p className="mt-6 break-all font-display text-4xl font-medium tracking-tight text-foreground md:text-5xl">
+                    {stat.value}
+                  </p>
+                  <p className="mt-4 text-xs leading-relaxed text-foreground/45">
+                    {stat.sub}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {/* Most recent verification */}
+            <div className="mt-8 border border-border p-6 md:p-8">
+              <div className="flex items-center gap-3">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan/60" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-cyan" />
+                </span>
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+                  Most recent verification
+                </p>
+              </div>
+              {stats.mostRecentTimestamp ? (
+                <>
+                  <p className="mt-4 font-display text-2xl font-medium tracking-tight text-foreground md:text-3xl">
+                    {formatTimestamp(stats.mostRecentTimestamp)}
+                  </p>
+                  <p className="mt-2 font-mono text-xs text-foreground/50">
+                    {timeAgo(stats.mostRecentTimestamp)}
+                  </p>
+                </>
+              ) : (
+                <p className="mt-4 text-sm text-foreground/55">
+                  No verifications recorded yet.
+                </p>
+              )}
+            </div>
+
+            {/* Data source attribution */}
+            <div className="mt-6 flex flex-col items-start justify-between gap-3 border border-border p-5 md:flex-row md:items-center">
+              <div className="flex items-center gap-3">
+                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-cyan" />
+                <p className="font-mono text-[11px] text-foreground/50">
+                  Live read from{" "}
+                  <a
+                    href={`https://explorer.solana.com/address/${PROGRAM_IDS.entrosAnchor}?cluster=devnet`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-cyan transition-colors hover:text-foreground"
+                  >
+                    GZYwTp2o…q4b2
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                  {" · entros-anchor"}
+                </p>
+              </div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+                Solana devnet
               </p>
             </div>
-            <Link
-              href="/verify"
-              className="inline-flex items-center gap-2 text-sm text-cyan hover:text-foreground transition-colors shrink-0"
-            >
-              Verify now <ArrowRight className="h-4 w-4" />
-            </Link>
           </div>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
-            <StatCard
-              label="Entros Anchors minted"
-              value={stats.totalAnchors.toLocaleString()}
-              sub="Total IdentityState PDAs on devnet"
-            />
-            <StatCard
-              label="Total verifications"
-              value={stats.totalVerifications.toLocaleString()}
-              sub="Cumulative across all anchors"
-            />
-            <StatCard
-              label="Average trust score"
-              value={stats.averageTrustScore}
-              sub="Mean across all active anchors"
-            />
-            <StatCard
-              label="Highest trust score"
-              value={stats.highestTrustScore}
-              sub="Top anchor on the network"
-            />
-            <StatCard
-              label="SAS attestations"
-              value={stats.attestationCount.toLocaleString()}
-              sub="Issued via Solana Attestation Service"
-            />
-          </div>
-          <GlowCard>
-            <p className="text-xs font-mono uppercase tracking-widest text-muted">
-              Most recent verification
-            </p>
-            {stats.mostRecentTimestamp ? (
-              <>
-                <p className="mt-3 text-2xl font-mono font-bold text-foreground">
-                  {formatTimestamp(stats.mostRecentTimestamp)}
-                </p>
-                <div className="mt-4 flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-cyan animate-pulse" />
-                  <span className="font-mono text-xs text-cyan">
-                    Live · Solana devnet
-                  </span>
-                </div>
-              </>
-            ) : (
-              <p className="mt-3 text-sm text-muted">No verifications recorded yet</p>
-            )}
-          </GlowCard>
-        </div>
-      )}
-
-      {!loading && !error && stats && (
-        <div className="mt-8 rounded-xl border border-border bg-surface/30 px-6 py-4 flex items-center justify-between gap-4 flex-wrap">
-          <div className="flex items-center gap-3">
-            <span className="h-2 w-2 rounded-full bg-cyan animate-pulse shrink-0" />
-            <p className="font-mono text-xs text-muted">
-              Data read live from{" "}
-              <span className="text-cyan">
-                GZYwTp2o…q4b2
-              </span>{" "}
-              · entros-anchor program
-            </p>
-          </div>
-          <p className="font-mono text-xs text-muted">Solana devnet</p>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </section>
   );
 }

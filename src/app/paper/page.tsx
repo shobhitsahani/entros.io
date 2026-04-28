@@ -6,13 +6,35 @@ import { pageMetadata } from "@/lib/page-metadata";
 export const metadata = pageMetadata({
   title: "Research Paper",
   description:
-    "Entros Protocol: Proof-of-Personhood through Temporal Biometric Consistency",
+    "Entros Protocol: Proof-of-Personhood through Temporal Biometric Consistency. The full research paper—abstract, threat model, ZK circuit, on-chain anchoring, security analysis.",
   path: "/paper",
 });
 
+interface PaperMeta {
+  version?: string;
+  updated?: string;
+  wordCount?: string;
+}
+
 export default function PaperPage() {
   const paperPath = path.join(process.cwd(), "src", "content", "paper.md");
-  const content = fs.readFileSync(paperPath, "utf-8");
+  const raw = fs.readFileSync(paperPath, "utf-8");
 
-  return <PaperContent content={content} />;
+  // Split off the title + metadata header (everything before the first
+  // standalone --- separator). The rest is the paper body.
+  const sepRegex = /\n---\n/;
+  const sepIndex = raw.search(sepRegex);
+  const headerRaw = sepIndex >= 0 ? raw.slice(0, sepIndex) : raw;
+  const body = sepIndex >= 0 ? raw.slice(sepIndex + 5).trim() : raw;
+
+  const titleMatch = headerRaw.match(/^#\s+(.+)$/m);
+  const title = titleMatch?.[1]?.trim() ?? "Research Paper";
+
+  const meta: PaperMeta = {
+    version: headerRaw.match(/\*\*Document Version:\*\*\s*([^\n]+)/)?.[1]?.trim(),
+    updated: headerRaw.match(/\*\*Updated:\*\*\s*([^\n]+)/)?.[1]?.trim(),
+    wordCount: headerRaw.match(/\*\*Word Count:\*\*\s*([^\n]+)/)?.[1]?.trim(),
+  };
+
+  return <PaperContent title={title} meta={meta} body={body} />;
 }

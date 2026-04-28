@@ -16,7 +16,6 @@ import {
 } from "@/components/verify/step-views";
 import { ResetBaselineDialog } from "@/components/verify/reset-baseline-dialog";
 import { WalletConnectButton } from "@/components/ui/wallet-connect-button";
-import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { usePulse } from "@/components/providers/pulse-provider";
 import { Wallet } from "lucide-react";
 
@@ -415,9 +414,19 @@ export function VerifyWalletConnected({
           </div>
         )}
         <div className="flex justify-center">
-          <ShimmerButton className="text-sm font-medium" onClick={() => handleStart("verify")} disabled={requesting}>
+          <button
+            onClick={() => handleStart("verify")}
+            disabled={requesting}
+            className="
+              inline-flex items-center justify-center gap-2
+              rounded-full bg-foreground px-6 py-3
+              text-sm font-medium text-background
+              transition-colors hover:bg-foreground/90
+              disabled:cursor-not-allowed disabled:opacity-50
+            "
+          >
             {requesting ? "Requesting access..." : "Start Verification"}
-          </ShimmerButton>
+          </button>
         </div>
         <p className="text-center text-xs text-muted">
           Raw data stays on your device. Only the ZK proof and a statistical summary leave.

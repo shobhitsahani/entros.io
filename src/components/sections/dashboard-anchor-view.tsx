@@ -2,12 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useWallet } from "@solana/wallet-adapter-react";
-import { useConnection } from "@solana/wallet-adapter-react";
+import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import { type IdentityState, PROGRAM_IDS } from "@entros/pulse-sdk";
 import { PublicKey } from "@solana/web3.js";
 import { WalletConnectButton } from "@/components/ui/wallet-connect-button";
-import { GlowCard } from "@/components/ui/glow-card";
 import { commitmentBytesToHex } from "@/lib/on-chain";
 import { explorerUrl } from "@/lib/explorer";
 import { ArrowRight, ExternalLink, Wallet, Loader2, ShieldAlert } from "lucide-react";
@@ -46,14 +44,14 @@ export function DashboardAnchorView() {
     setLoading(true);
     setError(null);
 
-    // Direct account read with manual deserialization (avoids IDL fetch issues)
     const programId = new PublicKey(PROGRAM_IDS.entrosAnchor);
     const [identityPda] = PublicKey.findProgramAddressSync(
       [new TextEncoder().encode("identity"), publicKey.toBuffer()],
       programId
     );
 
-    connection.getAccountInfo(identityPda)
+    connection
+      .getAccountInfo(identityPda)
       .then((account: { data: Uint8Array } | null) => {
         if (!account || account.data.length < 62) {
           setIdentity(null);
@@ -62,8 +60,6 @@ export function DashboardAnchorView() {
         const data = account.data;
         const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
 
-        // IdentityState layout: 8 disc + 32 owner + 8 creation + 8 lastVerif + 4 count + 2 trust + 32 commitment + 32 mint
-        //   + 1 bump + 416 recent_timestamps + 8 last_reset_timestamp  (total 551 bytes post-reset feature)
         const creationTimestamp = Number(view.getBigInt64(40, true));
         const lastVerificationTimestamp = Number(view.getBigInt64(48, true));
         const verificationCount = view.getUint32(56, true);
@@ -71,8 +67,6 @@ export function DashboardAnchorView() {
         const currentCommitment = new Uint8Array(data.slice(62, 94));
         const mintBytes = data.slice(94, 126);
         const mintPubkey = new PublicKey(mintBytes);
-        // last_reset_timestamp is at offset 543. Accounts minted before the
-        // reset feature (or not yet realloc'd) are shorter; default to 0.
         const lastResetTimestamp =
           data.length >= 551 ? Number(view.getBigInt64(543, true)) : 0;
 
@@ -91,37 +85,41 @@ export function DashboardAnchorView() {
       .finally(() => setLoading(false));
   }, [publicKey, connected, connection]);
 
-  if (!connected) {
-    return (
-      <div className="mx-auto max-w-md text-center space-y-6 py-12">
-        <Wallet className="mx-auto h-12 w-12 text-muted" strokeWidth={1.5} />
-        <div>
-          <p className="font-sans text-xl font-semibold text-foreground">
-            Connect your wallet
-          </p>
-          <p className="mt-2 text-sm text-muted">
-            View your Entros Anchor, Trust Score,
-            <br className="md:hidden" />
-            {" "}and verification history.
-          </p>
-        </div>
-        <WalletConnectButton />
-      </div>
-    );
-  }
-
   const truncatedAddress = publicKey
     ? `${publicKey.toBase58().slice(0, 4)}...${publicKey.toBase58().slice(-4)}`
     : "";
 
-  const walletBadge = (
-    <div className="flex justify-center mb-6">
-      <div className="inline-flex items-center gap-2 rounded-full border border-cyan/30 bg-cyan/5 px-4 py-1.5">
-        <span className="h-2 w-2 rounded-full bg-cyan animate-pulse" />
+  // Disconnected state
+  if (!connected) {
+    return (
+      <section>
+        <div className="mx-auto max-w-7xl px-6 pb-24">
+          <div className="flex flex-col items-center gap-6 border border-border py-20 text-center">
+            <Wallet className="h-10 w-10 text-foreground/40" strokeWidth={1.5} />
+            <div className="max-w-md">
+              <p className="font-display text-2xl font-medium tracking-tight text-foreground md:text-3xl">
+                Connect your wallet<span className="text-cyan">.</span>
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-foreground/60">
+                View your Entros Anchor, Trust Score, and verification
+                history.
+              </p>
+            </div>
+            <WalletConnectButton />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  const walletPill = (
+    <div className="mb-8 flex">
+      <div className="inline-flex items-center gap-3 border border-cyan/30 bg-cyan/[0.04] px-4 py-2">
+        <span className="h-1.5 w-1.5 rounded-full bg-cyan" />
         <span className="font-mono text-xs text-cyan">{truncatedAddress}</span>
         <button
           onClick={() => disconnect()}
-          className="ml-1 text-xs text-foreground/40 hover:text-foreground transition-colors"
+          className="ml-1 text-xs text-foreground/40 transition-colors hover:text-foreground"
           aria-label="Disconnect wallet"
         >
           &times;
@@ -132,166 +130,196 @@ export function DashboardAnchorView() {
 
   if (loading) {
     return (
-      <div className="py-16">
-        {walletBadge}
-        <div className="flex items-center justify-center">
-          <Loader2 className="h-8 w-8 text-cyan animate-spin" />
+      <section>
+        <div className="mx-auto max-w-7xl px-6 pb-24">
+          {walletPill}
+          <div className="flex flex-col items-center gap-4 border border-border py-20">
+            <Loader2 className="h-6 w-6 animate-spin text-cyan" />
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+              Reading from Solana devnet…
+            </p>
+          </div>
         </div>
-      </div>
+      </section>
     );
   }
 
   if (error) {
     return (
-      <div className="mx-auto max-w-md text-center space-y-4 py-12">
-        {walletBadge}
-        <ShieldAlert className="mx-auto h-10 w-10 text-danger" strokeWidth={1.5} />
-        <p className="text-sm text-muted">{error}</p>
-      </div>
+      <section>
+        <div className="mx-auto max-w-7xl px-6 pb-24">
+          {walletPill}
+          <div className="flex flex-col items-center gap-4 border border-border py-20 text-center">
+            <ShieldAlert className="h-8 w-8 text-danger" strokeWidth={1.5} />
+            <p className="text-sm text-foreground/65">{error}</p>
+          </div>
+        </div>
+      </section>
     );
   }
 
   if (!identity) {
     return (
-      <div className="mx-auto max-w-md text-center space-y-6 py-12">
-        {walletBadge}
-        <ShieldAlert className="mx-auto h-12 w-12 text-muted" strokeWidth={1.5} />
-        <div>
-          <p className="font-sans text-xl font-semibold text-foreground">
-            No Entros Anchor found
-          </p>
-          <p className="mt-2 text-sm text-muted">
-            Complete your first verification to mint your Entros Anchor identity.
-          </p>
+      <section>
+        <div className="mx-auto max-w-7xl px-6 pb-24">
+          {walletPill}
+          <div className="flex flex-col items-center gap-6 border border-border py-20 text-center">
+            <ShieldAlert className="h-10 w-10 text-foreground/40" strokeWidth={1.5} />
+            <div className="max-w-md">
+              <p className="font-display text-2xl font-medium tracking-tight text-foreground md:text-3xl">
+                No Entros Anchor yet<span className="text-cyan">.</span>
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-foreground/60">
+                Complete your first verification to mint your Entros
+                Anchor identity.
+              </p>
+            </div>
+            <Link
+              href="/verify"
+              className="
+                group inline-flex items-center justify-center gap-2
+                rounded-full bg-foreground px-6 py-3
+                text-sm font-medium text-background
+                transition-colors hover:bg-foreground/90
+              "
+            >
+              Verify now
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+          </div>
         </div>
-        <Link
-          href="/verify"
-          className="inline-flex items-center gap-2 text-sm text-cyan hover:text-foreground transition-colors"
-        >
-          Verify now <ArrowRight className="h-4 w-4" />
-        </Link>
-      </div>
+      </section>
     );
   }
 
   return (
-    <div>
-      {walletBadge}
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-      <GlowCard className="lg:col-span-1">
-        <div className="flex flex-col items-center text-center">
-          <p className="text-xs font-mono uppercase tracking-widest text-muted">
-            Trust Score
-          </p>
-          <p className="mt-3 text-6xl font-mono font-bold text-foreground">
-            {identity.trustScore}
-          </p>
-          <div className="mt-4 h-2 w-full max-w-[200px] rounded-full bg-surface overflow-hidden">
-            <div
-              className="h-full rounded-full bg-cyan"
-              style={{ width: `${Math.min(identity.trustScore, 100)}%` }}
-            />
-          </div>
-          {identity.trustScore > 0 ? (
-            <p className="mt-2 text-xs text-muted">Active</p>
-          ) : (
-            <div className="mt-3 text-xs text-muted max-w-[200px]">
-              <p className="text-cyan font-mono">Baseline established</p>
-              <p className="mt-1">Re-verify to start building your Trust Score. Each session that matches your behavioral pattern increases it.</p>
+    <section>
+      <div className="mx-auto max-w-7xl px-6 pb-16">
+        {walletPill}
+
+        <div className="grid grid-cols-1 gap-px border border-border bg-border lg:grid-cols-3">
+          {/* Trust Score panel */}
+          <div className="flex flex-col items-center justify-center bg-background p-8 text-center md:p-10 lg:col-span-1">
+            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+              Trust Score
+            </p>
+            <p className="mt-4 font-display text-7xl font-medium tracking-tight text-foreground md:text-8xl">
+              {identity.trustScore}
+            </p>
+            <div className="mt-6 h-1 w-full max-w-[220px] overflow-hidden bg-foreground/[0.06]">
+              <div
+                className="h-full bg-cyan transition-all"
+                style={{ width: `${Math.min(identity.trustScore, 100)}%` }}
+              />
             </div>
-          )}
-        </div>
-      </GlowCard>
-
-      <GlowCard className="lg:col-span-2">
-        <div className="grid grid-cols-2 gap-6">
-          <div>
-            <p className="text-xs font-mono uppercase tracking-widest text-muted">
-              Verifications
-            </p>
-            <p className="mt-1 text-2xl font-mono font-bold text-foreground">
-              {identity.verificationCount + 1}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs font-mono uppercase tracking-widest text-muted">
-              Last verified
-            </p>
-            <p className="mt-1 text-2xl font-mono font-bold text-foreground">
-              {identity.lastVerificationTimestamp > 0
-                ? formatRelativeTime(identity.lastVerificationTimestamp)
-                : "Never"}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs font-mono uppercase tracking-widest text-muted">
-              Anchor created
-            </p>
-            <p className="mt-1 text-sm text-foreground/70">
-              {formatDate(identity.creationTimestamp)}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs font-mono uppercase tracking-widest text-muted">
-              Commitment
-            </p>
-            <p className="mt-1 text-sm font-mono text-foreground/70 truncate">
-              {commitmentBytesToHex(identity.currentCommitment)}
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-6 pt-6 border-t border-border space-y-3">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div>
-              <p className="text-xs font-mono uppercase tracking-widest text-muted">
-                Owner
+            {identity.trustScore > 0 ? (
+              <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.2em] text-cyan/80">
+                Active
               </p>
-              <div className="mt-1 flex items-center gap-2">
-                <p className="text-xs font-mono text-foreground/60 truncate">
-                  {identity.owner}
+            ) : (
+              <div className="mt-4 max-w-[240px]">
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan/80">
+                  Baseline established
                 </p>
-                <a
-                  href={explorerUrl(identity.owner)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="shrink-0 text-cyan hover:text-foreground transition-colors"
-                  aria-label="View owner on Solana Explorer"
-                >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                </a>
+                <p className="mt-3 text-xs leading-relaxed text-foreground/55">
+                  Re-verify to start building your Trust Score. Each
+                  session that matches your behavioral pattern increases
+                  it.
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Stats panel */}
+          <div className="flex flex-col bg-background p-8 md:p-10 lg:col-span-2">
+            <div className="grid grid-cols-2 gap-8">
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+                  Verifications
+                </p>
+                <p className="mt-2 font-display text-3xl font-medium tracking-tight text-foreground md:text-4xl">
+                  {identity.verificationCount + 1}
+                </p>
+              </div>
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+                  Last verified
+                </p>
+                <p className="mt-2 font-display text-2xl font-medium tracking-tight text-foreground md:text-3xl">
+                  {identity.lastVerificationTimestamp > 0
+                    ? formatRelativeTime(identity.lastVerificationTimestamp)
+                    : "Never"}
+                </p>
+              </div>
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+                  Anchor created
+                </p>
+                <p className="mt-2 font-mono text-sm text-foreground">
+                  {formatDate(identity.creationTimestamp)}
+                </p>
+              </div>
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+                  Commitment
+                </p>
+                <p className="mt-2 truncate font-mono text-sm text-foreground/70">
+                  {commitmentBytesToHex(identity.currentCommitment)}
+                </p>
               </div>
             </div>
-            <div>
-              <p className="text-xs font-mono uppercase tracking-widest text-muted">
-                Mint
-              </p>
-              <div className="mt-1 flex items-center gap-2">
-                <p className="text-xs font-mono text-foreground/60 truncate">
-                  {identity.mint}
+
+            <div className="mt-8 grid grid-cols-1 gap-4 border-t border-border pt-6 sm:grid-cols-2">
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+                  Owner
                 </p>
-                <a
-                  href={explorerUrl(identity.mint)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="shrink-0 text-cyan hover:text-foreground transition-colors"
-                  aria-label="View mint on Solana Explorer"
-                >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                </a>
+                <div className="mt-2 flex items-center gap-2">
+                  <p className="truncate font-mono text-xs text-foreground/65">
+                    {identity.owner}
+                  </p>
+                  <a
+                    href={explorerUrl(identity.owner)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shrink-0 text-cyan transition-colors hover:text-foreground"
+                    aria-label="View owner on Solana Explorer"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                </div>
+              </div>
+              <div>
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+                  Mint
+                </p>
+                <div className="mt-2 flex items-center gap-2">
+                  <p className="truncate font-mono text-xs text-foreground/65">
+                    {identity.mint}
+                  </p>
+                  <a
+                    href={explorerUrl(identity.mint)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shrink-0 text-cyan transition-colors hover:text-foreground"
+                    aria-label="View mint on Solana Explorer"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                </div>
               </div>
             </div>
+
+            <Link
+              href="/verify"
+              className="mt-6 inline-flex w-fit items-center gap-2 font-mono text-[11px] uppercase tracking-[0.15em] text-cyan transition-colors hover:text-foreground"
+            >
+              Re-verify
+              <ArrowRight className="h-3 w-3" />
+            </Link>
           </div>
-          <Link
-            href="/verify"
-            className="inline-flex items-center gap-2 text-sm text-cyan hover:text-foreground transition-colors"
-          >
-            Re-verify
-            <ArrowRight className="h-4 w-4" />
-          </Link>
         </div>
-      </GlowCard>
-    </div>
-    </div>
+      </div>
+    </section>
   );
 }

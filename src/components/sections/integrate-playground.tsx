@@ -2,7 +2,6 @@
 
 import { useState, useRef } from "react";
 import { useConnection } from "@solana/wallet-adapter-react";
-import { GlowCard } from "@/components/ui/glow-card";
 import { CheckCircle, XCircle, Loader2, Search, ExternalLink } from "lucide-react";
 import { explorerUrl } from "@/lib/explorer";
 
@@ -93,7 +92,8 @@ export function IntegratePlayground() {
         anchorPda: identityPda.toBase58(),
       });
     } catch {
-      if (requestId.current === thisRequest) setError("Network error. Check the address and try again.");
+      if (requestId.current === thisRequest)
+        setError("Network error. Check the address and try again.");
     } finally {
       if (requestId.current === thisRequest) setLoading(false);
     }
@@ -101,19 +101,32 @@ export function IntegratePlayground() {
 
   return (
     <div>
-      <GlowCard>
-        <p className="text-xs font-mono uppercase tracking-widest text-muted mb-1">
-          Live on Solana devnet
-        </p>
-        <p className="text-sm text-foreground/70 mb-5">
-          Paste any wallet address to check its Entros verification status on-chain.
+      <div className="border border-border p-6 md:p-8">
+        <div className="flex items-center justify-between">
+          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+            // LIVE ON DEVNET
+          </p>
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-solana-green/60" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-solana-green" />
+            </span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+              Devnet
+            </span>
+          </div>
+        </div>
+
+        <p className="mt-6 text-sm leading-relaxed text-foreground/65">
+          Paste any wallet address to check its Entros verification status
+          on-chain.
         </p>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-end">
           <div className="flex-1">
             <label
               htmlFor="playground-wallet"
-              className="block text-xs font-mono uppercase tracking-widest text-muted mb-2"
+              className="mb-2 block font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40"
             >
               Wallet Address
             </label>
@@ -121,7 +134,7 @@ export function IntegratePlayground() {
               id="playground-wallet"
               type="text"
               placeholder="Paste a Solana wallet address..."
-              className="w-full bg-background border border-border rounded-lg px-4 py-3 text-sm font-mono text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-cyan/50 transition-colors"
+              className="w-full border border-border bg-background px-4 py-3 font-mono text-sm text-foreground placeholder:text-foreground/30 transition-colors focus:border-cyan/50 focus:outline-none"
               value={wallet}
               onChange={(e) => {
                 requestId.current++;
@@ -136,7 +149,7 @@ export function IntegratePlayground() {
           <button
             onClick={() => checkWallet(wallet)}
             disabled={loading || !wallet.trim()}
-            className="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-5 py-3 text-sm font-mono text-foreground transition-colors hover:border-cyan/50 hover:text-cyan disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center justify-center gap-2 border border-foreground/20 bg-foreground px-6 py-3 font-mono text-sm text-background transition-colors hover:bg-foreground/90 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -150,51 +163,78 @@ export function IntegratePlayground() {
         {error && <p className="mt-4 text-sm text-danger">{error}</p>}
 
         {notFound && (
-          <div className="mt-5 flex items-center gap-3 rounded-xl border border-border bg-surface/30 p-5">
-            <XCircle className="h-6 w-6 text-muted shrink-0" strokeWidth={1.5} />
+          <div className="mt-8 flex items-center gap-3 border border-border p-5">
+            <XCircle className="h-6 w-6 shrink-0 text-foreground/50" strokeWidth={1.5} />
             <div>
               <p className="text-sm font-medium text-foreground">Not verified</p>
-              <p className="text-xs text-muted mt-0.5">
-                This wallet has no Entros Anchor on devnet. No Trust Score, no verification history.
+              <p className="mt-0.5 text-xs text-foreground/50">
+                This wallet has no Entros Anchor on devnet. No Trust Score,
+                no verification history.
               </p>
             </div>
           </div>
         )}
 
         {result && (
-          <div className="mt-5 rounded-xl border border-solana-green/20 bg-solana-green/5 p-5">
-            <div className="flex items-center gap-3 mb-4">
-              <CheckCircle className="h-5 w-5 text-solana-green shrink-0" />
-              <p className="text-sm font-medium text-foreground">Verified Human</p>
+          <div className="mt-8 border border-solana-green/30 bg-solana-green/[0.04] p-6 md:p-8">
+            <div className="mb-8 flex items-center gap-3">
+              <CheckCircle className="h-5 w-5 shrink-0 text-solana-green" />
+              <p className="text-sm font-medium text-foreground">
+                Verified Human
+              </p>
             </div>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+
+            <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
               <div>
-                <p className="text-xs font-mono uppercase tracking-widest text-muted">Trust Score</p>
-                <p className="mt-1 text-2xl font-mono font-bold text-foreground">{result.trustScore}</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+                  Trust Score
+                </p>
+                <p className="mt-2 font-display text-3xl font-medium tracking-tight text-foreground">
+                  {result.trustScore}
+                </p>
               </div>
               <div>
-                <p className="text-xs font-mono uppercase tracking-widest text-muted">Verifications</p>
-                <p className="mt-1 text-2xl font-mono font-bold text-foreground">{result.verificationCount}</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+                  Verifications
+                </p>
+                <p className="mt-2 font-display text-3xl font-medium tracking-tight text-foreground">
+                  {result.verificationCount}
+                </p>
               </div>
               <div>
-                <p className="text-xs font-mono uppercase tracking-widest text-muted">Last Verified</p>
-                <p className="mt-1 text-sm font-mono text-foreground">{timeAgo(result.lastVerified)}</p>
-                <p className="text-xs text-muted">{formatTimestamp(result.lastVerified)}</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+                  Last Verified
+                </p>
+                <p className="mt-2 font-mono text-sm text-foreground">
+                  {timeAgo(result.lastVerified)}
+                </p>
+                <p className="text-xs text-foreground/50">
+                  {formatTimestamp(result.lastVerified)}
+                </p>
               </div>
               <div>
-                <p className="text-xs font-mono uppercase tracking-widest text-muted">Created</p>
-                <p className="mt-1 text-sm font-mono text-foreground">{formatTimestamp(result.createdAt)}</p>
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+                  Created
+                </p>
+                <p className="mt-2 font-mono text-sm text-foreground">
+                  {formatTimestamp(result.createdAt)}
+                </p>
               </div>
             </div>
-            <div className="mt-4 pt-3 border-t border-border/50">
-              <p className="text-xs font-mono uppercase tracking-widest text-muted">Entros Anchor PDA</p>
-              <div className="mt-1 flex items-center gap-2">
-                <p className="text-xs font-mono text-foreground/60 break-all">{result.anchorPda}</p>
+
+            <div className="mt-8 border-t border-border/50 pt-6">
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+                Entros Anchor PDA
+              </p>
+              <div className="mt-2 flex items-center gap-2">
+                <p className="break-all font-mono text-xs text-foreground/65">
+                  {result.anchorPda}
+                </p>
                 <a
                   href={explorerUrl(result.anchorPda)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="shrink-0 text-cyan hover:text-foreground transition-colors"
+                  className="shrink-0 text-cyan transition-colors hover:text-foreground"
                   aria-label="View on Solana Explorer"
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
@@ -203,20 +243,20 @@ export function IntegratePlayground() {
             </div>
           </div>
         )}
-      </GlowCard>
+      </div>
 
-      <p className="mt-4 text-xs text-muted text-center">
-        Try with:{" "}
+      <p className="mt-6 text-xs text-foreground/50">
+        Try with{" "}
         <button
           onClick={() => {
             setWallet(DEMO_WALLET);
             checkWallet(DEMO_WALLET);
           }}
-          className="text-cyan hover:text-foreground transition-colors font-mono"
+          className="font-mono text-cyan transition-colors hover:text-foreground"
         >
-          2jowce...SNQw
+          2jowce…SNQw
         </button>{" "}
-        (Entros verified wallet on devnet)
+       —Entros verified wallet on devnet.
       </p>
     </div>
   );

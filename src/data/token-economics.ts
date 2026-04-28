@@ -53,22 +53,31 @@ export const tokenDistribution: TokenAllocation[] = [
   {
     name: "Community",
     percentage: 30,
-    vesting: "10% airdrop at genesis, 20% via staking and usage emissions over 4 years",
+    vesting: "10% rolling-wave airdrops, 20% staking and usage emissions over 4 years",
+  },
+  {
+    name: "Treasury",
+    percentage: 25,
+    vesting: "Bi-weekly unlocks over 4 years, DAO-governed (includes 5% insurance pool + 5% emergency reserve)",
+  },
+  {
+    name: "Team & Contributors",
+    percentage: 18,
+    vesting: "48-month linear, 12-month cliff, bi-weekly post-cliff",
   },
   {
     name: "Ecosystem Grants",
-    percentage: 20,
-    vesting: "36-month linear vesting",
+    percentage: 13,
+    vesting: "36-month linear, bi-weekly unlocks",
   },
-  { name: "Treasury", percentage: 25, vesting: "Protocol-controlled, DAO-governed" },
   {
-    name: "Team & Contributors",
-    percentage: 15,
-    vesting: "48-month linear, 12-month cliff",
+    name: "Validator Rewards",
+    percentage: 7,
+    vesting: "On-chain reward pool, 4-year emission",
   },
   {
     name: "Initial Liquidity",
-    percentage: 10,
+    percentage: 7,
     vesting: "Unlocked at genesis",
   },
 ];

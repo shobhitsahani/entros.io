@@ -1,9 +1,6 @@
 import Link from "next/link";
-import { TextShimmer } from "@/components/ui/text-shimmer";
 
-const internalLinks = [
-  { label: "Research paper", href: "/paper" },
-];
+const internalLinks = [{ label: "Research paper", href: "/paper" }];
 
 const externalLinks = [
   {
@@ -24,43 +21,59 @@ const externalLinks = [
   },
 ];
 
+/**
+ * References—compact link list. Each row has a small chevron and
+ * an external arrow indicator on hover; rows are hairline-divided.
+ */
 export function References() {
   return (
-    <section id="references" className="mx-auto max-w-4xl px-6 py-16">
-      <TextShimmer
-        as="span"
-        className="font-mono text-sm tracking-widest uppercase"
-      >
-        {"// REFERENCES"}
-      </TextShimmer>
-      <h2 className="mt-4 font-mono text-2xl font-semibold text-foreground md:text-3xl">
-        Learn more
-      </h2>
-      <ul className="mt-8 space-y-3">
-        {internalLinks.map((ref) => (
-          <li key={ref.label}>
-            <Link
-              href={ref.href}
-              className="text-sm text-cyan transition-colors hover:text-cyan/80"
-            >
-              {ref.label}
-            </Link>
-          </li>
-        ))}
-        {externalLinks.map((ref) => (
-          <li key={ref.label}>
-            <a
-              href={ref.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-cyan transition-colors hover:text-cyan/80"
-            >
-              {ref.label}
-              <span className="ml-1 text-foreground/30">{"↗"}</span>
-            </a>
-          </li>
-        ))}
-      </ul>
+    <section id="references" className="border-t border-border">
+      <div className="mx-auto max-w-5xl px-6 py-24 md:py-32">
+        <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+          // REFERENCES
+        </span>
+
+        <h2 className="mt-6 max-w-2xl font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+          Learn more<span className="text-cyan">.</span>
+        </h2>
+
+        <ul className="mt-12 border-t border-border">
+          {internalLinks.map((ref) => (
+            <li key={ref.label} className="border-b border-border">
+              <Link
+                href={ref.href}
+                className="group flex items-center justify-between py-5 text-foreground/80 transition-colors hover:text-foreground"
+              >
+                <span className="text-base">{ref.label}</span>
+                <span
+                  aria-hidden="true"
+                  className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40 transition-colors group-hover:text-cyan"
+                >
+                  Internal →
+                </span>
+              </Link>
+            </li>
+          ))}
+          {externalLinks.map((ref) => (
+            <li key={ref.label} className="border-b border-border">
+              <a
+                href={ref.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center justify-between py-5 text-foreground/80 transition-colors hover:text-foreground"
+              >
+                <span className="text-base">{ref.label}</span>
+                <span
+                  aria-hidden="true"
+                  className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40 transition-colors group-hover:text-cyan"
+                >
+                  External ↗
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
     </section>
   );
 }

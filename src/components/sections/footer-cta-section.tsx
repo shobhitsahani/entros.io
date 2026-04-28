@@ -1,22 +1,46 @@
 import Link from "next/link";
-import { ShimmerButton } from "@/components/ui/shimmer-button";
+import { ArrowRight } from "lucide-react";
 
+/**
+ * Footer CTA—closing statement before the global footer. Display
+ * copy with two CTAs (filled primary + outlined secondary).
+ */
 export function FooterCTASection() {
   return (
-    <section className="mx-auto max-w-3xl px-6 py-24 text-center">
-      <hr className="mx-auto mb-16 w-24 border-t border-foreground/[0.06]" />
-      <p className="font-mono text-xl tracking-[0.02em] text-foreground md:text-2xl">
-        The future of identity is temporal, not static.
-      </p>
-      <div className="mt-8 flex justify-center">
-        <Link href="/technology">
-          <ShimmerButton className="text-sm font-medium lg:text-base">
-            <span className="flex items-center gap-2">
-              How It Works
-              <span aria-hidden="true">→</span>
-            </span>
-          </ShimmerButton>
-        </Link>
+    <section className="border-t border-border">
+      <div className="mx-auto max-w-5xl px-6 py-32 text-center md:py-40">
+        <h2 className="font-display text-4xl font-medium tracking-tight text-foreground md:text-6xl md:leading-[1.05]">
+          The future of identity
+          <br />
+          is temporal, not static<span className="text-cyan">.</span>
+        </h2>
+
+        <div className="mt-12 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <Link
+            href="/verify"
+            className="
+              group inline-flex items-center justify-center gap-2
+              rounded-full bg-foreground px-6 py-3
+              text-sm font-medium text-background
+              transition-colors hover:bg-foreground/90
+            "
+          >
+            Try the Demo
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+          <Link
+            href="/technology"
+            className="
+              group inline-flex items-center justify-center gap-2
+              rounded-full border border-foreground/20 px-6 py-3
+              text-sm font-medium text-foreground
+              transition-colors hover:border-foreground/40 hover:bg-foreground/5
+            "
+          >
+            How it works
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        </div>
       </div>
     </section>
   );

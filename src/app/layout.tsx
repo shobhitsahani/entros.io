@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Geist } from "next/font/google";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { ThemeProvider } from "@/components/providers/theme-provider";
@@ -22,6 +22,15 @@ const inter = Inter({
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-jetbrains",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+// Geist is Vercel's geometric sans—same family as Aeonik visually,
+// free and Google-Fonts-served. Used for display headlines on the
+// homepage redesign; body copy continues to use Inter.
+const geist = Geist({
+  variable: "--font-geist",
   subsets: ["latin"],
   display: "swap",
 });
@@ -101,7 +110,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${jetbrainsMono.variable} overflow-x-hidden`}
+      className={`${inter.variable} ${jetbrainsMono.variable} ${geist.variable} overflow-x-hidden`}
       suppressHydrationWarning
     >
       <body className="min-h-[100svh] overflow-x-clip bg-background text-foreground font-sans antialiased">

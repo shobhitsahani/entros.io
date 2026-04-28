@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { useConnection } from "@solana/wallet-adapter-react";
-import { SubpageHero } from "@/components/sections/subpage-hero";
 import { EntrosBadge } from "@/components/ui/entros-badge";
-import { GlowCard } from "@/components/ui/glow-card";
 import { CodeBlock } from "@/components/ui/code-block";
 
 const COMPONENT_CODE = `"use client";
@@ -59,18 +59,15 @@ export function EntrosBadge({ walletAddress, connection, className }: EntrosBadg
             ENTROS_PROGRAM_ID
           );
 
-          // If no connection prop is passed, use a default devnet connection
           const conn = connection || new Connection("https://api.devnet.solana.com", "confirmed");
-          
           const account = await conn.getAccountInfo(identityPda);
-          
+
           if (isMounted) {
             if (!account || account.data.length < EXPECTED_SIZE) {
               setTrustScore(null);
             } else {
               const data = account.data;
               const view = new DataView(data.buffer, data.byteOffset, data.byteLength);
-              // Trust score is a u16 at offset 60
               const score = view.getUint16(60, true);
               setTrustScore(score);
             }
@@ -154,81 +151,301 @@ export function ProfileHeader({ walletAddress }) {
 export default function BadgeDemo() {
   const { connection } = useConnection();
   const [walletInput, setWalletInput] = useState("");
-  // Only pass down a valid length string to avoid quick re-renders on typing
-  // base58 solana addresses are usually 32-44 characters
+  const [copied, setCopied] = useState(false);
   const isValidLength = walletInput.length >= 32;
+
+  function copySource() {
+    navigator.clipboard.writeText(COMPONENT_CODE);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }
 
   return (
     <>
-      <SubpageHero
-        title="Entros Badge"
-        subtitle="A drop-in React component to display on-chain proof-of-personhood status."
-      />
-      <div className="mx-auto max-w-5xl px-6 pb-24">
-        <GlowCard className="mb-12">
-          <div className="flex flex-col md:flex-row gap-8 items-start">
-            <div className="w-full md:w-1/2 space-y-4">
-              <label htmlFor="wallet-input" className="block text-sm font-mono text-muted uppercase tracking-widest">
-                Test Wallet Address
-              </label>
-              <input
-                id="wallet-input"
-                type="text"
-                placeholder="Enter a Solana address..."
-                className="w-full bg-surface border border-border rounded-lg px-4 py-3 text-sm font-mono text-foreground focus:outline-none focus:border-cyan/50 transition-colors"
-                value={walletInput}
-                onChange={(e) => setWalletInput(e.target.value)}
-              />
-              <p className="text-xs text-muted">
-                Tip: Use a wallet from your devnet testing to see the verified state.
+      {/* Hero—asymmetric split. Left: wide h1 + copy + CTAs. Right:
+          a profile-list mockup showing the badge in real context. */}
+      <section>
+        <div className="mx-auto max-w-7xl px-6 pt-32 pb-20 md:pt-40 md:pb-28">
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+            // ENTROS BADGE
+          </span>
+
+          <div className="mt-8 grid grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
+            <div className="lg:col-span-7">
+              <h1 className="font-display text-5xl font-medium leading-[1.02] tracking-[-0.02em] text-foreground md:text-6xl lg:text-7xl">
+                Trust<span className="text-cyan">,</span>
+                <br />
+                on display<span className="text-cyan">.</span>
+              </h1>
+
+              <p className="mt-8 max-w-xl text-base leading-relaxed text-foreground/70 md:text-lg">
+                A drop-in React component that displays any wallet's
+                Entros Trust Score. Use in profiles, comments,
+                leaderboards—anywhere humanness matters.
               </p>
+
+              <div className="mt-10 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+                <Link
+                  href="/integrate"
+                  className="
+                    group inline-flex items-center justify-center gap-2
+                    rounded-full bg-foreground px-6 py-3
+                    text-sm font-medium text-background
+                    transition-colors hover:bg-foreground/90
+                  "
+                >
+                  All components
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </Link>
+                <Link
+                  href="/verify"
+                  className="
+                    group inline-flex items-center justify-center gap-2
+                    rounded-full border border-foreground/20 px-6 py-3
+                    text-sm font-medium text-foreground
+                    transition-colors hover:border-foreground/40 hover:bg-foreground/5
+                  "
+                >
+                  Try the demo
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                </Link>
+              </div>
             </div>
-            
-            <div className="w-full md:w-1/2 flex flex-col items-center md:items-start justify-center min-h-[100px] border border-dashed border-border/50 rounded-xl bg-surface/20 p-8">
-              <p className="text-xs font-mono text-muted uppercase tracking-widest mb-4">
-                Preview
-              </p>
-              <div className="h-10 flex items-center justify-center">
-                {isValidLength ? (
-                  <EntrosBadge walletAddress={walletInput} connection={connection} />
-                ) : (
-                  <span className="text-sm font-mono text-muted/50">
-                    Enter a valid address to preview
-                  </span>
-                )}
+
+            {/* Mock profile list—the badge in real UI context */}
+            <div className="lg:col-span-5">
+              <div className="relative border border-border p-6 md:p-8">
+                <span className="absolute left-0 top-0 h-3 w-3 border-l border-t border-cyan/70" aria-hidden />
+                <span className="absolute right-0 top-0 h-3 w-3 border-r border-t border-cyan/70" aria-hidden />
+                <span className="absolute bottom-0 left-0 h-3 w-3 border-b border-l border-cyan/70" aria-hidden />
+                <span className="absolute bottom-0 right-0 h-3 w-3 border-b border-r border-cyan/70" aria-hidden />
+
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+                  // PROFILES
+                </p>
+
+                <div className="mt-8 space-y-6">
+                  {[
+                    { handle: "anatoly.sol", score: "1,247", state: "verified", pulse: true },
+                    { handle: "lily.sol", score: "482", state: "verified", pulse: false },
+                    { handle: "ada.sol", score: null, state: "loading", pulse: false },
+                    { handle: "0x4ku9.sol", score: null, state: "unverified", pulse: false },
+                  ].map((row) => (
+                    <div key={row.handle} className="flex items-center gap-3">
+                      <div
+                        className={`h-8 w-8 shrink-0 rounded-full border ${
+                          row.state === "verified"
+                            ? "border-cyan/50 bg-cyan shadow-[0_0_12px_rgba(34,211,230,0.45)]"
+                            : "border-border bg-surface"
+                        }`}
+                      />
+                      <p className="flex-1 truncate font-mono text-sm text-foreground/85">
+                        {row.handle}
+                      </p>
+                      {row.state === "verified" && (
+                        <span className="inline-flex items-center gap-2 rounded-full border border-cyan/30 bg-cyan/[0.05] px-3 py-1 font-mono text-[11px] text-cyan">
+                          <span
+                            className={`h-1.5 w-1.5 rounded-full bg-cyan ${
+                              row.pulse ? "animate-pulse" : ""
+                            }`}
+                          />
+                          {row.score}
+                        </span>
+                      )}
+                      {row.state === "loading" && (
+                        <span className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1 font-mono text-[11px] text-foreground/45">
+                          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-foreground/40" />
+                          …
+                        </span>
+                      )}
+                      {row.state === "unverified" && (
+                        <span className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1 font-mono text-[11px] text-foreground/35">
+                          <span className="h-1.5 w-1.5 rounded-full bg-foreground/25" />
+                          —
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-        </GlowCard>
-
-        <div className="space-y-8">
-          <section>
-            <h2 className="text-lg font-mono font-bold text-foreground mb-4">1. Usage</h2>
-            <p className="text-sm text-foreground/70 leading-relaxed mb-4">
-              Import and use the component anywhere in your app. Pass the wallet address and ideally your active Solana connection.
-            </p>
-            <CodeBlock code={USAGE_CODE} />
-          </section>
-
-          <section>
-            <h2 className="text-lg font-mono font-bold text-foreground mb-4">2. Component Source</h2>
-            <p className="text-sm text-foreground/70 leading-relaxed mb-4">
-              Copy this code into your project at <code className="text-cyan bg-surface px-1.5 py-0.5 rounded">components/ui/entros-badge.tsx</code>. It requires the <code className="text-cyan bg-surface px-1.5 py-0.5 rounded">@entros/pulse-sdk</code> and <code className="text-cyan bg-surface px-1.5 py-0.5 rounded">@solana/web3.js</code> packages.
-            </p>
-            <div className="relative">
-              <div className="absolute right-4 top-4 z-10">
-                <button 
-                  onClick={() => navigator.clipboard.writeText(COMPONENT_CODE)}
-                  className="text-xs font-mono text-muted hover:text-cyan transition-colors"
-                >
-                  COPY
-                </button>
-              </div>
-              <CodeBlock code={COMPONENT_CODE} className="max-h-[600px] overflow-y-auto" />
-            </div>
-          </section>
         </div>
-      </div>
+      </section>
+
+      {/* Live preview */}
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+            // LIVE PREVIEW
+          </span>
+
+          <h2 className="mt-6 max-w-3xl font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+            Try it now<span className="text-cyan">.</span>
+          </h2>
+
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-foreground/65 md:text-lg">
+            Enter any Solana address to see the badge render its
+            verification state and live Trust Score from devnet.
+          </p>
+
+          <div className="mt-12 border border-border p-6 md:p-8">
+            <div className="flex items-center justify-between">
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+                // INPUT
+              </p>
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-solana-green/60" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-solana-green" />
+                </span>
+                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+                  Devnet
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-8 grid grid-cols-1 items-start gap-8 md:grid-cols-2 md:gap-12">
+              <div>
+                <label
+                  htmlFor="wallet-input"
+                  className="mb-2 block font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40"
+                >
+                  Wallet Address
+                </label>
+                <input
+                  id="wallet-input"
+                  type="text"
+                  placeholder="Paste a Solana wallet address..."
+                  className="w-full border border-border bg-background px-4 py-3 font-mono text-sm text-foreground placeholder:text-foreground/30 transition-colors focus:border-cyan/50 focus:outline-none"
+                  value={walletInput}
+                  onChange={(e) => setWalletInput(e.target.value)}
+                />
+                <p className="mt-3 text-xs leading-relaxed text-foreground/50">
+                  Use a wallet from your devnet testing to see the
+                  verified state.
+                </p>
+              </div>
+
+              <div>
+                <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+                  Preview
+                </p>
+                <div className="flex min-h-[120px] items-center justify-center border border-border bg-surface p-6">
+                  {isValidLength ? (
+                    <EntrosBadge walletAddress={walletInput} connection={connection} />
+                  ) : (
+                    <span className="font-mono text-xs uppercase tracking-[0.15em] text-foreground/35">
+                      Enter a valid address
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Usage */}
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+            // USAGE
+          </span>
+
+          <div className="mt-6 grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-16">
+            <div className="lg:col-span-5">
+              <h2 className="font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+                Import<span className="text-cyan">.</span> Render
+                <span className="text-cyan">.</span>
+              </h2>
+              <p className="mt-8 text-base leading-relaxed text-foreground/70 md:text-lg">
+                Import the component and pass a wallet address. Pass your
+                active Solana connection through the{" "}
+                <code className="font-mono text-cyan">connection</code>{" "}
+                prop, or omit it for an automatic devnet fallback.
+              </p>
+            </div>
+
+            <div className="lg:col-span-7">
+              <CodeBlock code={USAGE_CODE} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Component source */}
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+            // COMPONENT SOURCE
+          </span>
+
+          <h2 className="mt-6 max-w-3xl font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+            Copy<span className="text-cyan">.</span> Paste
+            <span className="text-cyan">.</span> Ship
+            <span className="text-cyan">.</span>
+          </h2>
+
+          <p className="mt-6 max-w-3xl text-base leading-relaxed text-foreground/70 md:text-lg">
+            Paste this file at{" "}
+            <code className="font-mono text-cyan">
+              components/ui/entros-badge.tsx
+            </code>
+            . Requires{" "}
+            <code className="font-mono text-cyan">@entros/pulse-sdk</code>{" "}
+            and{" "}
+            <code className="font-mono text-cyan">@solana/web3.js</code>.
+          </p>
+
+          <div className="relative mt-12">
+            <button
+              onClick={copySource}
+              className="absolute right-4 top-4 z-10 font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40 transition-colors hover:text-cyan"
+            >
+              {copied ? "COPIED" : "COPY"}
+            </button>
+            <CodeBlock code={COMPONENT_CODE} className="max-h-[600px] overflow-y-auto" />
+          </div>
+        </div>
+      </section>
+
+      {/* Footer CTA */}
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-5xl px-6 py-32 text-center md:py-40">
+          <h2 className="font-display text-4xl font-medium tracking-tight text-foreground md:text-6xl md:leading-[1.05]">
+            One component<span className="text-cyan">.</span>
+            <br />
+            Every profile<span className="text-cyan">.</span>
+          </h2>
+          <div className="mt-12 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              href="/integrate"
+              className="
+                group inline-flex items-center justify-center gap-2
+                rounded-full bg-foreground px-6 py-3
+                text-sm font-medium text-background
+                transition-colors hover:bg-foreground/90
+              "
+            >
+              All components
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+            <Link
+              href="/gate-demo"
+              className="
+                group inline-flex items-center justify-center gap-2
+                rounded-full border border-foreground/20 px-6 py-3
+                text-sm font-medium text-foreground
+                transition-colors hover:border-foreground/40 hover:bg-foreground/5
+              "
+            >
+              See &lt;EntrosGate /&gt;
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+          </div>
+        </div>
+      </section>
     </>
   );
 }

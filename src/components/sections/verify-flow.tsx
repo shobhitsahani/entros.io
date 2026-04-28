@@ -6,7 +6,6 @@ import {
   verifyReducer,
   initialState,
 } from "@/components/verify/verify-state-machine";
-import { GlassPanel } from "@/components/ui/glass-panel";
 import { VerifyModeToggle } from "./verify-mode-toggle";
 import { VerifyWalletless } from "./verify-walletless";
 import { VerifyWalletConnected } from "./verify-wallet-connected";
@@ -24,15 +23,15 @@ class VerifyErrorBoundary extends Component<
   render() {
     if (this.state.error) {
       return (
-        <div className="text-center space-y-4 py-8">
+        <div className="space-y-4 py-8 text-center">
           <p className="text-sm text-danger">Verification error</p>
-          <p className="text-xs text-muted">{this.state.error}</p>
+          <p className="text-xs text-foreground/55">{this.state.error}</p>
           <button
             onClick={() => {
               this.setState({ error: null });
               this.props.onError();
             }}
-            className="rounded-full border border-border px-6 py-2 text-sm text-muted hover:text-foreground hover:border-border-hover transition-colors"
+            className="rounded-full border border-border px-6 py-2 text-sm text-foreground/65 transition-colors hover:border-foreground/40 hover:text-foreground"
           >
             Try again
           </button>
@@ -59,12 +58,17 @@ export function VerifyFlow() {
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       <div className="flex justify-center">
         <VerifyModeToggle mode={mode} onChange={handleModeChange} />
       </div>
 
-      <GlassPanel className="mx-auto max-w-xl rounded-2xl px-8 py-8 min-h-[460px] flex flex-col justify-center">
+      <div className="relative mx-auto flex min-h-[460px] max-w-xl flex-col justify-center border border-border bg-surface px-8 py-10">
+        <span className="absolute left-0 top-0 h-3 w-3 border-l border-t border-cyan/70" aria-hidden />
+        <span className="absolute right-0 top-0 h-3 w-3 border-r border-t border-cyan/70" aria-hidden />
+        <span className="absolute bottom-0 left-0 h-3 w-3 border-b border-l border-cyan/70" aria-hidden />
+        <span className="absolute bottom-0 right-0 h-3 w-3 border-b border-r border-cyan/70" aria-hidden />
+
         <VerifyErrorBoundary onError={handleBoundaryError}>
           {mode === "walletless" ? (
             <VerifyWalletless state={state} dispatch={dispatch} />
@@ -72,7 +76,7 @@ export function VerifyFlow() {
             <VerifyWalletConnected state={state} dispatch={dispatch} />
           )}
         </VerifyErrorBoundary>
-      </GlassPanel>
+      </div>
     </div>
   );
 }

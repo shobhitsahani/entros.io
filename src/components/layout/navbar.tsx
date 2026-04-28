@@ -1,34 +1,63 @@
 import Link from "next/link";
 import { mainNav } from "@/data/navigation";
 import { MobileNav } from "./mobile-nav";
-import { NavDropdown } from "./nav-dropdown";
+import { NavDropdown, type DropdownItem } from "./nav-dropdown";
+import { NavbarWordmark } from "./navbar-wordmark";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 
-const technologyDropdown = [
-  { label: "How It Works", href: "/technology" },
-  { label: "Security Program", href: "/security" },
+const technologyDropdown: DropdownItem[] = [
+  {
+    label: "How It Works",
+    href: "/technology",
+    description:
+      "From challenge to on-chain proof in twelve seconds.",
+  },
+  {
+    label: "Security Program",
+    href: "/security",
+    description:
+      "Continuous red team audit, transparent results.",
+  },
 ];
 
-const solutionsDropdown = [
-  { label: "Use Cases", href: "/solutions" },
-  { label: "Agent Anchor", href: "/agents" },
-  { label: "Governance", href: "/governance" },
-  { label: "Integrate", href: "/integrate" },
-  { label: "Stats", href: "/stats" },
+const solutionsDropdown: DropdownItem[] = [
+  {
+    label: "Use Cases",
+    href: "/solutions",
+    description: "Where temporal proof changes the equation.",
+  },
+  {
+    label: "Agent Anchor",
+    href: "/agents",
+    description: "Pseudonymous accountability for AI agents.",
+  },
+  {
+    label: "Governance",
+    href: "/governance",
+    description: "Sybil-resistant DAO voting and DAO oversight.",
+  },
+  {
+    label: "Integrate",
+    href: "/integrate",
+    description: "Two modes, one SDK. Drop-in for any dApp.",
+  },
+  {
+    label: "Stats",
+    href: "/stats",
+    description: "Live protocol metrics, on-chain truth.",
+  },
 ];
 
 export function Navbar() {
   return (
-    <nav className="fixed top-0 z-50 w-full border-b border-border bg-background md:bg-background/80 md:backdrop-blur-md">
+    <nav className="fixed top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center px-6">
-        <Link
-          href="/"
-          className="font-mono text-xl font-bold text-foreground tracking-tight"
-        >
-          Entros<span className="text-cyan">.</span>
-        </Link>
+        {/* Wordmark—client component, runs a one-shot hash-shuffle reveal
+            on first mount when entering on the home route. */}
+        <NavbarWordmark />
 
-        <ul className="absolute left-1/2 -translate-x-1/2 hidden items-center gap-8 md:flex">
+        {/* Center navigation */}
+        <ul className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-7 md:flex">
           {mainNav.map((item) =>
             item.label === "Technology" ? (
               <li key={item.href}>
@@ -43,7 +72,7 @@ export function Navbar() {
                 {item.external ? (
                   <a
                     href={item.href}
-                    className="text-sm text-foreground/70 transition-colors duration-200 hover:text-foreground py-2 leading-none"
+                    className="py-2 text-sm leading-none text-foreground/70 transition-colors duration-200 hover:text-foreground"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -52,7 +81,7 @@ export function Navbar() {
                 ) : (
                   <Link
                     href={item.href}
-                    className="text-sm text-foreground/70 transition-colors duration-200 hover:text-foreground py-2 leading-none"
+                    className="py-2 text-sm leading-none text-foreground/70 transition-colors duration-200 hover:text-foreground"
                   >
                     {item.label}
                   </Link>
@@ -62,19 +91,29 @@ export function Navbar() {
           )}
         </ul>
 
-        <div className="ml-auto flex items-center gap-3">
-          {/* Dashboard + Verify — match ShimmerButton recipe (faint
-              theme-aware tint, foreground/15 border, inset bottom-glow).
-              Verify uses cyan label to mark it as the primary action. */}
+        {/* Right-side actions: ghost Dashboard + filled-primary Verify. */}
+        <div className="ml-auto flex items-center gap-2">
           <Link
             href="/dashboard"
-            className="hidden md:inline-flex items-center rounded-full px-4 py-1.5 text-sm font-mono font-medium nav-cta-plate text-foreground border border-foreground/15 hover:border-foreground/30"
+            className="
+              hidden md:inline-flex items-center
+              rounded-full px-4 py-1.5 text-sm font-medium
+              text-foreground/70
+              transition-colors duration-200
+              hover:bg-foreground/5 hover:text-foreground
+            "
           >
             Dashboard
           </Link>
           <Link
             href="/verify"
-            className="hidden md:inline-flex items-center rounded-full px-4 py-1.5 text-sm font-mono font-medium nav-cta-plate text-cyan border border-foreground/15 hover:border-foreground/30"
+            className="
+              hidden md:inline-flex items-center
+              rounded-full bg-foreground px-4 py-1.5
+              text-sm font-medium text-background
+              transition-colors duration-200
+              hover:bg-foreground/90
+            "
           >
             Verify
           </Link>

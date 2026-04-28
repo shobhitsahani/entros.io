@@ -1,60 +1,69 @@
 import Image from "next/image";
-import { TextShimmer } from "@/components/ui/text-shimmer";
 import { integrationPartners } from "@/data/integration-partners";
 import { getIcon } from "@/lib/icons";
 
+/**
+ * Partners — 4×4 hairline grid of integration targets. Each cell:
+ * logo + name, category label, one-line description.
+ */
 export function PartnersSection() {
   return (
-    <section className="mx-auto max-w-7xl px-6 py-20">
-      <TextShimmer
-        as="span"
-        className="font-mono text-base tracking-widest uppercase"
-        duration={3}
-      >
-        {"// TARGET INTEGRATIONS"}
-      </TextShimmer>
+    <section className="border-t border-border">
+      <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+        <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+          // TARGET INTEGRATIONS
+        </span>
 
-      <h2 className="mt-6 font-sans text-2xl font-semibold text-foreground md:text-3xl">
-        Building with the Solana ecosystem
-      </h2>
+        <h2 className="mt-6 max-w-2xl font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+          Building for the Solana ecosystem<span className="text-cyan">.</span>
+        </h2>
 
-      <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {integrationPartners.map((partner) => {
-          const Icon = getIcon(partner.icon);
-          return (
-            <div
-              key={partner.name}
-              className="rounded-xl border border-border bg-surface/30 p-6 transition-colors hover:border-border-hover"
-            >
-              <div className="mb-3 flex items-center gap-3">
-                {partner.logoUrl ? (
-                  <Image
-                    src={partner.logoUrl}
-                    alt={`${partner.name} logo`}
-                    width={28}
-                    height={28}
-                    className="rounded-full"
-                    unoptimized
-                  />
-                ) : (
-                  <Icon
-                    className="h-7 w-7 text-foreground/50"
-                    strokeWidth={1.5}
-                  />
-                )}
-                <h3 className="font-sans text-base font-semibold text-foreground">
-                  {partner.name}
-                </h3>
+        <p className="mt-6 max-w-2xl text-base leading-relaxed text-foreground/65 md:text-lg">
+          Sequenced outreach plan across identity primitives, agent
+          infrastructure, DeFi, governance, and creator tooling. Goal:
+          one signed-up integrator pilot before mainnet.
+        </p>
+
+        <div className="mt-16 grid grid-cols-2 gap-px border-y border-border bg-border md:grid-cols-3 lg:grid-cols-4">
+          {integrationPartners.map((partner) => {
+            const Icon = getIcon(partner.icon);
+            return (
+              <div
+                key={partner.name}
+                className="flex flex-col bg-background p-6"
+              >
+                <div className="mb-4 flex items-center gap-3">
+                  {partner.logoUrl ? (
+                    <Image
+                      src={partner.logoUrl}
+                      alt={`${partner.name} logo`}
+                      width={28}
+                      height={28}
+                      className="rounded-full"
+                      unoptimized
+                    />
+                  ) : (
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full border border-border">
+                      <Icon
+                        className="h-4 w-4 text-foreground/50"
+                        strokeWidth={1.5}
+                      />
+                    </div>
+                  )}
+                  <h3 className="font-display text-base font-medium tracking-tight text-foreground">
+                    {partner.name}
+                  </h3>
+                </div>
+                <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-cyan/80">
+                  {partner.category}
+                </span>
+                <p className="mt-3 text-sm leading-relaxed text-foreground/55">
+                  {partner.description}
+                </p>
               </div>
-              <span className="text-xs font-mono uppercase tracking-widest text-cyan">
-                {partner.category}
-              </span>
-              <p className="mt-2 text-sm text-foreground/60">
-                {partner.description}
-              </p>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     </section>
   );

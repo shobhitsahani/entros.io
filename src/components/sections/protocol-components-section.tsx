@@ -1,72 +1,107 @@
-import { TextShimmer } from "@/components/ui/text-shimmer";
-import { GlowCard } from "@/components/ui/glow-card";
+import {
+  AsciiCircuitScene,
+  AsciiRelayScene,
+  AsciiSDKScene,
+  AsciiShieldScene,
+  AsciiTriadScene,
+} from "@/components/ui/ascii-scenes";
 import { protocolComponents } from "@/data/protocol-components";
-import { getIcon } from "@/lib/icons";
 
+const SCENES = [
+  AsciiSDKScene,
+  AsciiCircuitScene,
+  AsciiTriadScene,
+  AsciiRelayScene,
+  AsciiShieldScene,
+];
+
+/**
+ * Protocol Components—five layers, one row each. ASCII scene on one
+ * side, copy on the other; alternates per row so the eye walks down
+ * the page in a zigzag. Numbered (01–05) for ordering.
+ */
 export function ProtocolComponentsSection() {
   return (
-    <section className="mx-auto max-w-7xl px-6 py-20">
-      <TextShimmer
-        as="span"
-        className="font-mono text-base tracking-widest uppercase"
-        duration={3}
-      >
-        {"// PROTOCOL COMPONENTS"}
-      </TextShimmer>
+    <section className="border-t border-border">
+      <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+        <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+          // PROTOCOL COMPONENTS
+        </span>
 
-      <h2 className="mt-6 font-sans text-2xl font-semibold text-foreground md:text-3xl">
-        Five layers, one proof
-      </h2>
+        <h2 className="mt-6 max-w-2xl font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+          Five layers, one proof<span className="text-cyan">.</span>
+        </h2>
 
-      <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-6">
-        {protocolComponents.map((component, i) => {
-          const Icon = getIcon(component.icon);
-          const colSpan = i < 3 ? "md:col-span-2" : "md:col-span-3";
-          return (
-            <GlowCard key={component.title} className={`flex flex-col ${colSpan}`}>
-              <Icon
-                className="mb-4 h-8 w-8 text-foreground/50"
-                strokeWidth={1.5}
-              />
-              <h3 className="font-sans text-xl font-semibold text-foreground">
-                {component.title}
-              </h3>
-              <p className="mt-1 text-sm text-cyan font-mono">
-                {component.subtitle}
-              </p>
-              <p className="mt-4 text-sm leading-relaxed text-foreground/60">
-                {component.description}
-              </p>
-              <ul className="mt-4 space-y-2">
-                {component.highlights.map((highlight) => (
-                  <li
-                    key={highlight}
-                    className="flex items-start gap-2 text-sm text-foreground/60"
-                  >
-                    <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-cyan" />
-                    {highlight}
-                  </li>
-                ))}
-              </ul>
-              {component.links && component.links.length > 0 && (
-                <div className="mt-6 pt-4 border-t border-border flex gap-4">
-                  {component.links.map((link) => (
-                    <a
-                      key={link.href}
-                      href={link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-sm text-foreground/70 transition-colors hover:text-foreground"
-                    >
-                      {link.label}
-                      <span className="text-xs" aria-hidden="true">↗</span>
-                    </a>
-                  ))}
+        <div className="mt-20 flex flex-col gap-20 md:gap-28">
+          {protocolComponents.map((component, idx) => {
+            const number = String(idx + 1).padStart(2, "0");
+            const reverse = idx % 2 === 1;
+            const Scene = SCENES[idx] ?? AsciiSDKScene;
+            return (
+              <div
+                key={component.title}
+                className={`grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16 ${
+                  reverse ? "lg:[&>*:first-child]:order-2" : ""
+                }`}
+              >
+                <Scene
+                  label={`FIGURE ${number}`}
+                  aspect="4/3"
+                  className="lg:aspect-[5/4]"
+                />
+
+                {/* Copy side */}
+                <div>
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-xs tracking-[0.2em] text-cyan">
+                      {number}
+                    </span>
+                    <span className="h-px flex-1 bg-border" />
+                  </div>
+
+                  <h3 className="mt-6 font-display text-2xl font-medium tracking-tight text-foreground md:text-3xl md:leading-[1.05]">
+                    {component.title}
+                  </h3>
+                  <p className="mt-2 font-mono text-xs uppercase tracking-[0.15em] text-cyan/80">
+                    {component.subtitle}
+                  </p>
+                  <p className="mt-5 text-base leading-relaxed text-foreground/65">
+                    {component.description}
+                  </p>
+                  <ul className="mt-6 space-y-2">
+                    {component.highlights.map((highlight) => (
+                      <li
+                        key={highlight}
+                        className="flex items-start gap-2 text-sm text-foreground/55"
+                      >
+                        <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-cyan" />
+                        {highlight}
+                      </li>
+                    ))}
+                  </ul>
+                  {component.links && component.links.length > 0 && (
+                    <div className="mt-6 flex gap-5 border-t border-border pt-5">
+                      {component.links.map((link) => (
+                        <a
+                          key={link.href}
+                          href={link.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-sm text-foreground/70 transition-colors hover:text-foreground"
+                        >
+                          {link.label}
+                          <span className="text-xs" aria-hidden="true">
+                            ↗
+                          </span>
+                        </a>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
-            </GlowCard>
-          );
-        })}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

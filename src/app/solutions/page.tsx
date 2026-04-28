@@ -1,10 +1,7 @@
 import Link from "next/link";
-import { SubpageHero } from "@/components/sections/subpage-hero";
-import { SolutionsHeroAnimation } from "@/components/sections/solutions-hero-animation";
+import { ArrowRight } from "lucide-react";
 import { SolutionCasesSection } from "@/components/sections/solution-cases-section";
-import { IntegrationSection } from "@/components/sections/integration-section";
 import { PartnersSection } from "@/components/sections/partners-section";
-import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { pageMetadata } from "@/lib/page-metadata";
 
 export const metadata = pageMetadata({
@@ -17,28 +14,94 @@ export const metadata = pageMetadata({
 export default function Solutions() {
   return (
     <>
-      <SubpageHero
-        title="Solutions"
-        subtitle={"Proof-of-Personhood for protocols that need to know their users are real,\nwithout learning who they are."}
-      />
-      <SolutionsHeroAnimation />
+      {/* Hero — editorial typography, no visual element on the right.
+          The other pages lead with animation, diagram, or stat panel;
+          this one lets the headline carry the weight, since the use
+          cases below ARE the visual story. */}
+      <section>
+        <div className="mx-auto max-w-7xl px-6 pt-32 pb-24 md:pt-40 md:pb-32">
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+            // SOLUTIONS
+          </span>
+
+          <h1 className="mt-6 font-display text-5xl font-medium leading-[1.02] tracking-[-0.02em] text-foreground md:text-6xl lg:text-7xl">
+            Proof of personhood<span className="text-cyan">,</span>
+            <br />
+            wherever bots break things<span className="text-cyan">.</span>
+          </h1>
+
+          <p className="mt-12 max-w-3xl text-base leading-relaxed text-foreground/70 md:text-lg">
+            For protocols that need to know their users are real,
+            without learning who they are. Five concrete patterns,
+            one SDK, deployed across the Solana ecosystem.
+          </p>
+
+          <div className="mt-10 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+            <Link
+              href="/integrate"
+              className="
+                group inline-flex items-center justify-center gap-2
+                rounded-full bg-foreground px-6 py-3
+                text-sm font-medium text-background
+                transition-colors hover:bg-foreground/90
+              "
+            >
+              Start integrating
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+            <Link
+              href="/verify"
+              className="
+                group inline-flex items-center justify-center gap-2
+                rounded-full border border-foreground/20 px-6 py-3
+                text-sm font-medium text-foreground
+                transition-colors hover:border-foreground/40 hover:bg-foreground/5
+              "
+            >
+              Try the demo
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       <SolutionCasesSection />
-      <IntegrationSection />
       <PartnersSection />
-      <section className="mx-auto max-w-3xl px-6 py-24 text-center">
-        <hr className="mx-auto mb-16 w-24 border-t border-foreground/[0.06]" />
-        <p className="font-mono text-xl tracking-[0.02em] text-foreground md:text-2xl">
-          Ready to integrate?
-        </p>
-        <div className="mt-8 flex justify-center">
-          <Link href="/integrate">
-            <ShimmerButton className="text-sm font-medium lg:text-base">
-              <span className="flex items-center gap-2">
-                Start Integrating
-                <span aria-hidden="true">→</span>
-              </span>
-            </ShimmerButton>
-          </Link>
+
+      {/* Footer CTA */}
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-5xl px-6 py-32 text-center md:py-40">
+          <h2 className="font-display text-4xl font-medium tracking-tight text-foreground md:text-6xl md:leading-[1.05]">
+            Verify once<span className="text-cyan">.</span>
+            <br />
+            Compose anywhere<span className="text-cyan">.</span>
+          </h2>
+          <div className="mt-12 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              href="/integrate"
+              className="
+                group inline-flex items-center justify-center gap-2
+                rounded-full bg-foreground px-6 py-3
+                text-sm font-medium text-background
+                transition-colors hover:bg-foreground/90
+              "
+            >
+              Start integrating
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+            <Link
+              href="/technology"
+              className="
+                group inline-flex items-center justify-center gap-2
+                rounded-full border border-foreground/20 px-6 py-3
+                text-sm font-medium text-foreground
+                transition-colors hover:border-foreground/40 hover:bg-foreground/5
+              "
+            >
+              How it works
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+          </div>
         </div>
       </section>
     </>

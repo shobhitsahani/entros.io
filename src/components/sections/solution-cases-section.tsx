@@ -1,113 +1,100 @@
-"use client";
-
-import { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
-import { TextShimmer } from "@/components/ui/text-shimmer";
+import {
+  AsciiAirdropScene,
+  AsciiBotScene,
+  AsciiCreatorScene,
+  AsciiMintScene,
+  AsciiVoteScene,
+} from "@/components/ui/ascii-scenes";
 import { solutionCases } from "@/data/solution-cases";
-import { getIcon } from "@/lib/icons";
-import { cn } from "@/lib/utils";
-import { ChevronDown } from "lucide-react";
 
+const SCENES = [
+  AsciiAirdropScene,
+  AsciiVoteScene,
+  AsciiMintScene,
+  AsciiCreatorScene,
+  AsciiBotScene,
+];
+
+/**
+ * Solution Cases — five editorial spreads. Each case is a full row
+ * with a number badge + title + category at top, an ASCII scene on
+ * one side (alternating L/R), and the Problem · Solution · Example
+ * triplet on the other. Reads as a magazine feature spread.
+ */
 export function SolutionCasesSection() {
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-
   return (
-    <section className="mx-auto max-w-7xl px-6 py-20">
-      <TextShimmer
-        as="span"
-        className="font-mono text-base tracking-widest uppercase"
-        duration={3}
-      >
-        {"// USE CASES"}
-      </TextShimmer>
+    <section className="border-t border-border">
+      <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+        <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+          // USE CASES
+        </span>
 
-      <h2 className="mt-6 font-sans text-2xl font-semibold text-foreground md:text-3xl">
-        Where Entros fits
-      </h2>
+        <h2 className="mt-6 max-w-2xl font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+          Where Entros fits<span className="text-cyan">.</span>
+        </h2>
 
-      <div className="mt-10 space-y-2">
-        {solutionCases.map((c, i) => {
-          const Icon = getIcon(c.icon);
-          const isExpanded = expandedIndex === i;
-
-          return (
-            <motion.div
-              key={c.title}
-              layout
-              onClick={() => setExpandedIndex(isExpanded ? null : i)}
-              className={cn(
-                "cursor-pointer rounded-xl border bg-surface/30 transition-colors",
-                isExpanded
-                  ? "border-border-hover"
-                  : "border-border hover:border-border-hover"
-              )}
-            >
-              <div className="flex items-center gap-4 px-6 py-5">
-                <Icon
-                  className={cn(
-                    "h-5 w-5 shrink-0 transition-colors",
-                    isExpanded ? "text-cyan" : "text-foreground/60"
-                  )}
-                  strokeWidth={1.5}
+        <div className="mt-10 flex flex-col gap-40 md:gap-56">
+          {solutionCases.map((c, idx) => {
+            const number = String(idx + 1).padStart(2, "0");
+            const reverse = idx % 2 === 1;
+            const Scene = SCENES[idx] ?? AsciiAirdropScene;
+            return (
+              <article
+                key={c.title}
+                className={`grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-20 ${
+                  reverse ? "lg:[&>*:first-child]:order-2" : ""
+                }`}
+              >
+                <Scene
+                  label={`CASE ${number}`}
+                  aspect="4/5"
+                  className="lg:col-span-5 lg:h-full"
                 />
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-sans text-base font-semibold text-foreground">
+
+                {/* Copy side */}
+                <div className="lg:col-span-7">
+                  <div className="flex items-center gap-4">
+                    <span className="font-mono text-xs tracking-[0.2em] text-cyan">
+                      {number}
+                    </span>
+                    <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/50">
+                      {c.category}
+                    </span>
+                    <span className="h-px flex-1 bg-border" />
+                  </div>
+
+                  <h3 className="mt-6 font-display text-3xl font-medium tracking-tight text-foreground md:text-4xl md:leading-[1.05]">
                     {c.title}
                   </h3>
-                </div>
-                <span className="hidden sm:block text-xs font-mono uppercase tracking-widest text-cyan shrink-0">
-                  {c.category}
-                </span>
-                <ChevronDown
-                  className={cn(
-                    "h-4 w-4 shrink-0 text-foreground/30 transition-transform duration-200",
-                    isExpanded && "rotate-180 text-cyan"
-                  )}
-                  strokeWidth={1.5}
-                />
-              </div>
 
-              <AnimatePresence initial={false}>
-                {isExpanded && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.25, ease: "easeInOut" }}
-                    className="overflow-hidden"
-                  >
-                    <div className="grid grid-cols-1 gap-6 border-t border-border px-6 py-6 md:grid-cols-3">
-                      <div>
-                        <p className="text-xs font-mono uppercase tracking-widest text-muted mb-2">
-                          Problem
-                        </p>
-                        <p className="text-sm leading-relaxed text-foreground/70">
-                          {c.problem}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs font-mono uppercase tracking-widest text-muted mb-2">
-                          Solution
-                        </p>
-                        <p className="text-sm leading-relaxed text-foreground/70">
-                          {c.solution}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-xs font-mono uppercase tracking-widest text-muted mb-2">
-                          Example
-                        </p>
-                        <p className="text-sm leading-relaxed text-foreground/70">
-                          {c.example}
-                        </p>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          );
-        })}
+                  {/* Single grid so labels share one column track across rows.
+                      pt-[0.2rem] on the label nudges its cap-height onto the
+                      body's first-line baseline, removing visual drift. */}
+                  <dl className="mt-10 grid grid-cols-1 gap-x-6 gap-y-2 md:grid-cols-[6rem_1fr] md:gap-y-6">
+                    <dt className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40 md:pt-[0.2rem]">
+                      Problem
+                    </dt>
+                    <dd className="text-sm leading-relaxed text-foreground/65">
+                      {c.problem}
+                    </dd>
+                    <dt className="font-mono text-[10px] uppercase tracking-[0.2em] text-cyan md:pt-[0.2rem]">
+                      Solution
+                    </dt>
+                    <dd className="text-sm leading-relaxed text-foreground/75">
+                      {c.solution}
+                    </dd>
+                    <dt className="font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40 md:pt-[0.2rem]">
+                      Example
+                    </dt>
+                    <dd className="text-sm leading-relaxed text-foreground/65">
+                      {c.example}
+                    </dd>
+                  </dl>
+                </div>
+              </article>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

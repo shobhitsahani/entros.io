@@ -5,7 +5,6 @@ import type { PulseSession } from "@entros/pulse-sdk";
 import type { VerifyState, VerifyAction } from "@/components/verify/types";
 import { PulseChallenge } from "@/components/verify/pulse-challenge";
 import { ProvingView, VerifiedView, FailedView } from "@/components/verify/step-views";
-import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { usePulse } from "@/components/providers/pulse-provider";
 import { generateWalletlessPhrase } from "@/data/walletless-phrase-words";
 import { Radio } from "lucide-react";
@@ -197,9 +196,19 @@ export function VerifyWalletless({
           )}
         </div>
         <div className="flex justify-center">
-          <ShimmerButton className="text-sm font-medium" onClick={handleStart} disabled={requesting}>
+          <button
+            onClick={handleStart}
+            disabled={requesting}
+            className="
+              inline-flex items-center justify-center gap-2
+              rounded-full bg-foreground px-6 py-3
+              text-sm font-medium text-background
+              transition-colors hover:bg-foreground/90
+              disabled:cursor-not-allowed disabled:opacity-50
+            "
+          >
             {requesting ? "Requesting access..." : "Start Verification"}
-          </ShimmerButton>
+          </button>
         </div>
         <p className="text-center text-xs text-muted">
           Raw data stays on your device. Only the ZK proof and a statistical summary leave.

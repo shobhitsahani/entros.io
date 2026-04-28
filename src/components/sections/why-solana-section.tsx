@@ -1,23 +1,33 @@
-import { TextShimmer } from "@/components/ui/text-shimmer";
 import { Counter } from "@/components/ui/counter";
 import { solanaStats } from "@/data/stats";
 
+/**
+ * Why Solana—horizontal stat row in a hairline grid (2×2 mobile,
+ * 1×4 desktop). Each cell centers a metric and a label.
+ */
 export function WhySolanaSection() {
   return (
-    <section className="mx-auto max-w-7xl px-6 py-20">
-      <TextShimmer
-        as="span"
-        className="font-mono text-base tracking-widest uppercase"
-        duration={3}
-      >
-        {"// WHY SOLANA"}
-      </TextShimmer>
+    <section className="border-t border-border">
+      <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+        <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+          // WHY SOLANA
+        </span>
 
-      <div className="mt-12 border-y border-border py-12">
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+        <h2 className="mt-6 max-w-2xl font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+          Built for the chain
+          where machines already trade<span className="text-cyan">.</span>
+        </h2>
+
+        {/* Hairline grid: bg-border on the outer container shows through
+            the gap-px gaps between cells, giving us auto-responsive
+            dividers at every breakpoint without nth-child gymnastics. */}
+        <div className="mt-16 grid grid-cols-2 gap-px border-y border-border bg-border md:grid-cols-4">
           {solanaStats.map((stat) => (
-            <div key={stat.label} className="text-center">
-              <div className="font-mono text-3xl font-bold text-foreground md:text-4xl">
+            <div
+              key={stat.label}
+              className="flex flex-col items-center justify-center bg-background p-8 text-center"
+            >
+              <div className="font-display text-3xl font-medium tracking-tight text-foreground md:text-4xl">
                 {stat.numericValue != null ? (
                   <Counter
                     target={stat.numericValue}
@@ -28,7 +38,7 @@ export function WhySolanaSection() {
                   stat.value
                 )}
               </div>
-              <p className="mt-2 text-sm text-muted">{stat.label}</p>
+              <p className="mt-3 text-sm text-foreground/50">{stat.label}</p>
             </div>
           ))}
         </div>

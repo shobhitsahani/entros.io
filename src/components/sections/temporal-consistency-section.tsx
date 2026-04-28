@@ -1,8 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { TextShimmer } from "@/components/ui/text-shimmer";
-import { GlowCard } from "@/components/ui/glow-card";
+
+/**
+ * Temporal Consistency—the conceptual heart of Entros. Two-column
+ * split: copy on the left, the bounded-drift waveform on the right.
+ * Below that, three flat phase cards in a hairline grid.
+ */
 
 const phases = [
   {
@@ -25,117 +29,153 @@ const phases = [
   },
 ];
 
-function DriftWaveform({ active }: { active: boolean }) {
-  const points = 60;
-  const width = 400;
-  const height = 120;
-  const mid = height / 2;
-
-  function buildPath(
-    phaseOffset: number,
-    ampScale: number,
-    freqScale: number
-  ): string {
-    const segments: string[] = [];
-    for (let i = 0; i <= points; i++) {
-      const x = (i / points) * width;
-      const t = (i / points) * Math.PI * 4 * freqScale;
-      const y =
-        mid +
-        Math.sin(t + phaseOffset) * 28 * ampScale +
-        Math.sin(t * 2.3 + phaseOffset * 0.7) * 12 * ampScale;
-      segments.push(`${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`);
-    }
-    return segments.join(" ");
+/**
+ * Smooth Catmull-Rom-ish path generator. Each segment is a Bezier
+ * approximation drawn through the sample points so the curve reads
+ * like a fluid waveform rather than a polyline.
+ */
+function buildSmoothPath(
+  width: number,
+  mid: number,
+  phaseOffset: number,
+  ampScale: number,
+  freqScale: number,
+  points: number
+): string {
+  const ys: number[] = [];
+  const xs: number[] = [];
+  for (let i = 0; i <= points; i++) {
+    const x = (i / points) * width;
+    const t = (i / points) * Math.PI * 4 * freqScale;
+    const y =
+      mid +
+      Math.sin(t + phaseOffset) * 56 * ampScale +
+      Math.sin(t * 2.3 + phaseOffset * 0.7) * 22 * ampScale;
+    xs.push(x);
+    ys.push(y);
   }
+  let d = `M${xs[0]!.toFixed(1)},${ys[0]!.toFixed(1)}`;
+  for (let i = 0; i < points; i++) {
+    const x0 = xs[i]!;
+    const y0 = ys[i]!;
+    const x1 = xs[i + 1]!;
+    const y1 = ys[i + 1]!;
+    const cx = (x0 + x1) / 2;
+    // Quadratic Bezier with control midway between the two anchors —
+    // gives smoother, more organic curves than straight L segments.
+    d += ` Q${x0.toFixed(1)},${y0.toFixed(1)} ${cx.toFixed(1)},${((y0 + y1) / 2).toFixed(1)}`;
+  }
+  d += ` T${xs[points]!.toFixed(1)},${ys[points]!.toFixed(1)}`;
+  return d;
+}
 
-  const prevPath = buildPath(0, 0.9, 1.0);
-  const currPath = buildPath(0.4, 1.0, 1.02);
+function DriftWaveform({ active }: { active: boolean }) {
+  const width = 600;
+  const height = 320;
+  const mid = height / 2;
+  const points = 80;
+
+  const prevPath = buildSmoothPath(width, mid, 0, 0.85, 1.0, points);
+  const currPath = buildSmoothPath(width, mid, 0.5, 1.0, 1.02, points);
+  const currAnimated = buildSmoothPath(width, mid, 0.9, 1.05, 1.01, points);
+
+  // Fill paths close the curve back to the bottom edge so a gradient
+  // can wash underneath each wave.
+  const prevFill = `${prevPath} L${width},${height} L0,${height} Z`;
+  const currFill = `${currPath} L${width},${height} L0,${height} Z`;
 
   return (
     <svg
       viewBox={`0 0 ${width} ${height}`}
-      className="w-full h-auto"
+      className="h-auto w-full"
       preserveAspectRatio="xMidYMid meet"
       role="img"
       aria-label="Two behavioral waveforms showing bounded drift between sessions"
     >
-      {/* Bounded region hint */}
-      <rect
-        x="0"
-        y={mid - 44}
-        width={width}
-        height={88}
-        fill="rgba(0, 240, 255, 0.02)"
-        rx="4"
-      />
+      <defs>
+        <linearGradient id="prev-fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="rgba(34, 211, 230, 0.10)" />
+          <stop offset="100%" stopColor="rgba(34, 211, 230, 0)" />
+        </linearGradient>
+        <linearGradient id="curr-fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="rgba(34, 211, 230, 0.28)" />
+          <stop offset="100%" stopColor="rgba(34, 211, 230, 0)" />
+        </linearGradient>
+        <filter id="curr-glow" x="-10%" y="-50%" width="120%" height="200%">
+          <feGaussianBlur stdDeviation="3" />
+        </filter>
+      </defs>
 
-      {/* Previous session waveform */}
+      {/* Previous session—ghost, thin, low opacity, no fill glow */}
+      <path
+        d={prevFill}
+        fill="url(#prev-fill)"
+        className="transition-opacity duration-1000"
+        style={{ opacity: active ? 1 : 0 }}
+      />
       <path
         d={prevPath}
         fill="none"
-        stroke="rgba(0, 240, 255, 0.15)"
-        strokeWidth="1.5"
+        stroke="rgba(34, 211, 230, 0.25)"
+        strokeWidth="2"
+        strokeLinecap="round"
         className="transition-opacity duration-1000"
         style={{ opacity: active ? 1 : 0 }}
       />
 
-      {/* Current session waveform */}
+      {/* Current session—primary, brighter, with gradient fill and soft glow */}
       <path
-        d={currPath}
-        fill="none"
-        stroke="rgba(0, 240, 255, 0.5)"
-        strokeWidth="1.5"
+        d={currFill}
+        fill="url(#curr-fill)"
         className="transition-opacity duration-1000 delay-300"
         style={{ opacity: active ? 1 : 0 }}
       >
         {active && (
           <animate
             attributeName="d"
-            values={`${currPath};${buildPath(0.8, 1.05, 1.01)};${currPath}`}
-            dur="8s"
+            values={`${currFill};${currAnimated} L${width},${height} L0,${height} Z;${currFill}`}
+            dur="9s"
             repeatCount="indefinite"
           />
         )}
       </path>
-
-      {/* Labels */}
-      <text
-        x="0"
-        y="14"
-        className="fill-foreground/20"
-        fontSize="9"
-        fontFamily="var(--font-jetbrains)"
+      <path
+        d={currPath}
+        fill="none"
+        stroke="rgba(34, 211, 230, 0.55)"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        filter="url(#curr-glow)"
+        className="transition-opacity duration-1000 delay-300"
+        style={{ opacity: active ? 0.6 : 0 }}
       >
-        previous session
-      </text>
-      <text
-        x="0"
-        y={height - 6}
-        className="fill-cyan/40"
-        fontSize="9"
-        fontFamily="var(--font-jetbrains)"
+        {active && (
+          <animate
+            attributeName="d"
+            values={`${currPath};${currAnimated};${currPath}`}
+            dur="9s"
+            repeatCount="indefinite"
+          />
+        )}
+      </path>
+      <path
+        d={currPath}
+        fill="none"
+        stroke="rgb(34, 211, 230)"
+        strokeWidth="2"
+        strokeLinecap="round"
+        className="transition-opacity duration-1000 delay-300"
+        style={{ opacity: active ? 1 : 0 }}
       >
-        current session
-      </text>
-
-      {/* Threshold lines */}
-      <line
-        x1="0"
-        y1={mid - 44}
-        x2={width}
-        y2={mid - 44}
-        stroke="rgba(0, 240, 255, 0.06)"
-        strokeDasharray="4 4"
-      />
-      <line
-        x1="0"
-        y1={mid + 44}
-        x2={width}
-        y2={mid + 44}
-        stroke="rgba(0, 240, 255, 0.06)"
-        strokeDasharray="4 4"
-      />
+        {active && (
+          <animate
+            attributeName="d"
+            values={`${currPath};${currAnimated};${currPath}`}
+            dur="9s"
+            repeatCount="indefinite"
+          />
+        )}
+      </path>
     </svg>
   );
 }
@@ -158,50 +198,48 @@ export function TemporalConsistencySection() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="mx-auto max-w-7xl px-6 py-20">
-      <TextShimmer
-        as="span"
-        className="font-mono text-base tracking-widest uppercase"
-        duration={3}
-      >
-        {"// TEMPORAL CONSISTENCY"}
-      </TextShimmer>
+    <section ref={sectionRef} className="border-t border-border">
+      <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+        <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+          // TEMPORAL CONSISTENCY
+        </span>
 
-      <div className="mt-8 grid grid-cols-1 gap-16 lg:grid-cols-2 lg:items-center">
-        <div>
-          <h2 className="font-sans text-2xl font-semibold text-foreground md:text-3xl lg:text-4xl">
-            Identity is not a moment.
-            <br />
-            It is a pattern.
-          </h2>
-          <p className="mt-5 max-w-lg text-base leading-relaxed text-foreground/60">
-            The protocol measures behavioral drift across sessions: small,
-            involuntary changes in voice, motion, and touch that follow a
-            bounded pattern unique to each person. Verify once to register.
-            Verify again to prove you are still you. Each session strengthens
-            the claim.
-          </p>
-        </div>
-
-        <div className="relative">
-          <DriftWaveform active={visible} />
-        </div>
-      </div>
-
-      <div className="mt-16 grid grid-cols-1 gap-6 md:grid-cols-3">
-        {phases.map((phase) => (
-          <GlowCard key={phase.day}>
-            <span className="font-mono text-xs tracking-widest text-cyan uppercase">
-              {phase.day}
-            </span>
-            <h3 className="mt-3 font-sans text-lg font-semibold text-foreground">
-              {phase.title}
-            </h3>
-            <p className="mt-2 text-sm leading-relaxed text-foreground/60">
-              {phase.description}
+        <div className="mt-6 grid grid-cols-1 gap-12 lg:grid-cols-5 lg:items-start lg:gap-16">
+          <div className="lg:col-span-2">
+            <h2 className="font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+              Identity is not a moment<span className="text-cyan">.</span>
+              <br />
+              It is a pattern<span className="text-cyan">.</span>
+            </h2>
+            <p className="mt-6 text-base leading-relaxed text-foreground/65 md:text-lg">
+              The protocol measures behavioral drift across sessions:
+              small, involuntary changes in voice, motion, and touch
+              that follow a bounded pattern unique to each person.
+              Verify once to register. Verify again to prove you are
+              still you. Each session strengthens the claim.
             </p>
-          </GlowCard>
-        ))}
+          </div>
+
+          <div className="lg:col-span-3">
+            <DriftWaveform active={visible} />
+          </div>
+        </div>
+
+        <div className="mt-20 grid grid-cols-1 gap-px border-y border-border bg-border md:grid-cols-3">
+          {phases.map((phase) => (
+            <div key={phase.day} className="bg-background p-8">
+              <span className="font-mono text-xs uppercase tracking-[0.2em] text-cyan">
+                {phase.day}
+              </span>
+              <h3 className="mt-4 font-display text-lg font-medium tracking-tight text-foreground">
+                {phase.title}
+              </h3>
+              <p className="mt-3 text-sm leading-relaxed text-foreground/60">
+                {phase.description}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

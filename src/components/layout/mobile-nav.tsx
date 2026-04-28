@@ -76,14 +76,14 @@ export function MobileNav() {
               <Link
                 href="/dashboard"
                 onClick={() => setOpen(false)}
-                className="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-mono font-medium nav-cta-plate text-foreground border border-foreground/15"
+                className="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-medium text-foreground/70 transition-colors hover:bg-foreground/5 hover:text-foreground"
               >
                 Dashboard
               </Link>
               <Link
                 href="/verify"
                 onClick={() => setOpen(false)}
-                className="inline-flex items-center rounded-full px-4 py-1.5 text-sm font-mono font-medium nav-cta-plate text-cyan border border-foreground/15"
+                className="inline-flex items-center rounded-full bg-foreground px-4 py-1.5 text-sm font-medium text-background transition-colors hover:bg-foreground/90"
               >
                 Verify
               </Link>
