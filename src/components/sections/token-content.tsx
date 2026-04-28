@@ -1,16 +1,5 @@
-import Link from "next/link";
-import { TextShimmer } from "@/components/ui/text-shimmer";
-import { GlowCard } from "@/components/ui/glow-card";
-import { ShimmerButton } from "@/components/ui/shimmer-button";
 import { SolanaIcon } from "@/lib/solana-icon";
-import {
-  Shield,
-  Vote,
-  Layers,
-  Rocket,
-  TrendingUp,
-  Lock,
-} from "lucide-react";
+import { Shield, Vote, Layers, Rocket, TrendingUp, Lock } from "lucide-react";
 import {
   protocolFee,
   flywheel,
@@ -19,228 +8,236 @@ import {
   launchDetails,
 } from "@/data/token-economics";
 
+const UTILITY_ICONS = [Shield, Vote, Layers];
+
 export function TokenContent() {
   return (
-    <div className="mx-auto max-w-4xl px-6 pb-24">
+    <>
       {/* Protocol Fee */}
-      <section className="mt-16">
-        <TextShimmer
-          as="span"
-          className="font-mono text-base tracking-widest uppercase"
-          duration={3}
-        >
-          {"// PROTOCOL FEE"}
-        </TextShimmer>
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+          <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-16">
+            <div className="lg:col-span-5">
+              <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+                // PROTOCOL FEE
+              </span>
 
-        <h2 className="mt-4 font-mono text-xl font-bold text-foreground md:text-2xl">
-          Every verification generates protocol revenue.
-        </h2>
+              <h2 className="mt-6 font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+                Every verification<span className="text-cyan">.</span>
+                <br />
+                On-chain revenue<span className="text-cyan">.</span>
+              </h2>
+            </div>
 
-        <GlowCard className="mt-6">
-          <div className="flex items-start gap-4">
-            <SolanaIcon className="mt-1 h-6 w-6 shrink-0 text-cyan" />
-            <div>
-              <p className="font-mono text-lg font-semibold text-foreground">
-                {protocolFee.amount}
-              </p>
-              <p className="mt-2 text-sm text-foreground/70 leading-relaxed">
-                {protocolFee.description}
-              </p>
-              <p className="mt-3 text-sm text-foreground/70 leading-relaxed">
-                Users pay a small fee to prove they&apos;re human. Integrators
-                read on-chain state for free. Bot farms pay real money at
-                scale.
-              </p>
+            <div className="lg:col-span-7">
+              <div className="border border-border p-6 md:p-8">
+                <div className="flex items-start gap-4">
+                  <SolanaIcon className="mt-1 h-6 w-6 shrink-0 text-cyan" />
+                  <div>
+                    <p className="font-display text-2xl font-medium tracking-tight text-foreground md:text-3xl">
+                      {protocolFee.amount}
+                    </p>
+                    <p className="mt-3 font-mono text-[10px] uppercase tracking-[0.2em] text-foreground/40">
+                      {protocolFee.destination}
+                    </p>
+                  </div>
+                </div>
+
+                <p className="mt-8 text-base leading-relaxed text-foreground/70 md:text-lg">
+                  {protocolFee.description}
+                </p>
+                <p className="mt-4 text-base leading-relaxed text-foreground/65 md:text-lg">
+                  Users pay a small fee to prove they're human. Integrators
+                  read on-chain state for free. Bot farms pay real money at
+                  scale.
+                </p>
+              </div>
             </div>
           </div>
-        </GlowCard>
+        </div>
       </section>
 
       {/* Revenue Flywheel */}
-      <section className="mt-20">
-        <TextShimmer
-          as="span"
-          className="font-mono text-base tracking-widest uppercase"
-          duration={3}
-        >
-          {"// REVENUE FLYWHEEL"}
-        </TextShimmer>
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+            // REVENUE FLYWHEEL
+          </span>
 
-        <h2 className="mt-4 font-mono text-xl font-bold text-foreground md:text-2xl">
-          Verification volume drives token value.
-        </h2>
+          <h2 className="mt-6 max-w-3xl font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+            Verification volume drives token value<span className="text-cyan">.</span>
+          </h2>
 
-        <div className="mt-8 space-y-4">
-          {flywheel.map((step, i) => (
-            <GlowCard key={i}>
-              <div className="flex items-start gap-4">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-cyan/10 font-mono text-sm font-bold text-cyan">
-                  {i + 1}
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-foreground/65 md:text-lg">
+            Five steps. Protocol revenue scales linearly with verification
+            volume. Each step compounds the next.
+          </p>
+
+          <div className="mt-16 grid grid-cols-1 gap-px border-y border-border bg-border md:grid-cols-5">
+            {flywheel.map((step, i) => (
+              <div
+                key={step.step}
+                className="flex flex-col bg-background p-6 md:p-8"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="font-mono text-xs tracking-[0.2em] text-cyan">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span className="h-px flex-1 bg-border" />
                 </div>
-                <div>
-                  <p className="font-mono text-sm font-semibold text-foreground">
-                    {step.step}
-                  </p>
-                  <p className="mt-1 text-sm text-foreground/70 leading-relaxed">
-                    {step.description}
-                  </p>
-                </div>
+
+                <h3 className="mt-6 font-display text-base font-medium tracking-tight text-foreground md:text-lg">
+                  {step.step}
+                </h3>
+
+                <p className="mt-3 text-sm leading-relaxed text-foreground/60">
+                  {step.description}
+                </p>
               </div>
-            </GlowCard>
-          ))}
+            ))}
+          </div>
         </div>
-
-        <p className="mt-6 text-center text-sm text-muted">
-          Protocol revenue scales linearly with verification volume.
-        </p>
       </section>
 
       {/* Token Distribution */}
-      <section className="mt-20">
-        <TextShimmer
-          as="span"
-          className="font-mono text-base tracking-widest uppercase"
-          duration={3}
-        >
-          {"// TOKEN DISTRIBUTION"}
-        </TextShimmer>
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+            // TOKEN DISTRIBUTION
+          </span>
 
-        <h2 className="mt-4 font-mono text-xl font-bold text-foreground md:text-2xl">
-          The governance and staking token of the Entros Protocol.
-        </h2>
+          <h2 className="mt-6 max-w-3xl font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+            Allocation at genesis<span className="text-cyan">.</span>
+          </h2>
 
-        <div className="mt-8 grid gap-3">
-          {tokenDistribution.map((allocation) => (
-            <GlowCard key={allocation.name}>
-              <div className="flex items-center justify-between">
+          <div className="mt-12 border border-border">
+            {tokenDistribution.map((allocation, i) => (
+              <div
+                key={allocation.name}
+                className={`grid grid-cols-1 items-center gap-6 px-6 py-6 md:grid-cols-[1fr_2fr_auto] md:gap-10 md:px-8 ${
+                  i < tokenDistribution.length - 1 ? "border-b border-border" : ""
+                }`}
+              >
                 <div>
-                  <p className="font-mono text-sm font-semibold text-foreground">
+                  <p className="font-display text-lg font-medium tracking-tight text-foreground md:text-xl">
                     {allocation.name}
                   </p>
-                  <p className="text-xs text-muted">{allocation.vesting}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="h-2 w-24 rounded-full bg-foreground/10 overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-cyan"
-                      style={{ width: `${allocation.percentage * 2.5}%` }}
-                    />
-                  </div>
-                  <p className="w-10 text-right font-mono text-sm font-bold text-cyan">
-                    {allocation.percentage}%
+                  <p className="mt-1 font-mono text-[11px] text-foreground/45">
+                    {allocation.vesting}
                   </p>
                 </div>
+                <div className="h-1.5 overflow-hidden bg-foreground/[0.06]">
+                  <div
+                    className="h-full bg-cyan"
+                    style={{ width: `${(allocation.percentage / 30) * 100}%` }}
+                  />
+                </div>
+                <p className="font-display text-2xl font-medium tracking-tight text-cyan md:text-3xl md:min-w-[5rem] md:text-right">
+                  {allocation.percentage}%
+                </p>
               </div>
-            </GlowCard>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Token Utility */}
-      <section className="mt-20">
-        <TextShimmer
-          as="span"
-          className="font-mono text-base tracking-widest uppercase"
-          duration={3}
-        >
-          {"// TOKEN UTILITY"}
-        </TextShimmer>
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+          <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+            // TOKEN UTILITY
+          </span>
 
-        <h2 className="mt-4 font-mono text-xl font-bold text-foreground md:text-2xl">
-          Stake. Govern. Validate.
-        </h2>
+          <h2 className="mt-6 max-w-3xl font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+            Stake<span className="text-cyan">.</span> Govern<span className="text-cyan">.</span> Validate<span className="text-cyan">.</span>
+          </h2>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-3">
-          {tokenUtilities.map((utility, i) => {
-            const icons = [Shield, Vote, Layers];
-            const Icon = icons[i] ?? Shield;
-            return (
-              <GlowCard key={utility.title}>
-                <Icon className="h-5 w-5 text-cyan" />
-                <p className="mt-3 font-mono text-sm font-semibold text-foreground">
-                  {utility.title}
-                </p>
-                <p className="mt-2 text-sm text-foreground/70 leading-relaxed">
-                  {utility.description}
-                </p>
-              </GlowCard>
-            );
-          })}
+          <div className="mt-16 grid grid-cols-1 gap-px border-y border-border bg-border md:grid-cols-3">
+            {tokenUtilities.map((utility, i) => {
+              const Icon = UTILITY_ICONS[i] ?? Shield;
+              return (
+                <div
+                  key={utility.title}
+                  className="flex flex-col bg-background p-8 md:p-10"
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon className="h-4 w-4 text-cyan" strokeWidth={1.5} />
+                    <span className="h-px flex-1 bg-border" />
+                  </div>
+
+                  <h3 className="mt-8 font-display text-xl font-medium tracking-tight text-foreground md:text-2xl">
+                    {utility.title}
+                  </h3>
+
+                  <p className="mt-4 text-sm leading-relaxed text-foreground/65">
+                    {utility.description}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 
       {/* Launch */}
-      <section className="mt-20">
-        <TextShimmer
-          as="span"
-          className="font-mono text-base tracking-widest uppercase"
-          duration={3}
-        >
-          {"// LAUNCH"}
-        </TextShimmer>
+      <section className="border-t border-border">
+        <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
+          <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-16">
+            <div className="lg:col-span-5">
+              <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+                // LAUNCH
+              </span>
 
-        <h2 className="mt-4 font-mono text-xl font-bold text-foreground md:text-2xl">
-          Verified humans only.
-        </h2>
+              <h2 className="mt-6 font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+                Verified humans only<span className="text-cyan">.</span>
+              </h2>
+            </div>
 
-        <GlowCard className="mt-6">
-          <div className="space-y-4">
-            <div className="flex items-start gap-3">
-              <Rocket className="mt-0.5 h-5 w-5 shrink-0 text-cyan" />
-              <div>
-                <p className="font-mono text-sm font-semibold text-foreground">
-                  {launchDetails.mechanism}
-                </p>
-                <p className="mt-1 text-sm text-foreground/70 leading-relaxed">
-                  {launchDetails.airdrop}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <Lock className="mt-0.5 h-5 w-5 shrink-0 text-cyan" />
-              <div>
-                <p className="font-mono text-sm font-semibold text-foreground">
-                  {launchDetails.standard}
-                </p>
-                <p className="mt-1 text-sm text-foreground/70">
-                  Supply fixed at genesis. Confidential Balances for private
-                  staking.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <TrendingUp className="mt-0.5 h-5 w-5 shrink-0 text-cyan" />
-              <div>
-                <p className="font-mono text-sm font-semibold text-foreground">
-                  Revenue-backed from day one
-                </p>
-                <p className="mt-1 text-sm text-foreground/70">
-                  The protocol generates SOL revenue before the token launches.
-                  Treasury accumulates real value. The token amplifies the
-                  flywheel.
-                </p>
-              </div>
+            <div className="lg:col-span-7">
+              <dl className="border border-border">
+                <div className="grid grid-cols-1 gap-4 border-b border-border p-6 md:grid-cols-[auto_1fr] md:gap-8 md:p-8">
+                  <Rocket className="h-5 w-5 text-cyan" strokeWidth={1.5} />
+                  <div>
+                    <dt className="font-display text-base font-medium tracking-tight text-foreground md:text-lg">
+                      {launchDetails.mechanism}
+                    </dt>
+                    <dd className="mt-2 text-sm leading-relaxed text-foreground/65">
+                      {launchDetails.airdrop}
+                    </dd>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 border-b border-border p-6 md:grid-cols-[auto_1fr] md:gap-8 md:p-8">
+                  <Lock className="h-5 w-5 text-cyan" strokeWidth={1.5} />
+                  <div>
+                    <dt className="font-display text-base font-medium tracking-tight text-foreground md:text-lg">
+                      {launchDetails.standard}
+                    </dt>
+                    <dd className="mt-2 text-sm leading-relaxed text-foreground/65">
+                      Supply fixed at genesis. Confidential Balances for
+                      private staking.
+                    </dd>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4 p-6 md:grid-cols-[auto_1fr] md:gap-8 md:p-8">
+                  <TrendingUp className="h-5 w-5 text-cyan" strokeWidth={1.5} />
+                  <div>
+                    <dt className="font-display text-base font-medium tracking-tight text-foreground md:text-lg">
+                      Revenue-backed from day one
+                    </dt>
+                    <dd className="mt-2 text-sm leading-relaxed text-foreground/65">
+                      The protocol generates SOL revenue before the token
+                      launches. Treasury accumulates real value. The token
+                      amplifies the flywheel.
+                    </dd>
+                  </div>
+                </div>
+              </dl>
             </div>
           </div>
-        </GlowCard>
-      </section>
-
-      <section className="mt-20 text-center">
-        <hr className="mx-auto mb-16 w-24 border-t border-foreground/[0.06]" />
-        <p className="font-mono text-xl tracking-[0.02em] text-foreground md:text-2xl">
-          Prove you&apos;re human. Build your Trust Score.
-        </p>
-        <div className="mt-8 flex justify-center">
-          <Link href="/verify">
-            <ShimmerButton className="text-sm font-medium lg:text-base">
-              <span className="flex items-center gap-2">
-                Try the Demo
-                <span aria-hidden="true">→</span>
-              </span>
-            </ShimmerButton>
-          </Link>
         </div>
       </section>
-    </div>
+    </>
   );
 }
