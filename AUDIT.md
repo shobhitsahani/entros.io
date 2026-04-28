@@ -38,7 +38,7 @@ below).
 ### Medium
 
 - [x] **Re-verification sends 3 separate transactions** — Batched all 3 into a single atomic transaction with 250K CU budget using `.instruction()` + `wallet.sendTransaction`. One prompt, atomic revert on failure. Fixed 2026-04-10.
-- [ ] **`any` types for wallet and connection** — Solana adapter types are optional peer deps, can't be strictly typed without making them required. Documented with eslint-disable comments.
+- [x] **`any` types for wallet and connection — DECIDED AGAINST 2026-04-27.** Reviewed: refactoring `wallet: any` and `connection: any` to local `WalletLike` / `ConnectionLike` interfaces would (a) force `as any` casts at every `AnchorProvider` constructor call site (Anchor's Wallet type is structurally specific), (b) break consumers that pass non-fully-conformant wallet objects (entros.io passes `wallet?.adapter` paths that don't perfectly match Anchor's Wallet shape), (c) trade real maintenance burden for marginal type-safety gain that the existing `eslint-disable @typescript-eslint/no-explicit-any` already acknowledges and documents. Real fix path is v1.5/v2.0 when pulse-sdk migrates to `@solana/kit` (web3.js v2) — that migration redefines the wallet/connection surface anyway, making the local-interface refactor a wasted intermediate step. Audit accepts the eslint-disable as adequate documentation. Watch item: re-evaluate when planning the @solana/kit migration.
 - [x] **`verifyProofLocally` uses Node.js `fs` in browser bundle** — Changed to accept VK object directly, no fs import. Fixed 2026-03-23.
 - [x] **`Buffer.from()` in browser-targeted code** — Replaced with `TextEncoder.encode()` and `Uint8Array`. Fixed 2026-03-23.
 - [x] **`@solana/spl-token` missing from peerDependencies** — Added as optional peer dependency. Fixed 2026-03-23.
@@ -215,7 +215,7 @@ kept private per responsible-disclosure convention.
 - [x] **Website `@coral-xyz/anchor` 0.30.1 behind org standard 0.32.1** — Updated to 0.32.1. Fixed.
 - [x] **Website `lucide-react` 0.577 behind v1.x** — Updated to 1.6.0. Fixed.
 - [x] **TypeScript 5.x behind 6.0 across all JS/TS repos** — Updated to 6.0 across pulse-sdk, circuits, protocol-core, token-contracts, website. All compile clean. Fixed.
-- [ ] **Executor `solana-client`/`solana-sdk` 2.2 behind v4.0** — 4.0 is still beta. Using beta in production is worse than stable 2.2. RPC protocol is backward compatible. Upgrade when 4.0 stable releases.
+- [ ] **Executor `solana-client`/`solana-sdk` 2.2 behind latest** — As of 2026-04-27: latest stable is **3.1.14**, latest beta is **4.0.0-beta.7**. We're intentionally on 2.2 because (a) 4.0 still beta — using beta in production is worse than stable; (b) jumping 2.2 → 3.1.14 is a non-trivial migration with breaking changes at the SDK level; (c) RPC protocol is backward compatible across the gap, no client-side urgency. Upgrade trigger: 4.0 stable release, OR a 2.2-specific bug surfaces. Re-checked 2026-04-27.
 - [x] **`mocha` 10.x behind 11.x in protocol-core, token-contracts, circuits** — Updated to 11.x across all three repos. Fixed.
 
 ### Blocked (Anchor 0.32.1 dependency tree)
@@ -224,8 +224,11 @@ kept private per responsible-disclosure convention.
 
 ### Watch (not actionable yet)
 
-- [ ] **Anchor 1.0.0-rc.5 available** — Release candidate, not stable. Migration from 0.32.x will be significant. Monitor for stable release.
-- [ ] **`@solana/kit` (web3.js v2) 6.5 available** — New API replacing `@solana/web3.js`. Ecosystem still migrating. Plan eventual adoption.
+- [ ] **Anchor 1.0.1 stable released — migration deferred** — As of 2026-04-27: Anchor **1.0.1 stable** is on crates.io. All five on-chain programs (entros-anchor, entros-verifier, entros-registry, entros-token, entros-voter-weight) are aligned on **0.32.1**. Migration from 0.32.x → 1.0 is significant (account structure changes, IDL format, error types, breaking API changes). Deferred until post-hackathon: no in-flight Anchor program work in the next 2 weeks would benefit from the upgrade, and migration risk is high without integration test coverage on the new version. Trigger to action: next major work on the on-chain programs where 1.0 features outweigh the migration cost.
+
+- [x] **entros-governance-plugin Anchor version aligned to org standard 0.32.1** — Identified 2026-04-27, resolved same day. The voter weight plugin previously pinned one minor version behind the rest of the on-chain programs. Aligned to org standard via in-place devnet upgrade: program ID `99nwXz...` unchanged, all live state preserved, 38/38 tests pass. Standalone runtime was not affected during the drift period (raw-byte account reading, no Anchor CPI), and the plugin had no production integrators using its IDL.
+
+- [ ] **`@solana/kit` (web3.js v2) 6.8.0 latest** — Stays as a "monitor for ecosystem adoption" item. As of 2026-04-27: 6.8.0 published, but `@solana/web3.js` v1.x is still the dominant ecosystem dep (wallet adapter, Anchor 0.31.x, most integrators). Migrating pulse-sdk would force every consumer to also migrate or stay pinned to an older version. Defer until `@solana/wallet-adapter-base` and Anchor publish kit-compatible majors. Re-checked 2026-04-27.
 
 ### Current (no action needed)
 
