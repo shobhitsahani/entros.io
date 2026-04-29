@@ -20,8 +20,8 @@ export function HeroSection() {
         </h1>
 
         <p className="mt-7 max-w-xl text-base leading-relaxed text-foreground/70 md:mt-8 md:text-lg">
-          Proof of personhood for Solana, verified through behavior over
-          time. Runs entirely on your device, portable across every dApp.
+          Behavioral ZK-proofs for humans. Agent Anchor for the AI operators
+          behind them. On-device, Solana-native, portable across every dApp.
         </p>
 
         <div className="mt-10 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
