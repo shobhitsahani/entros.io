@@ -1,6 +1,15 @@
 # Entros Protocol — Security & Quality Audit Tracker
 
-Last updated: 2026-04-29
+Last updated: 2026-04-30
+
+**Recent activity (2026-04-30):** Mint-receipt binding promoted from log-only
+to enforced on devnet. Every first-verify mint now requires a fresh
+verification-service signature on the (wallet, commitment, timestamp) tuple.
+Attestation requests at the off-chain endpoint now require an explicit wallet
+ownership proof on every call, closing a path where a caller could issue
+attestations against an arbitrary target wallet. Client SDK published as 1.4.2
+with the matching changes; site updated to consume it. No public-API or
+wire-protocol breaking changes.
 
 **Recent activity (2026-04-29):** First-mint receipt binding shipped to
 devnet in log-only mode. The on-chain identity program now inspects the
