@@ -17,6 +17,12 @@ export function PulseProvider({ children }: { children: React.ReactNode }) {
       wasmUrl: process.env.NEXT_PUBLIC_WASM_URL,
       zkeyUrl: process.env.NEXT_PUBLIC_ZKEY_URL,
       debug: process.env.NODE_ENV === "development",
+      // Crypto-unavailable browsers (iOS Safari private mode, Brave shields,
+      // Firefox TCP) hit this callback. `true` keeps the pre-1.3 plaintext
+      // localStorage UX so baselines survive reload. Replacing this with a
+      // user-prompt component is a future enhancement when we want to
+      // surface the privacy choice explicitly to those users.
+      onPrivacyFallback: async () => true,
     };
     return new PulseSDK(config);
   }, []);

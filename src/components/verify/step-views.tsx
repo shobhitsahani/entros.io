@@ -114,6 +114,8 @@ const SOFT_HINT: Record<string, string> = {
     "Speak and move at the same time—they were a bit out of sync.",
   phrase_content_mismatch:
     "Read the phrase clearly at a normal pace, exactly as shown.",
+  validation_unavailable:
+    "We couldn't reach the verification service. Check your connection and try again.",
 };
 
 const SOFT_HINT_FALLBACK =

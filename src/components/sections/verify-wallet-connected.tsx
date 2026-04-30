@@ -274,6 +274,9 @@ export function VerifyWalletConnected({
       "entropy_bounds",
       "temporal_coupling_low",
       "phrase_content_mismatch",
+      // Client-side reason emitted by pulse-sdk when /validate-features is
+      // unreachable (network failure, timeout, abort). Treated as transient.
+      "validation_unavailable",
     ]);
 
     Promise.race([proofPromise, timeoutPromise])
