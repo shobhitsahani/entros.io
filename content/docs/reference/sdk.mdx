@@ -5,7 +5,7 @@ description: Public API surface of @entros/pulse-sdk.
 
 `@entros/pulse-sdk` is the client SDK. It captures behavioral signals on-device, extracts statistical features, hashes the result, generates a zero-knowledge proof, and submits to Solana. This page lists every public export, grouped by purpose.
 
-The current published version is `1.3.0`. Install with `npm install @entros/pulse-sdk`.
+The current published version is `1.5.0`. Install with `npm install @entros/pulse-sdk`. See the [changelog](/docs/reference/changelog) for the upgrade path from earlier versions.
 
 ## Top-level
 
@@ -101,6 +101,36 @@ Statistics utilities also exported: `mean`, `variance`, `skewness`, `kurtosis`, 
 | `fetchIdentityState` | `(wallet, connection) => Promise<IdentityState \| null>` | Read the full Anchor PDA |
 | `storeVerificationData` | `(data) => Promise<void>` | Persist verification state to local storage |
 | `loadVerificationData` | `() => Promise<StoredVerificationData \| null>` | Load persisted state |
+
+## Configuration
+
+`PulseSDK` is constructed with a `PulseConfig`:
+
+```ts
+type PulseConfig = {
+  cluster: "devnet" | "mainnet-beta" | "localnet";
+  rpcEndpoint?: string;
+  relayerUrl?: string;
+  relayerApiKey?: string;
+  zkeyUrl?: string;
+  wasmUrl?: string;
+  threshold?: number;
+  debug?: boolean;
+  // Crypto-unavailable browsers (iOS Safari private mode, Brave shields,
+  // Firefox Total Cookie Protection) hit this callback. Return true to allow
+  // plaintext localStorage; false to keep storage in-memory only (data lost
+  // on reload). Without the callback, the SDK defaults to in-memory only.
+  onPrivacyFallback?: () => Promise<boolean>;
+};
+```
+
+## Verification result reasons
+
+`VerificationResult.reason` (when `success: false`) is a narrow, client-side signal:
+
+- `validation_unavailable` — the executor's `/validate-features` endpoint was unreachable (network failure, timeout, abort). Treat as transient and offer a retry CTA.
+
+The validator's server-side rejections do not surface a category code to the client by design — host code should not depend on a per-check breakdown. Build retry UX around the `success` boolean and an attempt counter, not a reason taxonomy. The `reason` field is absent on every server-side rejection, every on-chain submission failure, and every data-quality rejection.
 
 ## Peer dependencies
 

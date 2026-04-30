@@ -25,7 +25,7 @@ The schema fields:
 | `isHuman` | `bool` | Whether the wallet has a verified Anchor |
 | `trustScore` | `u16` | Snapshot of the Trust Score at attestation time |
 | `verifiedAt` | `i64` | Unix timestamp of the verification |
-| `mode` | `string` | `"wallet-connected"` or `"walletless"` |
+| `mode` | `string` | Always `"wallet-connected"` in production; the field is preserved for forward compatibility |
 
 The attestation PDA is derived from the credential, schema, and user wallet:
 
@@ -77,7 +77,9 @@ Attestations carry an expiry timestamp, configurable per attestation. The defaul
 
 ## Walletless mode
 
-Walletless verifications produce attestations under the same schema, with `mode: "walletless"`. The attestation is the only on-chain record—there is no Anchor PDA, no compounding Trust Score, no persistent identity. Walletless mode is built for low-stakes filtering (CAPTCHA-equivalent surfaces) where a one-shot human signal is sufficient. For any gate that depends on the temporal-identity claim, integrators should require `mode === "wallet-connected"`.
+Walletless mode still exists for low-stakes CAPTCHA-equivalent surfaces, but it does not write to the Solana Attestation Service. Every SAS attestation is now bound to a wallet that signed an ownership proof at issue time — `/attest` requires `wallet_address`, `nonce`, `signature`, and `message` together on every call. The earlier walletless-on-SAS path was removed because it created a griefing surface where any caller could issue an attestation against any target wallet pubkey without proof of control.
+
+Walletless integrations that need a one-shot human signal rely on the executor's client-side ephemeral receipt — short-lived, not persisted on chain. For any gate that depends on the temporal-identity claim (re-verification cadence, accumulated score, returning-operator reasoning), require a wallet-connected verification.
 
 ## Where to look next
 
