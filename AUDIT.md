@@ -9,13 +9,16 @@ verification-service signature on a (wallet, commitment, timestamp)
 receipt. Enforcement flip pending an SDK release + a soak window. No
 public API or wire-protocol breaking changes.
 
-**Recent activity (2026-04-28):** Cross-repo internal hardening pass shipped
-across five repositories (validator, executor, circuits, governance plugin,
-client SDK). Improvements: tighter HTTP-boundary input validation, constant-time
-API-key comparison aligned across services, hardened error reporting paths,
-resource-cleanup hygiene in client sensor capture, and stricter type guards on
-local storage. On-chain governance plugin redeployed in-place (program ID
-unchanged, all existing state preserved). No public-API breaking changes.
+**Recent activity (2026-04-28/29):** Cross-repo internal hardening pass shipped
+across all six active program / service / SDK repositories (validator, executor,
+circuits, governance plugin, client SDK, on-chain protocol). Improvements:
+tighter HTTP-boundary input validation, constant-time API-key comparison aligned
+across services, hardened error reporting paths, resource-cleanup hygiene in
+client sensor capture, stricter type guards on local storage, defense-in-depth
+cross-program account validation on the on-chain identity program, future-dated
+attestation rejection, and a new layout-drift regression test for the on-chain
+config account. On-chain programs redeployed in-place (program IDs unchanged,
+all existing state preserved). No public-API breaking changes.
 
 Running log of resolved bugs, hardening items, and known limitations across
 the protocol's repositories.
