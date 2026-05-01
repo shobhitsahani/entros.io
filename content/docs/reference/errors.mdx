@@ -3,52 +3,87 @@ title: Errors
 description: Error codes returned by each on-chain program.
 ---
 
-Every program returns custom error codes via Anchor's `#[error_code]` macro. The codes are stable across program versions; meanings are documented here.
+Every program returns custom error codes via Anchor's `#[error_code]` macro. The codes start at 6000 and are assigned in declaration order; meanings are documented here. The error variants are append-only across versions, so existing codes are stable.
 
 ## entros-anchor errors
 
 | Code | Name | When |
 | --- | --- | --- |
-| 6000 | `InvalidProof` | The submitted proof failed verifier validation |
-| 6001 | `CommitmentMismatch` | The proof's `commitment_prev` does not match the on-chain `previous_commitment` |
-| 6002 | `BelowMinDistance` | The Hamming distance is below the anti-replay floor |
-| 6003 | `AboveThreshold` | The Hamming distance exceeds the configured threshold |
-| 6004 | `CooldownActive` | A `reset_identity_state` was attempted before the 7-day cooldown elapsed |
-| 6005 | `InsufficientFee` | The transaction did not include the protocol fee |
-| 6006 | `ScoreOverflow` | A score update would exceed `u16::MAX`; clipped to cap instead |
+| 6000 | `InvalidCommitment` | Submitted commitment is all zeros |
+| 6001 | `Unauthorized` | Caller is not the identity owner |
+| 6002 | `ArithmeticOverflow` | Internal arithmetic operation overflowed |
+| 6003 | `InvalidProtocolConfig` | Protocol config account owner or layout is wrong |
+| 6004 | `InvalidIdentityState` | Identity state account failed to deserialize |
+| 6005 | `IdentitySerializationFailed` | Identity state account failed to serialize |
+| 6006 | `VerificationResultWrongOwner` | Verification result account is not owned by the verifier program |
+| 6007 | `StaleVerificationResult` | Verification result account predates the cross-program binding patch |
+| 6008 | `VerifierMismatch` | Verification result was signed by a different authority than the one in the request |
+| 6009 | `ProofExpired` | The verification result is older than `MAX_PROOF_AGE_SECS` (10 minutes) |
+| 6010 | `CommitmentMismatch` | The proof's `commitment_new` does not match the submitted new commitment |
+| 6011 | `PrevCommitmentMismatch` | The proof's `commitment_prev` does not match the identity's current commitment |
+| 6012 | `ResetCooldownActive` | A `reset_identity_state` was attempted before the 7-day cooldown elapsed |
+| 6013 | `UnauthorizedNewWallet` | Caller is not authorized by the old identity to claim a new wallet |
+| 6014 | `ProofFromFuture` | The verification result's `verified_at` is in the future relative to the cluster clock |
+| 6015 | `MissingValidatorReceipt` | `mint_anchor` expected a preceding Ed25519 validator-signed receipt instruction; none was found |
+| 6016 | `ReceiptValidatorMismatch` | Mint receipt was signed by a key that does not match the registered validator pubkey |
+| 6017 | `ReceiptCommitmentMismatch` | Mint receipt commitment does not match the `mint_anchor` commitment argument |
+| 6018 | `ReceiptWalletMismatch` | Mint receipt wallet does not match the mint signer |
+| 6019 | `ReceiptExpired` | Mint receipt has aged past `MAX_RECEIPT_AGE_SECS` (5 minutes) |
+| 6020 | `ReceiptFromFuture` | Mint receipt `validated_at` is in the future relative to the cluster clock |
+| 6021 | `MalformedReceiptMessage` | Mint receipt message has malformed length, layout, or cross-instruction references |
+
+The Receipt* family (6015–6021) only fires on the first-verification path. Re-verification (`update_anchor`) binds via the verifier-program `VerificationResult` PDA, not via the validator-signed mint receipt.
 
 ## entros-verifier errors
 
 | Code | Name | When |
 | --- | --- | --- |
-| 6000 | `Groth16VerificationFailed` | On-chain pairing check failed |
-| 6001 | `InvalidPublicInputs` | Public input count or encoding does not match the circuit |
+| 6000 | `InvalidProofFormat` | Proof bytes don't decode as a valid Groth16 proof |
+| 6001 | `ProofVerificationFailed` | On-chain pairing check failed |
 | 6002 | `ChallengeExpired` | The associated challenge passed its expiry window |
-| 6003 | `ChallengeNotFound` | No challenge exists for the supplied nonce |
-| 6004 | `NonceReused` | The challenge has already been consumed |
+| 6003 | `ChallengeAlreadyUsed` | The challenge was already consumed by a successful `verify_proof` |
+| 6004 | `InvalidPublicInputs` | Public input count, encoding, or value bounds violated |
+| 6005 | `ChallengeNotUsed` | A `close_challenge` was attempted on a challenge that has not been consumed |
+| 6006 | `InvalidNonce` | The challenge nonce is all zeros |
+| 6007 | `ArithmeticOverflow` | Internal arithmetic operation overflowed |
 
 ## entros-registry errors
 
 | Code | Name | When |
 | --- | --- | --- |
-| 6000 | `Unauthorized` | Caller is not the protocol authority |
-| 6001 | `InvalidConfig` | Config update violates an invariant (e.g. fee above ceiling) |
-| 6002 | `InsufficientStake` | Validator stake is below `min_stake` |
-| 6003 | `UnbondingActive` | Validator has an active unbonding period |
-| 6004 | `TreasuryUnderflow` | Withdrawal exceeds available treasury balance |
+| 6000 | `InsufficientStake` | Validator stake is below `min_stake` |
+| 6001 | `ValidatorAlreadyRegistered` | Validator state already exists for this authority |
+| 6002 | `ValidatorNotActive` | Validator state is registered but not currently active |
+| 6003 | `Unauthorized` | Caller is not the expected authority for this instruction |
+| 6004 | `ArithmeticOverflow` | Internal arithmetic operation overflowed |
+| 6005 | `InsufficientTreasuryBalance` | Withdrawal amount exceeds the treasury's available balance |
+| 6006 | `ProgramDataBytes` | ProgramData account bytes are malformed or shorter than expected |
+| 6007 | `WrongUpgradeAuthority` | Caller is not the program's upgrade authority |
+| 6008 | `InvalidProtocolConfig` | Protocol config bytes are malformed |
+| 6009 | `InvalidValidatorPubkey` | Validator pubkey supplied to `set_validator_pubkey` is the zero pubkey |
 
 ## entros-voter-weight errors
 
 | Code | Name | When |
 | --- | --- | --- |
-| 6000 | `InvalidRegistrar` | The registrar does not match the realm/mint pair |
-| 6001 | `AnchorNotFound` | Voter has no Entros Anchor on file |
-| 6002 | `BelowTrustScore` | Voter's score is below the configured `min_trust_score` |
-| 6003 | `VerificationStale` | Voter's last verification is older than `max_verification_age` |
+| 6000 | `InvalidRealmAuthority` | Caller signing the registrar instruction is not the realm authority |
+| 6001 | `MissingIdentityAccount` | Voter's identity account was not supplied via `remaining_accounts` |
+| 6002 | `InvalidIdentityPda` | Identity account address does not match the expected PDA derivation |
+| 6003 | `InvalidIdentityOwner` | Identity account is not owned by the Entros Anchor program |
+| 6004 | `InvalidIdentityData` | Identity account data is shorter than the expected layout |
+| 6005 | `InsufficientTrustScore` | Voter's score is below the registrar's `min_trust_score` |
+| 6006 | `VerificationExpired` | Voter's last verification is older than `max_verification_age` |
+| 6007 | `VoterWeightRecordRealmMismatch` | Voter weight record realm does not match the registrar |
+| 6008 | `VoterWeightRecordMintMismatch` | Voter weight record mint does not match the registrar |
+| 6009 | `VoterWeightRecordOwnerMismatch` | Voter weight record owner does not match the voter authority |
+| 6010 | `RealmHasNoAuthority` | The realm has no authority configured; registrar updates require one |
+| 6011 | `GoverningTokenOwnerSignerMismatch` | The instruction's `governing_token_owner` does not match the signer |
+| 6012 | `InvalidMaxVerificationAge` | `max_verification_age` must be greater than zero |
+| 6013 | `InvalidMaxVoterWeight` | `max_voter_weight` must be greater than zero |
 
-## Handling errors in the SDK
+## SDK and HTTP errors
 
-Every SDK submission helper returns a `SubmissionResult`:
+`@entros/pulse-sdk` returns a `SubmissionResult` from every submission helper:
 
 ```ts
 type SubmissionResult = {
@@ -59,22 +94,48 @@ type SubmissionResult = {
 };
 ```
 
-On success, `txSignature` is the verification transaction signature and `attestationTx` (when present) is the SAS attestation write. On failure, `error` carries the user-surfaceable message; the underlying program error code, if any, is included in that string and can be matched on:
+On success, `txSignature` is the verification transaction signature. `attestationTx`, when present, is the SAS attestation write. On failure, `error` carries the user-surfaceable message; the underlying program error code, when one exists, is included in that string and can be matched on.
+
+### Chain-side transaction failures
+
+Since 1.5.0, the SDK throws when an on-chain transaction reverts. Earlier versions silently returned `success: true` for transactions that were included on chain but failed during execution—an easy way to ship a "verified!" UI for a tx that mutated nothing. The thrown error preserves the JSON `InstructionError` shape so callers can extract the `Custom` code:
 
 ```ts
-const result = await submitViaWallet(proof, commitment, options);
+const result = await session.complete(wallet, connection);
 if (!result.success) {
-  if (result.error?.includes("6004")) {
-    showCooldownMessage();
-  } else if (result.error?.includes("6005")) {
-    showFeePrompt();
+  // result.error is one of:
+  //   "Transaction failed on chain: {\"InstructionError\":[0,{\"Custom\":6011}]} (sig=...)"  // PrevCommitmentMismatch
+  //   "Transaction failed on chain: {\"InstructionError\":[1,{\"Custom\":6015}]} (sig=...)"  // MissingValidatorReceipt
+  //   "Transaction failed on chain: {\"InstructionError\":[0,\"InsufficientFundsForRent\"]}"
+  //   ...or a non-chain failure (network, wallet rejected, etc.)
+  const customMatch = result.error?.match(/"Custom":(\d+)/);
+  if (customMatch) {
+    const code = Number(customMatch[1]);
+    if (code === 6012) showCooldownMessage();
+    else if (code === 6011) showStaleBaselinePrompt();
+    else showGenericError(`Program error ${code}`);
   } else {
     showGenericError(result.error);
   }
 }
 ```
 
+### `/attest` requires wallet ownership proof
+
+A request to the executor's `/attest` endpoint now requires `wallet_address`, `nonce`, `signature`, and `message` together on every call. Missing any of those returns:
+
+```json
+{ "error": "wallet_ownership_required" }
+```
+
+with HTTP 400. The signed message format is `Entros-ATTEST:{wallet_address}:{timestamp_secs}`. The walletless attestation path was removed—wallets that cannot sign should not call `/attest` at all.
+
+### Response padding
+
+Authenticated executor responses include an opaque `_padding` field of repeated ASCII characters that pads the JSON to a fixed byte length. Treat it as forward-compatible noise: ignore it on parse, do not surface it to users, do not assert on its content or length. It exists to defeat byte-length analysis of response classes.
+
 ## Where to look next
 
 - [Reference: Programs](/docs/reference/programs)—instruction documentation that defines when each error fires
 - [Reference: SDK](/docs/reference/sdk)—submission helper signatures
+- [Reference: Changelog](/docs/reference/changelog)—when each error variant was introduced

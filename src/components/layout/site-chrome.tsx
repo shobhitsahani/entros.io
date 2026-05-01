@@ -14,8 +14,9 @@ export function SiteChrome({
 }) {
   const pathname = usePathname();
   const inDocs = pathname?.startsWith("/docs") ?? false;
+  const inEmbed = pathname?.startsWith("/embed") ?? false;
 
-  if (inDocs) return <>{children}</>;
+  if (inDocs || inEmbed) return <>{children}</>;
 
   return (
     <>

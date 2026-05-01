@@ -10,9 +10,9 @@ export function FooterCTASection() {
     <section className="border-t border-border">
       <div className="mx-auto max-w-5xl px-6 py-32 text-center md:py-40">
         <h2 className="font-display text-4xl font-medium tracking-tight text-foreground md:text-6xl md:leading-[1.05]">
-          The future of identity
+          Identity that compounds
           <br />
-          is temporal, not static<span className="text-cyan">.</span>
+          over time<span className="text-cyan">.</span>
         </h2>
 
         <div className="mt-12 flex flex-col items-center justify-center gap-3 sm:flex-row">

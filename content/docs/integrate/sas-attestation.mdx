@@ -78,13 +78,15 @@ For an Anchor program that gates on the attestation rather than the underlying A
 
 ## Walletless vs wallet-connected
 
-Walletless verifications produce attestations under the same schema, with `mode: "walletless"`. The attestation is the only on-chain record—there is no Anchor PDA, no Trust Score, no persistent identity. The mode is built for low-stakes filtering (CAPTCHA-equivalent) where a one-shot human signal is sufficient.
+The Solana Attestation Service is wallet-only: every successful attestation is bound to a wallet that signed an ownership proof at issue time. The walletless tier — designed for CAPTCHA-equivalent one-shot human signals — does not write to SAS. Walletless integrations rely on a client-side ephemeral receipt produced by the executor, not a persistent on-chain attestation.
 
-For any gate that depends on the temporal-identity claim—re-verification cadence, accumulated score, or the ability to reason about a returning operator—require `mode === "wallet-connected"`:
+The earlier walletless-on-SAS path was removed because it created a griefing surface where any caller could issue an attestation against any target wallet pubkey without proof of control. `/attest` now requires `wallet_address`, `nonce`, `signature`, and `message` together on every call; missing any of those returns HTTP 400 with `error: "wallet_ownership_required"`. See [Errors → SDK and HTTP errors](/docs/reference/errors#sdk-and-http-errors) for the response shape.
+
+The `mode` field on `EntrosAttestation` is preserved for forward compatibility (always `"wallet-connected"` in current production) and gates that depend on temporal-identity claims — re-verification cadence, accumulated score, returning-operator reasoning — can ignore it:
 
 ```ts
-if (attestation.mode !== "wallet-connected") {
-  // route to walletless-tier handling, or require a wallet-connected verification
+if (!attestation.isHuman || attestation.expired) {
+  // route to your no-attestation handling
 }
 ```
 

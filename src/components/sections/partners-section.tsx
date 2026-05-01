@@ -19,9 +19,9 @@ export function PartnersSection() {
         </h2>
 
         <p className="mt-6 max-w-2xl text-base leading-relaxed text-foreground/65 md:text-lg">
-          Sequenced outreach plan across identity primitives, agent
-          infrastructure, DeFi, governance, and creator tooling. Goal:
-          one signed-up integrator pilot before mainnet.
+          Integration surfaces mapped across identity primitives, agent
+          infrastructure, DeFi, governance, and creator tooling. Each
+          reads the same on-chain Trust Score with zero integration cost.
         </p>
 
         <div className="mt-16 grid grid-cols-2 gap-px border-y border-border bg-border md:grid-cols-3 lg:grid-cols-4">

@@ -233,9 +233,29 @@ function isRateLimitedError(error: string): boolean {
   return error.toLowerCase().includes("too many attempts");
 }
 
+// pulse-sdk 1.5.0+ surfaces on-chain Anchor reverts as:
+//   Transaction failed on chain: {"InstructionError":[N,{"Custom":CODE}]}
+// Code 6011 is `PrevCommitmentMismatch` from entros-anchor — the local
+// baseline produces a `commitment_prev` that doesn't match the on-chain
+// identity. The user-actionable fix is the same as missing-baseline:
+// rotate the on-chain commitment via reset.
+function isPrevCommitmentMismatchError(error: string): boolean {
+  return /"Custom":\s*6011\b/.test(error);
+}
+
+// Catch-all for any other on-chain Anchor program revert (cooldown,
+// proof-from-future, missing receipt, etc.). Routes to a friendly
+// "verification failed" surface instead of leaking the raw
+// `{"InstructionError":[N,{"Custom":N}]}` JSON.
+function isProgramRevertError(error: string): boolean {
+  return error.includes("InstructionError") || /"Custom":\s*\d+/.test(error);
+}
+
 type FailureKind =
   | { kind: "relayer-down" }
   | { kind: "missing-baseline"; canReset: boolean }
+  | { kind: "stale-baseline"; canReset: boolean }
+  | { kind: "program-revert" }
   | { kind: "insufficient-sol" }
   | { kind: "user-rejection" }
   | { kind: "stale-blockhash" }
@@ -251,6 +271,12 @@ function categorizeFailure(error: string, canResetBaseline: boolean): FailureKin
   if (isUserRejectionError(error)) return { kind: "user-rejection" };
   if (isStaleBlockhashError(error)) return { kind: "stale-blockhash" };
   if (isRateLimitedError(error)) return { kind: "rate-limited" };
+  // Specific Custom code routes before the generic program-revert bucket
+  // so we can offer the Reset baseline action for 6011.
+  if (isPrevCommitmentMismatchError(error)) {
+    return { kind: "stale-baseline", canReset: canResetBaseline };
+  }
+  if (isProgramRevertError(error)) return { kind: "program-revert" };
   return { kind: "generic", message: error };
 }
 
@@ -294,6 +320,24 @@ export function FailedView({
         };
         dismissLabel = "Cancel";
       }
+      break;
+    case "stale-baseline":
+      title = "Baseline out of sync";
+      body =
+        "Your Entros Anchor on-chain doesn't match the baseline on this device. Reset your baseline to re-enroll from this device.";
+      if (failure.canReset && onResetBaseline) {
+        secondaryAction = {
+          label: "Reset baseline",
+          onClick: onResetBaseline,
+          tone: "danger",
+        };
+        dismissLabel = "Cancel";
+      }
+      break;
+    case "program-revert":
+      title = "Verification failed";
+      body =
+        "The on-chain program rejected this verification. Please try again.";
       break;
     case "insufficient-sol":
       // MAINNET TODO (master-list #124): rewrite devnet-specific copy + CTA.

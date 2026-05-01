@@ -6,7 +6,7 @@ export const solutionCases: SolutionCase[] = [
     title: "Sybil-Resistant Airdrops",
     category: "DeFi",
     problem:
-      "Jupiter's 2025 Jupuary distributed 700M JUP across 2M wallets, with multi-wallet farming patterns detected post-hoc and filtered after the fact. The 2026 Jupuary was delayed from January to May and reduced to 400M JUP. Meow has publicly stated the path forward is enforcing higher minimum thresholds and requiring proof of humanness before claims.",
+      "Jupiter filtered 750,000+ wallets as sybil before Jupuary 2025 distribution. The 2026 round was cut sharply by DAO vote and postponed. Every major Solana airdrop relitigates sybil from scratch because existing identity checks verify a moment, not sustained human presence over time.",
     solution:
       "Gate airdrop claims on Entros Anchor with a minimum Trust Score (e.g., 500+). Trust Score requires sustained re-verification over time, making bot farming slow and expensive. Progressive scoring means 100 verifications in one day scores less than weekly verifications over 3 months.",
     example:
@@ -17,18 +17,18 @@ export const solutionCases: SolutionCase[] = [
     title: "Verified Governance",
     category: "DAOs",
     problem:
-      "Token-weighted governance fails at predictable moments. Mango Markets 2022: Avi Eisenberg used his MNGO position to vote a proposal keeping $47M of his own oracle-manipulation drain. A Solana DAO 2025: an attacker filed 10 self-funded proposals, each clearing token-balance quorum, draining ~$230K on the 10th. Chainalysis 10-DAO study: under 1% of holders control 90% of votes; turnout under 10%. Token weight ≠ community will.",
+      "Token-weighted governance fails at predictable moments. Mango Markets 2022: Avi Eisenberg used his MNGO position to vote a proposal keeping $47M of his own oracle-manipulation drain. Chainalysis found that across major DAOs, under 1% of holders control over 90% of voting power, with turnout typically below 10%. Token weight is not community will.",
     solution:
       "Voters must hold an Entros Anchor with minimum Trust Score and recent verification. The Realms voter-weight plugin gates voting on verified-personhood, not token holdings. The whale's bag becomes one vote. Spam-quorum requires verified humans, not allocations.",
     example:
-      "A DAO using Realms gates voting on Entros Trust Score, not just token holdings. One human, one vote—without document upload, without face scan, without a hardware visit. Plugin shipped on devnet, spl-governance compatible.",
+      "A DAO using Realms gates voting on Entros Trust Score, not just token holdings. One human, one vote—verified behaviorally in 12 seconds on any device. Plugin shipped on devnet, spl-governance compatible.",
   },
   {
     icon: "gamepad",
     title: "Fair Mints and Competitions",
     category: "NFT / DeFi",
     problem:
-      "NFT drops at launch are bot-minted at scale. Referral programs and trading competitions on perp DEXes get sybil-farmed across hundreds of accounts. Filtering wallets without forcing KYC is the unsolved layer.",
+      "NFT drops at launch are bot-minted at scale. Referral programs and trading competitions on perp DEXes get sybil-farmed across hundreds of accounts. Filtering wallets without collecting identity documents remains a gap.",
     solution:
       "Mint gate: one human per allocation, verified by Anchor. Competition entry: require Anchor age > 30 days and recent verification. Short-lived bot accounts with zero trust cannot qualify. Each verification costs the user SOL, making large-scale bot farming economically punitive at the protocol layer.",
     example:

@@ -11,16 +11,17 @@ export function ProblemSection() {
         </span>
 
         <h2 className="mt-6 font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
-          Bots stole roughly{" "}
-          <span className="text-foreground">$500M</span> from Solana
-          protocols last year<span className="text-cyan">.</span>
+          Wallets are free<span className="text-cyan">.</span>{" "}
+          Proving a returning human operates one is still an open
+          problem<span className="text-cyan">.</span>
         </h2>
 
         <p className="mt-6 max-w-2xl text-base leading-relaxed text-foreground/65 md:text-lg">
-          The fix the network needs is a proof-of-personhood primitive
-          that runs in any browser, keeps raw biometric data on the
-          device, and travels across every dApp on Solana. That&apos;s
-          the slot Entros fills.
+          Document checks and static biometrics verify a moment.
+          Airdrops, governance, and agent accountability need something
+          that verifies over time. Entros is the behavioral layer—continuous
+          proof-of-personhood that runs in any browser, keeps raw data on
+          the device, and compounds trust across every dApp on Solana.
         </p>
       </div>
     </section>

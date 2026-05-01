@@ -25,10 +25,10 @@ export const trustSignals: TrustSignal[] = [
   },
   {
     icon: "globe",
-    name: "Integration Targets",
-    description: "Mapped Solana ecosystem fit.",
+    name: "Ecosystem Fit",
+    description: "Integration surfaces mapped across Solana.",
     detail:
-      "Sequenced outreach plan covers Jupiter, Drift, 8004 Labs, Metaplex, Realms-using DAOs, Marinade, Tensor, Magic Eden, and Phantom—each with a specific integration angle. Goal: one signed-up integrator pilot before mainnet.",
+      "SAS attestation issuer (live), Agent Anchor on 8004 registry (live on devnet), Realms voter-weight plugin (shipped on devnet). Integration surfaces mapped for Jupiter, Drift, Metaplex, Marinade, Tensor, Magic Eden, and Phantom.",
     href: "/solutions",
   },
   {

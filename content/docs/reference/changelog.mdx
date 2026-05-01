@@ -7,9 +7,25 @@ The protocol publishes the SDK as `@entros/pulse-sdk` on npm. Programs are deplo
 
 ## Pulse SDK
 
-### 1.3.0
+### 1.5.0
 
 Current published version.
+
+- `submitViaWallet` now throws when an on-chain transaction reverts. Earlier versions returned `success: true` for transactions that were included but failed in execution, which let a "verified!" UI render for a tx that mutated nothing. The thrown error preserves the `InstructionError` JSON shape so callers can match on `Custom` codes.
+- Anchor IDLs (`entros_anchor`, `entros_verifier`) are now bundled into the SDK at compile time; the SDK no longer fetches IDLs at runtime. Saves ~150–300ms per identity read and ~300–600ms per re-verification submit. Bundle size grows ~12KB gzipped.
+
+### 1.4.x
+
+- 1.4.0 — first-verification mints now bundle a validator-signed receipt as an `Ed25519Program::verify` instruction immediately before `mint_anchor`. The on-chain program enforces the binding (see entros-anchor errors 6015–6021). The SDK consumes the receipt from the `/validate-features` response and prepends the verify instruction transparently; callers do not need to handle the receipt directly.
+- 1.4.0 — `instructionsSysvar` is now always passed to `mint_anchor` (the on-chain accounts struct requires it whether or not a receipt is bundled). SDKs older than 1.4.0 are silently broken against the deployed program.
+- 1.4.0 — `PulseConfig.onPrivacyFallback` callback. Browsers that block encrypted localStorage (iOS Safari private mode, Brave shields, Firefox Total Cookie Protection) trigger this callback; the host app returns `true` to allow plaintext fallback or `false` to keep storage in-memory only. Without the callback, the SDK defaults to in-memory only—safer than the previous silent plaintext fallback.
+- 1.4.0 — validator-unreachable returns `{ ok: false, reason: "validation_unavailable" }` instead of silently bypassing server validation.
+- 1.4.1 — Ed25519 receipt instruction is pinned immediately before `mint_anchor` with an explicit ComputeBudget so wallet adapters can't inject between them.
+- 1.4.2 — `requestSasAttestation` skips the `/attest` call when wallet ownership proof can't be produced (no `signMessage`, signing throws, or no server nonce). Avoids doomed-to-400 requests after the executor's `/attest` ownership requirement landed.
+
+### 1.3.0
+
+- New `PulseSDK.resetBaseline()`, `PulseSession.completeReset()`, and `submitResetViaWallet` public API for the baseline-reset flow. `IdentityState` type gains `lastResetTimestamp`.
 
 ### 1.2.x
 
@@ -31,7 +47,8 @@ Initial public release. Capture, feature extraction, hashing, proof generation, 
 
 ### entros-anchor
 
-- Current deployment includes the cross-program binding patch (`update_anchor` against verifier program). Discovered and fixed in the same sprint as the T4a security wave.
+- Current deployment enforces validator-signed mint-receipt binding on first verification: every `mint_anchor` call must be immediately preceded by an `Ed25519Program::verify` instruction whose signed message ties the wallet, commitment, and `validated_at` timestamp to the registered validator pubkey. SDKs at 1.4.0 or later bundle the receipt automatically; older SDKs hit `MissingValidatorReceipt` (6015). Re-verification (`update_anchor`) binds via the on-chain `VerificationResult` PDA produced by the verifier program and is unaffected.
+- Cross-program binding patch on `update_anchor` against the verifier program. Discovered and fixed in the same sprint as the T4a security wave.
 - Reset path (`reset_identity_state`) gated behind a 7-day cooldown.
 
 ### entros-verifier
@@ -42,6 +59,7 @@ Initial public release. Capture, feature extraction, hashing, proof generation, 
 ### entros-registry
 
 - `ProtocolConfig` initialized on devnet. Validator registration is gated until the Anonymity Ring transitions to permissionless operation.
+- `ProtocolConfig` extended with `validator_pubkey` (offset 77, +32 bytes; LEN 77→109) for the mint-receipt binding above. Migration handled by the admin-only `set_validator_pubkey` instruction with a realloc + raw-byte write so accounts initialized at the legacy 69-byte size are upgraded in place.
 
 ## Where to look next
 

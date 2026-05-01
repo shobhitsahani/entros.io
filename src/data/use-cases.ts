@@ -15,7 +15,7 @@ export const useCases: UseCase[] = [
     problem:
       "Token-weighted governance is plutocracy by default. A wealthy attacker can ratify their own theft (Mango 2022) or spam-clear quorum with self-funded proposals.",
     solution:
-      "Realms voter-weight plugin gates voting on verified-personhood Trust Score, not token holdings. One human, one vote—without document upload or face scan.",
+      "Realms voter-weight plugin gates voting on verified-personhood Trust Score, not token holdings. One human, one vote—verified behaviorally on any device.",
   },
   {
     icon: "bot",
