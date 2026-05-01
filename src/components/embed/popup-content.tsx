@@ -143,6 +143,16 @@ function categorizeError(error: string): EmbedErrorReason {
   if (e.includes("timed out") || e.includes("timeout")) {
     return "timeout";
   }
+  // Anchor program reverts surface from pulse-sdk 1.5.0 as
+  //   Transaction failed on chain: {"InstructionError":[N,{"Custom":CODE}]}
+  // The Custom codes (PrevCommitmentMismatch 6011, ResetCooldownActive
+  // 6012, ProofFromFuture 6014, MissingValidatorReceipt 6015, etc.) all
+  // signal that the on-chain program rejected the submission — collapse
+  // them into validation_failed so the integrator sees a meaningful
+  // bucket rather than the catch-all unknown.
+  if (e.includes('"custom"') || e.includes("instructionerror")) {
+    return "validation_failed";
+  }
   return "unknown";
 }
 
