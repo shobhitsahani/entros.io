@@ -26,6 +26,7 @@ import { ProvingView, SigningView } from "@/components/verify/step-views";
 import { WalletConnectButton } from "@/components/ui/wallet-connect-button";
 import { usePulse } from "@/components/providers/pulse-provider";
 
+import { PopupBaselineStale } from "./popup-baseline-stale";
 import { PopupSuccess } from "./popup-success";
 import { PopupFailure } from "./popup-failure";
 
@@ -35,7 +36,13 @@ type State =
   | { step: "processing" }
   | { step: "signing" }
   | { step: "verified" }
-  | { step: "failed"; reason: EmbedErrorReason };
+  | { step: "failed"; reason: EmbedErrorReason }
+  // Distinct from `failed`: stale on-chain commitment (entros-anchor
+  // `Custom(6011) PrevCommitmentMismatch`) can't be resolved by
+  // re-clicking the integrator's button — needs a baseline reset on
+  // /verify. Renders an interactive recovery surface that does not
+  // auto-close. The wire still emits `validation_failed`.
+  | { step: "failed-baseline-stale" };
 
 const PROOF_TIMEOUT_MS = 60_000;
 
@@ -46,6 +53,16 @@ const PROOF_TIMEOUT_MS = 60_000;
  * surfaces as `network_error` rather than `validation_failed`.
  */
 const VALIDATION_UNAVAILABLE_REASON = "validation_unavailable";
+
+/**
+ * `entros-anchor` Custom error code 6011 (`PrevCommitmentMismatch`):
+ * the proof's `commitment_prev` doesn't match the identity's current
+ * on-chain commitment. Re-clicking the integrator's button can't fix
+ * this; the user has to reset baseline on /verify first. Detected here
+ * so we route to a dedicated recovery surface instead of the generic
+ * "Try again from the integrator" copy.
+ */
+const PREV_COMMITMENT_MISMATCH_PATTERN = /"Custom":\s*6011\b/;
 
 /**
  * Reads `trust_score` directly from the IdentityState PDA via a byte
@@ -325,9 +342,17 @@ export function PopupContent({ params }: { params: ParsedEmbedParams }) {
             fail("validation_failed");
             return;
           }
-          fail(
-            result.error ? categorizeError(result.error) : "unknown",
-          );
+          // Stale-baseline on-chain revert: emit the same opaque
+          // validation_failed bucket on the wire (integrator handles
+          // the same way) but route the popup UI to the dedicated
+          // recovery surface that links to /verify's reset path.
+          const errorMsg = result.error ?? "";
+          if (PREV_COMMITMENT_MISMATCH_PATTERN.test(errorMsg)) {
+            emitError(ctx, "validation_failed");
+            setState({ step: "failed-baseline-stale" });
+            return;
+          }
+          fail(errorMsg ? categorizeError(errorMsg) : "unknown");
           return;
         }
 
@@ -371,6 +396,9 @@ export function PopupContent({ params }: { params: ParsedEmbedParams }) {
   }
   if (state.step === "failed") {
     return <PopupFailure reason={state.reason} />;
+  }
+  if (state.step === "failed-baseline-stale") {
+    return <PopupBaselineStale />;
   }
   if (state.step === "capturing") {
     return (
