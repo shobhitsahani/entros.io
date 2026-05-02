@@ -9,13 +9,36 @@ const STAGE_SUBTITLES: Record<string, string> = {
   "Submitting to Solana...": "Writing verification on-chain",
 };
 
+/**
+ * Solid cyan block that tumbles clockwise — holds on a side, rotates
+ * 90° to the next, repeats four times per cycle. Replaces the lucide
+ * `Loader2` circular spinner on Entros-owned proving stages
+ * (Extracting features → Validating → Computing proof → Submitting).
+ * The wallet-owned signing stage keeps its purple `Loader2` to
+ * distinguish wallet-side wait from protocol-side work.
+ *
+ * Rotation pivot is the geometric centre, so the block stays put on
+ * screen. The eye reads rotation during the eased 90° glide; the
+ * resting holds in between let each side land as a deliberate tick,
+ * giving it a calm cartoon-block rhythm rather than a continuous spin.
+ */
+function TumblingSquare() {
+  return (
+    <div
+      className="mx-auto h-6 w-6 bg-cyan"
+      style={{ animation: "entros-tumble 3s ease-in-out infinite" }}
+      aria-hidden
+    />
+  );
+}
+
 export function ProvingView({ stage }: { stage?: string }) {
   const label = stage || "Processing...";
   const subtitle = (stage && STAGE_SUBTITLES[stage]) || "Please wait";
 
   return (
     <div className="text-center space-y-4">
-      <Loader2 className="mx-auto h-8 w-8 text-cyan animate-spin" />
+      <TumblingSquare />
       <p className="font-mono text-sm text-foreground">
         {label}
       </p>
@@ -59,7 +82,7 @@ export function VerifiedView({
 }) {
   return (
     <div className="text-center space-y-6">
-      <CheckCircle className="mx-auto h-12 w-12 text-solana-green" />
+      <CheckCircle className="mx-auto h-12 w-12 text-cyan" />
       <div>
         <p className="font-sans text-xl font-semibold text-foreground">
           {title}
