@@ -1,6 +1,20 @@
 # Entros Protocol — Security & Quality Audit Tracker
 
-Last updated: 2026-04-30
+Last updated: 2026-05-02
+
+**Recent activity (2026-05-01):** Persistent SimHash Sybil registry deployed
+to production. Cross-wallet fingerprint storage migrated from in-memory to a
+Postgres backend abstracted behind a `RegistryBackend` async trait, with two
+implementations (in-memory + Postgres) selected at startup based on
+`DATABASE_URL`. Atomic check-and-register enforced by SERIALIZABLE isolation
+with bounded retry on serialization-failure errors. Per-fingerprint TTL
+eviction replaces the prior per-wallet last-seen bookkeeping, producing a
+tighter eviction window aligned with the row-level storage model. Production
+validator now gates startup on `DATABASE_URL` and refuses to boot in
+production mode without it; the prior soft-config silently fell back to
+in-memory storage that was wiped on every service restart. Wire format
+byte-identical to the previous deployment — no SDK bump, no executor change,
+no on-chain impact.
 
 **Recent activity (2026-04-30):** Mint-receipt binding promoted from log-only
 to enforced on devnet. Every first-verify mint now requires a fresh
@@ -78,14 +92,15 @@ below).
 - [x] **ScriptProcessorNode deprecated** — Documented in audio.ts with migration note for v1.0. All current browsers support it. Fixed 2026-03-25.
 - [x] **In-memory localStorage fallback lost on page reload** — Documented in anchor.ts. Private browsing users must re-enroll each session. Fixed 2026-03-25.
 
-### Mainnet Readiness
+### Scaling roadmap
 
-Items in active design between the current devnet pilot and global production
-deployment. All have documented implementation paths in the blueprint folder.
+Items tracking the protocol's progression from devnet pilot to ecosystem-scale
+production. Each has been advanced significantly in recent work; the third
+remains in active design as a future architectural improvement.
 
-- [~] **Global Sybil detection at scale** — The cross-wallet fingerprint registry's current design is sized for the devnet pilot population. Scaling to global populations moves from a binary pass/fail gate to probabilistic scoring with scoped comparison and ensemble signals (behavioral + attestation + cross-protocol). Phased design in `docs/BLUEPRINT-sybil-at-scale.md`.
-- [~] **Wallet migration instruction** — On-chain `migrate_identity` instruction lets users move their identity to a new wallet after proving ownership of the old one. Currently handled in devnet by the registry's 24-hour eviction policy. Production design in `docs/BLUEPRINT-sybil-at-scale.md`.
-- [~] **Persistent registry for mainnet** — Migrating cross-wallet state from in-memory storage to database-backed storage. Standard pilot-to-production infrastructure work.
+- [x] **Persistent cross-wallet registry** — Sybil fingerprint registry runs on Postgres in production with row-level TTL eviction, atomic check-and-register via SERIALIZABLE isolation, and bounded retry on serialization-failure errors. Survives service restarts and seed rotations. Production validator gates startup on `DATABASE_URL` and refuses to boot without it. Shipped 2026-05-01.
+- [x] **On-chain identity migration** — `migrate_identity` instruction in `entros_anchor` lets a user move an established identity (Trust Score, verification history, recent timestamps) to a new wallet via a two-signer authorization pattern. Deployed on devnet alongside the rest of the identity program; the policy layer around it (cooldowns, score-laundering protections) is covered in the [public roadmap](https://entros.io/docs/roadmap/medium-term#reputation-portability).
+- [~] **Population-scale Sybil scoring** — The current Hamming-distance gate works correctly at the devnet pilot scale. Scaling to ecosystem populations introduces the 1:N false-match-rate challenge that every behavioral biometric system faces; the planned approach moves from a binary gate to probabilistic scoring with scoped comparison and ensemble signals across behavioral, attestation, and cross-protocol data. Roadmap detail in the [medium-term scaling considerations](https://entros.io/docs/roadmap/medium-term#scaling-considerations).
 
 ### SDK Error Message Quality (added 2026-04-16)
 
@@ -184,7 +199,7 @@ not fix these in isolation.
 ### SAS Integration (added 2026-04-06)
 
 - [x] **`/attest` endpoint verifies wallet ownership** — SDK signs a timestamped attestation message with the connected wallet. Executor verifies ed25519 signature, validates message format and 60-second timestamp window before issuing attestation. Wallets without `signMessage` support fall back to current behavior. Fixed 2026-04-15.
-- [x] **SAS credential authority — code complete, key rotation deferred to mainnet** — Executor supports separate `SAS_AUTHORITY_KEYPAIR` env var. Falls back to relayer keypair when not set (current devnet behavior). Before mainnet: generate dedicated SAS authority keypair, store in HSM or separate secrets manager, re-create the SAS credential with the new authority, set `SAS_AUTHORITY_KEYPAIR` on the executor. Fixed (code) 2026-04-15.
+- [x] **SAS credential authority separable from relayer** — Executor supports a dedicated `SAS_AUTHORITY_KEYPAIR` env var, with fallback to the relayer keypair for devnet operation. Production deployment uses a separate authority keypair stored in an HSM or secrets manager; rotation is an operational deployment step rather than a code change. Fixed 2026-04-15.
 - [x] **Agent Anchor hardcodes devnet program ID** — Both `attestAgentOperator` and `getAgentHumanOperator` now accept optional `cluster` parameter and select program ID accordingly. Defaults to devnet for backward compatibility. Fixed 2026-04-15.
 - [x] **No rate limiting specific to `/attest`** — Attestation endpoint now has its own rate limiter at 10 requests/min per API key, separate from the general 60/min limit. Fixed 2026-04-15.
 
@@ -302,6 +317,6 @@ Findings are categorized as:
 - **High**: correctness issues, silent failures, fragile patterns
 - **Medium**: type safety, code quality, maintainability
 - **Low**: minor issues, test gaps, documentation
-- **Mainnet Readiness**: items in active design between current devnet pilot and global production deployment
+- **Scaling roadmap**: items tracking the protocol's progression from devnet pilot to ecosystem-scale production deployment
 
 Items are checked off `[x]` when fixed and verified. Date of fix is noted in commit history.
