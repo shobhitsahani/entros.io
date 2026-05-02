@@ -2,6 +2,20 @@
 
 Last updated: 2026-05-02
 
+**Recent activity (2026-05-02):** Cross-stack dependency cleanup pass.
+Dependabot advisories closed across pulse-sdk, protocol-core, and circuits
+via transitive overrides; build-tool and library upgrades brought all four
+target packages (vite, uuid, brace-expansion, picomatch) to their patched
+versions. Pulse SDK published as **1.5.3** with audio capture refinements
+(OS-level voice isolation request added to `getUserMedia` constraints,
+supported on Chrome/ChromeOS and Safari macOS Sonoma+/iOS 17+) alongside
+the dependency cleanup. Internal `cargo audit` on the validator returned a
+single advisory (rsa transitive via sqlx-mysql) which doesn't apply to
+this build because the mysql feature is not enabled (sqlx is configured
+with `default-features = false` plus only the postgres-related features);
+documented and ignored with rationale in `.cargo/audit.toml`. No
+public-API or wire-protocol breaking changes.
+
 **Recent activity (2026-05-01):** Persistent SimHash Sybil registry deployed
 to production. Cross-wallet fingerprint storage migrated from in-memory to a
 Postgres backend abstracted behind a `RegistryBackend` async trait, with two
@@ -217,7 +231,7 @@ kept private per responsible-disclosure convention.
 
 - [x] **Statistical gap surfaced during T3b campaign** — Feature-space optimization against the server-side validation pipeline found a narrow exploitable seam across a small subset of probes. Hardened via an additional consistency constraint in the validation service; subsequent campaign attempts rejected. Attack mechanism and specific constraint kept private. Fixed 2026-04-18.
 - [x] **Cross-modality correlation check removed** — Discovered 2026-04-20 during T4a Wave 1 log analysis: the check correlated feature-vector statistical summaries at matching index positions across modalities, which is a category error (correlating mean F0 in Hz against mean jerk in m/s³ has no semantic grounding). Observed range on unrelated inputs 0.004–0.881, threshold 0.01 was below noise floor — zero defense value. Removed in entros-validation 2026-04-21. Sound cross-modal defense remains via the temporal coupling check (Pearson on F0 contour × accel magnitude time-series, same-unit same-time). Semantic replacement checks deferred pending human-baseline calibration data.
-- [x] **Phrase content binding shipped** — Tier 1 validation now verifies that the audio content matches the server-issued challenge phrase, not just voice texture. Closes the pre-recorded-arbitrary-content attack class (T4a Wave 1 baseline). Combinatorial defense ≈ 4.7 × 10¹⁵ unique phrases per session via random sampling from a curated neutral-vocabulary dictionary. Calibrated discrimination gap ≈ 95 percentage points between right and wrong content across initial verifications; threshold tolerates one transcription word-error per phrase with margin. Fixed 2026-04-25.
+- [x] **Phrase content binding shipped** — Tier 1 validation now verifies that the audio content matches the server-issued challenge phrase, not just voice texture. Closes the pre-recorded-arbitrary-content attack class (T4a Wave 1 baseline). Combinatorial defense ≈ 4.7 × 10¹⁵ unique phrases per session via random sampling from a curated neutral-vocabulary dictionary, reducing precomputation feasibility to negligible. Calibrated to consistently distinguish correct from incorrect phrase content while accommodating natural transcription variance. Fixed 2026-04-25.
 
 ---
 
