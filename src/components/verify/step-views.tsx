@@ -243,9 +243,30 @@ function isPrevCommitmentMismatchError(error: string): boolean {
   return /"Custom":\s*6011\b/.test(error);
 }
 
-// Catch-all for any other on-chain Anchor program revert (cooldown,
-// proof-from-future, missing receipt, etc.). Routes to a friendly
-// "verification failed" surface instead of leaking the raw
+// Code 6012 is `ResetCooldownActive` from entros-anchor. The 7-day
+// cooldown after a successful baseline reset has not elapsed. Until it
+// does, no further reset can land. Distinct from program-revert because
+// the user-actionable answer is "wait" — re-attempting today, even with
+// a perfect capture, produces the same revert.
+function isResetCooldownError(error: string): boolean {
+  return /"Custom":\s*6012\b/.test(error);
+}
+
+// Pre-flight cooldown checks (verify-wallet-connected.tsx) embed the
+// computed unlock timestamp in the synthetic error string so this UI
+// can show the user a specific "try again on $DATE" message. On the
+// post-submit path (chain reverts with a real 6012) the field is
+// absent and the case falls back to the generic 7-day-cooldown copy.
+function extractCooldownUnlockDate(error: string): Date | null {
+  const m = /unlock_at=(\S+)/.exec(error);
+  if (!m || !m[1]) return null;
+  const d = new Date(m[1]);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+// Catch-all for any other on-chain Anchor program revert (proof-from-
+// future, missing receipt, malformed accounts, etc.). Routes to a
+// friendly "verification failed" surface instead of leaking the raw
 // `{"InstructionError":[N,{"Custom":N}]}` JSON.
 function isProgramRevertError(error: string): boolean {
   return error.includes("InstructionError") || /"Custom":\s*\d+/.test(error);
@@ -255,6 +276,7 @@ type FailureKind =
   | { kind: "relayer-down" }
   | { kind: "missing-baseline"; canReset: boolean }
   | { kind: "stale-baseline"; canReset: boolean }
+  | { kind: "cooldown-active" }
   | { kind: "program-revert" }
   | { kind: "insufficient-sol" }
   | { kind: "user-rejection" }
@@ -271,11 +293,12 @@ function categorizeFailure(error: string, canResetBaseline: boolean): FailureKin
   if (isUserRejectionError(error)) return { kind: "user-rejection" };
   if (isStaleBlockhashError(error)) return { kind: "stale-blockhash" };
   if (isRateLimitedError(error)) return { kind: "rate-limited" };
-  // Specific Custom code routes before the generic program-revert bucket
-  // so we can offer the Reset baseline action for 6011.
+  // Specific Custom codes route before the generic program-revert bucket
+  // so each gets its own user-actionable surface.
   if (isPrevCommitmentMismatchError(error)) {
     return { kind: "stale-baseline", canReset: canResetBaseline };
   }
+  if (isResetCooldownError(error)) return { kind: "cooldown-active" };
   if (isProgramRevertError(error)) return { kind: "program-revert" };
   return { kind: "generic", message: error };
 }
@@ -334,6 +357,23 @@ export function FailedView({
         dismissLabel = "Cancel";
       }
       break;
+    case "cooldown-active": {
+      title = "Reset on cooldown";
+      const unlockDate = extractCooldownUnlockDate(error);
+      if (unlockDate) {
+        const formatted = unlockDate.toLocaleString(undefined, {
+          dateStyle: "long",
+          timeStyle: "short",
+        });
+        body = `This wallet was reset within the last 7 days. The protocol enforces a cooldown between baseline resets. You can reset again on ${formatted}.`;
+      } else {
+        body =
+          "This wallet was reset within the last 7 days. The protocol enforces a cooldown between baseline resets. Try again after the cooldown expires.";
+      }
+      footnote =
+        "Or verify from the device that holds the original baseline.";
+      break;
+    }
     case "program-revert":
       title = "Verification failed";
       body =
