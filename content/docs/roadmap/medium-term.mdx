@@ -42,7 +42,25 @@ The Anchor PDA lives on Solana. Other chains can verify a wallet's status via cr
 
 ## Reputation portability
 
-Reputation today is wallet-bound. A user who needs to migrate wallets—for security reasons, hardware change, or otherwise—must currently rebuild from a fresh Anchor. The medium-term path is a controlled migration instruction: the user proves a single fresh capture from the new wallet, plus a signature from the old wallet's keypair, and the score transfers. The protocol-level discussion is when to allow this and how to prevent score-laundering attacks.
+Reputation today is wallet-bound by default — users build Trust Score against a specific wallet through repeated verification. The `migrate_identity` instruction in the on-chain identity program lets a user move an established identity (Trust Score, verification history, recent timestamps) to a new wallet via a two-signer authorization pattern: the existing wallet authorizes the new one, then the new wallet completes the migration. This is shipped on devnet today.
+
+The medium-term work is the policy layer around it — when to allow migration (cooldowns, score caps), how to prevent score-laundering attacks where one identity is reused to bootstrap multiple wallets, and how integrators surface migration status to users (e.g., "this score was transferred from wallet X on date Y"). The protocol-level discussion is balancing user mobility against attack resistance.
+
+## Scaling considerations
+
+The Sybil registry today compares each new verification against every existing wallet's stored fingerprint with a single similarity threshold. This binary gate works correctly at the devnet pilot scale (hundreds to low thousands of wallets) and through the integrator pilots described in [near-term](/docs/roadmap/near-term).
+
+At ecosystem scale (millions of wallets on mainnet) the underlying tradeoff every behavioral biometric system faces becomes load-bearing. Re-verifying the *same* person against the *same* stored fingerprint (1:1 match) is well-served by behavioral signals — that is how Trust Score's continuity check works today. Distinguishing one person from *every other person* in the population (1:N deduplication) requires discrimination orders of magnitude sharper than 1:1, and no published behavioral biometric system achieves that at planetary scale without supplementary signals.
+
+The medium-term architectural shift is from binary gating to **probabilistic scoring with ensemble signals**:
+
+- **Scoped comparison** instead of universal — partition the registry by domain, recency, or integrator context so each verification compares against a relevant slice rather than all global state.
+- **Multi-signal ensemble** — combine the behavioral fingerprint with attestation history (SAS records), cross-protocol signals (existing identity systems on Solana and beyond), and Trust Score recency. No single signal carries the full discrimination weight.
+- **Probabilistic outcomes** — surface a confidence score to integrators rather than a binary pass/fail, letting different use cases pick their own discrimination point on the precision-recall curve.
+
+This is the same direction every production identity system has converged on — Aadhaar uses iris and fingerprint plus demographics; Worldcoin uses iris plus the orb-network Sybil layer; behavioral systems supplement with device signals. Entros's contribution is occupying the **behavioral temporal consistency** slot in that ensemble, complementary to anatomical and document-based approaches rather than replacing them.
+
+Calibration of the new scoring system depends on empirical fingerprint distributions across a substantially larger and more diverse user population than the current pilot. The work is gated on that data; the design publishes as it stabilizes.
 
 ## Where to look next
 
