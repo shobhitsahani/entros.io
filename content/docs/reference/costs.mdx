@@ -7,13 +7,17 @@ Two cost surfaces matter: the user pays a small fee per verification, and each o
 
 ## Protocol fee
 
-| Operation | Default | Configurable | Where |
-| --- | --- | --- | --- |
-| `mint_anchor` | 0.005 SOL | `verification_fee` in `ProtocolConfig` | Charged to the user |
-| `update_anchor` | 0.005 SOL | same | Charged to the user |
-| `reset_identity_state` | 0.005 SOL | same | Charged to the user |
+A single user transaction invokes one of the instructions below—not a sum across them. Per-action cost is 0.005 SOL.
 
-The fee is charged to the user in wallet-connected mode. In walletless mode (relayer), the integrator funds the fee through the executor's relayer escrow.
+| Operation | Fee | Configurable | When |
+| --- | --- | --- | --- |
+| `mint_anchor` | 0.005 SOL | `verification_fee` in `ProtocolConfig` | First verification (one-time per wallet) |
+| `update_anchor` | 0.005 SOL | same | Each subsequent re-verification |
+| `reset_identity_state` | 0.005 SOL | same | Recovery path, gated behind a 7-day cooldown |
+
+The two-signer `migrate_identity` flow used for wallet migration charges through a separate `migration_fee` field on `ProtocolConfig`, set independently of the main verification fee.
+
+The fee is charged to the user in wallet-connected mode—signed and paid in the same transaction that mints or updates the Anchor. The walletless capture path on `entros.io/verify` is a no-wallet preview of the capture experience and incurs no protocol fee; it does not write on-chain identity, attestations, or Trust Score.
 
 The fee accumulates in the `Treasury` PDA owned by `entros-registry`. The protocol authority (currently the team, decentralizing post-audit) draws from the treasury for protocol operations.
 
@@ -36,18 +40,18 @@ Each new account on Solana requires rent-exempt funding. Numbers below are queri
 
 | Account | Size | Rent | Refundable |
 | --- | --- | --- | --- |
-| `IdentityState` | 551 bytes | 0.004726 SOL | No (held while Anchor is active) |
-| `Mint` (Token-2022 NonTransferable) | 170 bytes | 0.002074 SOL | No |
-| Associated Token Account | 165 bytes | 0.002039 SOL | No |
+| `IdentityState` | 583 bytes | 0.00494856 SOL | No (held while Anchor is active) |
+| `Mint` (Token-2022 with NonTransferable + MintCloseAuthority) | 206 bytes | 0.00232464 SOL | No |
+| Associated Token Account (Token-2022 with ImmutableOwner) | 174 bytes | 0.00210192 SOL | No |
 | `Challenge` | 90 bytes | 0.001517 SOL | Yes, via `close_challenge` |
 | `VerificationResult` | 182 bytes | 0.002158 SOL | Yes, via `close_verification_result` |
 | Agent metadata entry | governed by Solana Agent Registry | ~0.003 SOL | If marked mutable; immutable entries are permanent |
 
-Total user-side cost on first verification: protocol fee (0.005 SOL) plus rent for `IdentityState` + `Mint` + ATA (~0.0089 SOL one-time) ≈ **0.0139 SOL** total. Subsequent re-verifications pay only the 0.005 SOL protocol fee—the persistent accounts are already funded, and the temporary `Challenge` and `VerificationResult` accounts are closed for rent recovery in the same transaction.
+Total user-side cost on first verification: protocol fee (0.005 SOL) plus rent for `IdentityState` + `Mint` + ATA (~0.00938 SOL one-time) ≈ **0.01438 SOL** total. Subsequent re-verifications pay only the 0.005 SOL protocol fee—the persistent accounts are already funded, and the temporary `Challenge` and `VerificationResult` accounts are closed for rent recovery in the same transaction.
 
 ## Economic notes
 
-The fee is set deliberately low for individual users—about a quarter of a US cent at SOL = $50—and high enough to create real cumulative cost for an attacker maintaining many Anchors. The fee schedule is configurable through `update_protocol_config` and may evolve as the protocol decentralizes.
+The fee is set deliberately small per individual verification and high enough to create real cumulative cost for an attacker maintaining many Anchors. The `verification_fee` field on `ProtocolConfig` is updateable by the protocol authority via `update_protocol_config` and may evolve as the protocol decentralizes or as SOL economics shift.
 
 ## Where to look next
 

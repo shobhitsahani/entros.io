@@ -296,6 +296,8 @@ remains in active design as a future architectural improvement.
 - [x] **On-chain identity migration** — `migrate_identity` instruction in `entros_anchor` lets a user move an established identity (Trust Score, verification history, recent timestamps) to a new wallet via a two-signer authorization pattern. Deployed on devnet alongside the rest of the identity program; the policy layer around it (cooldowns, score-laundering protections) is covered in the [public roadmap](https://entros.io/docs/roadmap/medium-term#reputation-portability).
 - [~] **Population-scale Sybil scoring** — The current Hamming-distance gate works correctly at the devnet pilot scale. Scaling to ecosystem populations introduces the 1:N false-match-rate challenge that every behavioral biometric system faces; the planned approach moves from a binary gate to probabilistic scoring with scoped comparison and ensemble signals across behavioral, attestation, and cross-protocol data. Roadmap detail in the [medium-term scaling considerations](https://entros.io/docs/roadmap/medium-term#scaling-considerations).
 
+The protocol fee (`verification_fee` field on `ProtocolConfig`) is updateable by the protocol authority via `update_protocol_config` and can be recalibrated as SOL economics evolve, without program redeploy or governance changes.
+
 ---
 
 ## Security Program
