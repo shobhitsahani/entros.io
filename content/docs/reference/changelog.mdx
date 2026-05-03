@@ -7,9 +7,15 @@ The protocol publishes the SDK as `@entros/pulse-sdk` on npm. Programs are deplo
 
 ## Pulse SDK
 
-### 1.5.0
+### 1.5.x
 
-Current published version.
+Current published version: `1.5.3`. The 1.5.1–1.5.3 line is responsiveness, audio capture, and dependency hygiene on top of the 1.5.0 baseline; no API or breaking changes.
+
+- 1.5.3 — Audio capture passes `voiceIsolation: true` in `getUserMedia` constraints (W3C Media Capture Extensions); browsers and OS layers that support the constraint apply the platform's voice-isolation pipeline before samples reach the SDK, browsers that don't recognize it fall back to the default constraints. The F0 contour detector also yields to the host event loop between blocks so the verify spinner repaints through the F0 stage. Transitive `uuid` dependency is overridden to `^14.0.0` to clear advisories surfaced by the upstream chain.
+- 1.5.2 — Heavy feature-extraction stages yield to the host event loop between blocks. The verify spinner repaints during long extraction stages instead of stalling.
+- 1.5.1 — Republish carrying README cross-link to `@entros/verify` for the drop-in path. No code change against 1.5.0.
+
+### 1.5.0
 
 - `submitViaWallet` now throws when an on-chain transaction reverts. Earlier versions returned `success: true` for transactions that were included but failed in execution, which let a "verified!" UI render for a tx that mutated nothing. The thrown error preserves the `InstructionError` JSON shape so callers can match on `Custom` codes.
 - Anchor IDLs (`entros_anchor`, `entros_verifier`) are now bundled into the SDK at compile time; the SDK no longer fetches IDLs at runtime. Saves ~150–300ms per identity read and ~300–600ms per re-verification submit. Bundle size grows ~12KB gzipped.
