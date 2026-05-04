@@ -1,0 +1,49 @@
+---
+title: Verify a wallet in five lines
+description: Drop EntrosVerify into your app for one-click on-chain proof of personhood.
+---
+
+The shortest path to a verified human. Render `<EntrosVerify />` as a button anywhere in your React tree—on click, the user completes wallet connect plus a 12-second behavioral capture inside a popup window, and your `onVerified` callback fires with the verified payload. Your app never touches the wallet adapter or the SDK directly.
+
+This is the **Tier 1 drop-in path**—the right choice for ~90% of integrations. If you instead want to gate against existing on-chain Anchors without running verification yourself, that's the **Tier 3 path**—see [Next.js—gate a route](/docs/quickstart/next-js).
+
+## Install
+
+```bash
+npm install @entros/verify
+```
+
+The package declares `react ^19` and `react-dom ^19` as peer dependencies. No Solana adapter, no SDK, no web3.js install on your side—those live behind the popup boundary on entros.io.
+
+## Five-line usage
+
+```tsx
+import { EntrosVerify } from "@entros/verify";
+
+<EntrosVerify
+  integratorKey="your-integrator-key"
+  onVerified={(result) => grantAccess(result.walletPubkey)}
+/>
+```
+
+On click: a popup opens to entros.io, the user connects their wallet, completes the 12-second capture, signs the on-chain verification transaction (a first-time `mint_anchor` or a returning-user `update_anchor`), and the popup posts the verified payload back via `onVerified`. The component renders a single `<button>`; style it with `className` or `style`.
+
+## The verified payload
+
+```ts
+interface EntrosVerifyResult {
+  walletPubkey: string;       // Base58 Solana wallet address
+  attestationPda: string;     // SAS attestation PDA—readable by any Solana program
+  txSig: string;              // Confirmed transaction signature
+  trustScore: number;         // On-chain Trust Score after this verification
+  cluster: "devnet" | "mainnet-beta";
+}
+```
+
+`walletPubkey` identifies the user. `trustScore` lets you gate higher-stakes actions (e.g. require 100+ for airdrop eligibility). `attestationPda` and `txSig` give you audit trails.
+
+## Where to look next
+
+- [Verification flow](/docs/integrate/verification-flow)—full surface, all props, error categories, integrator key registration
+- [Next.js—gate a route](/docs/quickstart/next-js)—the read-only path against existing Anchors
+- [Read a Trust Score with no SDK](/docs/quickstart/read-trust-score)—direct PDA read for server-side checks

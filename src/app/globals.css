@@ -321,6 +321,24 @@ body {
 }
 
 /* ----------------------------------------------------------------
+   Verify proving-stage loader — cartoon "tumbling block".
+   Square holds on a side, then rotates 90° clockwise to the next.
+   Repeats four times per full revolution. The hold is the resting
+   "tick"; the rotation is a smooth eased glide so the eye reads it
+   as a graceful tumble rather than a hard snap. Each tick+rotation
+   pair is 750 ms (450 ms hold, 300 ms rotation) at the default 3 s
+   cycle below.
+   ---------------------------------------------------------------- */
+
+@keyframes entros-tumble {
+  0%,   15%  { transform: rotate(0deg); }
+  25%,  40%  { transform: rotate(90deg); }
+  50%,  65%  { transform: rotate(180deg); }
+  75%,  90%  { transform: rotate(270deg); }
+  100%       { transform: rotate(360deg); }
+}
+
+/* ----------------------------------------------------------------
    Hero background—static dot grid with depth gradient.
    Pure CSS, zero JS, zero repaints.
    ---------------------------------------------------------------- */

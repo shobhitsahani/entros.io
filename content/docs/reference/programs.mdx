@@ -18,8 +18,10 @@ Owns the Anchor identity state. Holds per-wallet `IdentityState` PDAs and Token-
 | Instruction | Purpose |
 | --- | --- |
 | `mint_anchor` | Initialize a new Anchor on first verification. Validates a ZK proof from the verifier program. Charges the protocol fee. |
-| `update_anchor` | Re-verification path. Validates a fresh proof against the current commitment, advances the score, rotates the previous commitment. |
-| `reset_identity_state` | Recovery path. Zeroes the score and clears the fingerprint commitments after a 7-day cooldown. Charges the fee. |
+| `update_anchor` | Re-verification path. Validates a fresh proof against the current commitment, advances the score, overwrites `current_commitment`. |
+| `reset_identity_state` | Recovery path. Zeroes the score and clears the fingerprint commitment after a 7-day cooldown. Charges the fee. |
+| `authorize_new_wallet` | First step of wallet migration. Old + new wallets co-sign to record the successor and delegate the identity token. |
+| `migrate_identity` | Second step of wallet migration. The authorized new wallet completes the move; the old mint is closed. |
 
 ### Accounts
 
@@ -78,6 +80,7 @@ Protocol-level configuration, validator stake, and treasury. Configures the prot
 | --- | --- |
 | `initialize_protocol` | One-time setup of the protocol config |
 | `update_protocol_config` | Authority-only updates to fee, expiry, score caps |
+| `set_validator_pubkey` | Authority-only write of the validator pubkey used for the mint-receipt binding (entros-anchor 6015–6021). Reallocs the protocol config to the post-binding layout the first time it runs. |
 | `migrate_admin` | Emergency administrative migration of the protocol authority |
 | `register_validator` | Stake to join the Anonymity Ring (gated until ring decentralizes) |
 | `compute_trust_score` | Read-only preview of what a score would be given a verification history |

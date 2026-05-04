@@ -102,6 +102,16 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "avatars.githubusercontent.com" },
     ],
   },
+  // Force Vercel's per-route output tracing to include the OG logo file
+  // in every lambda bundle. The metadata pipeline imports `lib/og.tsx`
+  // (transitively, via Next.js metadata-route discovery on
+  // `app/opengraph-image.tsx` + `app/twitter-image.tsx`), and that module
+  // readFileSyncs the PNG. Without this directive Vercel's tracer drops
+  // the file from dynamic-route lambdas, which then throw ENOENT on first
+  // request — cf. /embed/verify-popup, the only ƒ route in this build.
+  outputFileTracingIncludes: {
+    "/**/*": ["./public/logos/Entros.png"],
+  },
   turbopack: {
     resolveAlias: {
       fs: { browser: "./src/lib/empty-module.ts" },

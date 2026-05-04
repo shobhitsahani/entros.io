@@ -34,9 +34,9 @@ if (!result.success) {
 `attestAgentOperator` does four things in sequence:
 
 1. Reads the operator's Entros Anchor PDA from `entros-anchor`.
-2. Extracts `trustScore` and `lastVerificationTimestamp`.
-3. Borsh-serializes the three fields into a 42-byte metadata payload.
-4. Calls the registry's `set_metadata_pda` instruction to write the payload.
+2. Extracts `trustScore` and the last-verification timestamp from the on-chain account.
+3. JSON-serializes the four fields (`anchorPda`, `trustScore`, `verifiedAt`, `wallet`) and wraps them in the registry's Borsh `Vec<u8>` envelope.
+4. Calls the registry's `set_metadata_pda` instruction to write the payload, marked immutable.
 
 The wallet calling `attestAgentOperator` must be both the agent's owner on the registry and the holder of the operator Anchor.
 
@@ -54,7 +54,7 @@ if (operator) {
 }
 ```
 
-Returns `null` if no operator metadata is set, or `{ anchorPda, trustScore, verifiedAt }` otherwise.
+Returns `null` if no operator metadata is set, or `{ anchorPda, trustScore, verifiedAt, wallet }` otherwise.
 
 ## Gate a platform on operator score
 

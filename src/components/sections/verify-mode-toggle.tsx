@@ -32,7 +32,7 @@ export function VerifyModeToggle({
             : "text-muted hover:text-foreground"
         )}
       >
-        Walletless
+        Preview (no wallet)
       </button>
     </div>
   );

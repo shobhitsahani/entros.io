@@ -2,17 +2,17 @@ import type { Stat } from "./types";
 
 export const solanaStats: Stat[] = [
   {
-    label: "Per verification",
-    value: "~0.005 SOL",
+    label: "Monthly transactions",
+    value: "3.5B+",
   },
   {
     label: "Finality",
     value: "<1s",
   },
   {
-    label: "Monthly active users",
-    value: "30M+",
-    numericValue: 30,
+    label: "Monthly active addresses",
+    value: "50M+",
+    numericValue: 50,
     suffix: "M+",
   },
   {

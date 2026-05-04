@@ -20,11 +20,12 @@ import { EntrosBadge } from "./components/EntrosBadge";
 <EntrosBadge walletAddress={comment.author} />
 ```
 
-The component fetches the Anchor PDA on mount and renders one of three states:
+The component fetches the Anchor PDA on mount and renders one of four states:
 
-- **Verified**—shows the Trust Score and last-verified timestamp
-- **Not verified**—shows a neutral "no Anchor" indicator
-- **Loading**—shows a placeholder with the same dimensions as the eventual content
+- **Verified**—shows "Verified · Trust: *score*" with the on-chain Trust Score
+- **Not verified**—shows a neutral "Not Verified" indicator
+- **Loading**—shows a "Verifying Entros…" placeholder with the same dimensions as the eventual content
+- **Invalid address**—shows an "Invalid Address" indicator when the prop is not a valid base58 pubkey
 
 ## Props
 

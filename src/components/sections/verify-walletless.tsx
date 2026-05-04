@@ -173,11 +173,6 @@ export function VerifyWalletless({
             Speak a phrase while tracing a shape. All sensors record
             simultaneously for 12 seconds. No wallet needed.
           </p>
-          <p className="mt-3 text-xs text-foreground/40 max-w-sm mx-auto">
-            Walletless mode is a preview of the capture experience. It does not
-            interact with on-chain identity, Trust Score, attestations, or
-            server-side validation. Connect a wallet for the full verification flow.
-          </p>
         </div>
         <div className={`grid gap-4 mx-auto max-w-sm ${hasMotion ? "grid-cols-3" : "grid-cols-2"}`}>
           <div className="flex flex-col items-center gap-2 text-center">
@@ -211,7 +206,7 @@ export function VerifyWalletless({
           </button>
         </div>
         <p className="text-center text-xs text-muted">
-          Raw data stays on your device. Only the ZK proof and a statistical summary leave.
+          Capture and proof generation run entirely on your device.
         </p>
       </div>
     );

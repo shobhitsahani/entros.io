@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
-import { type PulseSession, PROGRAM_IDS, fetchChallenge } from "@entros/pulse-sdk";
+import { type PulseSession, PROGRAM_IDS, fetchChallenge, fetchIdentityState } from "@entros/pulse-sdk";
 import type { VerifyState, VerifyAction } from "@/components/verify/types";
 import { PulseChallenge } from "@/components/verify/pulse-challenge";
 import {
@@ -27,6 +27,15 @@ function commitmentToHex(bytes: Uint8Array): string {
       .join("")
   );
 }
+
+// Mirrors `RESET_COOLDOWN_SECS` in `entros_anchor::lib.rs`. The on-chain
+// program rejects a second reset within this window with Custom error
+// 6012 (`ResetCooldownActive`); the pre-flight check below surfaces the
+// same constraint before the user spends a capture session on a
+// verification destined to revert. If the on-chain constant changes,
+// update this number too — the post-submit branch in step-views still
+// catches drift, but pre-flight false-negatives waste a capture cycle.
+const RESET_COOLDOWN_SECS = 7 * 24 * 60 * 60;
 
 export function VerifyWalletConnected({
   state,
@@ -227,7 +236,35 @@ export function VerifyWalletConnected({
     }
   }
 
-  function handleResetBaselineClick() {
+  async function handleResetBaselineClick() {
+    if (!publicKey) {
+      setResetDialogOpen(true);
+      return;
+    }
+
+    try {
+      const identity = await fetchIdentityState(publicKey.toBase58(), connection);
+      if (identity && identity.lastResetTimestamp > 0) {
+        const now = Math.floor(Date.now() / 1000);
+        const elapsed = now - identity.lastResetTimestamp;
+        if (elapsed < RESET_COOLDOWN_SECS) {
+          // Synthesize an error string the categorizer in step-views
+          // recognizes as 6012, with the unlock timestamp encoded so the
+          // FailedView can render a specific date instead of generic copy.
+          const unlockTs = identity.lastResetTimestamp + RESET_COOLDOWN_SECS;
+          const unlockIso = new Date(unlockTs * 1000).toISOString();
+          dispatch({
+            type: "VERIFICATION_FAILED",
+            error: `Reset on cooldown. {"InstructionError":[0,{"Custom":6012}]} unlock_at=${unlockIso}`,
+          });
+          return;
+        }
+      }
+    } catch {
+      // Pre-flight fetch failed (network blip, RPC hiccup). Fall through
+      // to the dialog—the user will see the on-chain revert if cooldown
+      // actually applies. Same UX as before this pre-flight existed.
+    }
     setResetDialogOpen(true);
   }
 

@@ -28,8 +28,8 @@ export const verifyComponentSnippet = {
  * Tier 2 — programmatic SDK via `@entros/pulse-sdk`.
  *
  * For apps that want to own the verification UX (custom capture canvas,
- * inline rather than popup, branded loading states). The snippets below
- * are inside React component context — top-level `await` is impossible
+ * inline rather than popup, branded loading states). The snippet below
+ * is inside React component context — top-level `await` is impossible
  * outside an async function or top-level ESM module, so we show the
  * realistic `useEffect` / event-handler shape an integrator would
  * actually write.
@@ -39,7 +39,7 @@ export const integrationSnippets: IntegrationSnippet[] = [
     mode: "wallet-connected",
     title: "Wallet-connected verification",
     description:
-      "The primary flow. The user pays a small protocol fee (~0.005 SOL) and signs a single transaction. An on-chain Anchor is minted or updated, a SAS attestation is written, and the Trust Score recomputes—all from one wallet prompt. Your app reads results on-chain for free.",
+      "The user pays a small protocol fee (~0.005 SOL) and signs a single transaction. An on-chain Anchor is minted or updated, a SAS attestation is written, and the Trust Score recomputes—all from one wallet prompt. Your app reads results on-chain for free.",
     code: `"use client";
 import { useRef } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
@@ -65,37 +65,6 @@ export function CustomVerify() {
     <>
       <div ref={touchRef} className="capture-canvas" />
       <button onClick={handleVerify}>Verify</button>
-    </>
-  );
-}`,
-  },
-  {
-    mode: "walletless",
-    title: "Walletless verification",
-    description:
-      "Captcha-equivalent tier for sign-up flows. The SDK runs the capture, generates a Groth16 proof, and submits to the relayer for liveness validation. No wallet, no transaction, no on-chain Anchor—device-bound and ephemeral. The integrator funds verifications via API key.",
-    code: `"use client";
-import { useRef } from 'react';
-import { PulseSDK } from '@entros/pulse-sdk';
-
-const pulse = new PulseSDK({
-  cluster: 'devnet',
-  relayerUrl: 'https://relayer.entros.io',
-  relayerApiKey: process.env.NEXT_PUBLIC_ENTROS_KEY!,
-});
-
-export function CaptchaCheck() {
-  const touchRef = useRef<HTMLDivElement>(null);
-
-  async function handleCheck() {
-    const result = await pulse.verify(touchRef.current);
-    if (result.success) grantAccess(result.commitment);
-  }
-
-  return (
-    <>
-      <div ref={touchRef} className="capture-canvas" />
-      <button onClick={handleCheck}>Prove I'm human</button>
     </>
   );
 }`,

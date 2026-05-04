@@ -52,8 +52,8 @@ export const solutionCases: SolutionCase[] = [
     problem:
       "Reward platforms and content distribution apps are overrun by bot accounts farming rewards, inflating engagement metrics, and crowding out real users.",
     solution:
-      "Require Entros verification at account creation or reward claim. Entropy scoring per modality and minimum Hamming distance constraints catch the synthetic inputs scripted bots produce. Walletless mode works as a captcha replacement for sign-up flows where the bot floor is the problem rather than on-chain economic loss.",
+      "Require Entros verification at account creation or reward claim. The closed-source defense layer rejects synthetic inputs before they reach the chain. Each verification costs the user SOL, making large-scale farming economically punitive at the protocol layer.",
     example:
-      "A creator-rewards platform can gate reward claims on Entros Trust Score. A web platform can use walletless mode as a captcha-equivalent at signup—no wallet required, device-bound liveness check, drop-in SDK.",
+      "A creator-rewards platform can gate reward claims on Entros Trust Score. Each fake identity requires a funded wallet, per-verification SOL, and sustained re-verification across multiple days to clear meaningful thresholds.",
   },
 ];

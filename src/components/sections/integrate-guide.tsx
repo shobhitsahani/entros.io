@@ -11,8 +11,8 @@ import { IntegratePlayground } from "./integrate-playground";
 const CONFIG_OPTIONS = [
   { name: "cluster", type: '"devnet" | "mainnet-beta"', description: "Solana cluster to connect to." },
   { name: "rpcEndpoint", type: "string", description: "Custom RPC URL (optional)." },
-  { name: "relayerUrl", type: "string", description: "Entros relayer endpoint (walletless mode only)." },
-  { name: "relayerApiKey", type: "string", description: "API key for walletless mode (optional)." },
+  { name: "relayerUrl", type: "string", description: "Entros executor endpoint (advanced; not needed for wallet-connected)." },
+  { name: "relayerApiKey", type: "string", description: "Executor API key (advanced; not needed for wallet-connected)." },
   { name: "wasmUrl", type: "string", description: "Path to entros_hamming.wasm circuit artifact." },
   { name: "zkeyUrl", type: "string", description: "Path to entros_hamming_final.zkey proving key." },
   { name: "threshold", type: "number", description: "Hamming distance threshold (default: 96)." },
@@ -39,9 +39,9 @@ const ABUSE_MECHANISMS = [
   },
   {
     number: "04",
-    title: "Graduated trust tiers",
+    title: "Closed-source defense layer",
     description:
-      "Walletless mode is a liveness check. Wallet-connected mode builds portable, on-chain Trust Score. Match the tier to the sensitivity of the action.",
+      "Captures pass through a closed-source validation pipeline before reaching the chain. Rejection responses are uniform across check types—no per-check signal leaks to clients, denying attackers a directed-calibration channel.",
   },
 ];
 
@@ -115,36 +115,25 @@ export function IntegrateGuide() {
           </div>
 
           <h2 className="mt-6 max-w-3xl font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
-            Two modes<span className="text-cyan">.</span> Full control<span className="text-cyan">.</span>
+            Custom UX<span className="text-cyan">.</span> Full control<span className="text-cyan">.</span>
           </h2>
 
           <p className="mt-6 max-w-3xl text-base leading-relaxed text-foreground/70 md:text-lg">
             For apps that want to own the verification UX—custom capture
-            canvas, inline rather than popup, branded loading states.
-            Wallet-connected is the primary flow with a Groth16 proof, an
-            on-chain Anchor, a SAS attestation, and a Trust Score that
-            compounds. Walletless is the captcha-equivalent tier for
-            sign-up—device-bound, ephemeral, no on-chain identity.
+            canvas, inline rather than popup, branded loading states. Each
+            verification produces a Groth16 proof, an on-chain Anchor, a
+            SAS attestation, and a Trust Score that compounds across
+            re-verifications.
           </p>
 
-          <div className="mt-16 grid grid-cols-1 gap-px border-y border-border bg-border lg:grid-cols-2">
-            {integrationSnippets.map((snippet, idx) => (
+          <div className="mt-16 border-y border-border">
+            {integrationSnippets.map((snippet) => (
               <div key={snippet.mode} className="flex flex-col bg-background p-8 md:p-10">
-                <div className="flex items-center gap-3">
-                  <span className="font-mono text-xs tracking-[0.2em] text-cyan">
-                    {String(idx + 1).padStart(2, "0")}
-                  </span>
-                  <span className="h-px flex-1 bg-border" />
-                  <span className="font-mono text-xs uppercase tracking-[0.15em] text-foreground/50">
-                    {snippet.mode === "wallet-connected" ? "PRIMARY" : "CAPTCHA TIER"}
-                  </span>
-                </div>
-
-                <h3 className="mt-6 font-display text-xl font-medium tracking-tight text-foreground md:text-2xl">
+                <h3 className="font-display text-xl font-medium tracking-tight text-foreground md:text-2xl">
                   {snippet.title}
                 </h3>
 
-                <p className="mt-4 text-sm leading-relaxed text-foreground/65">
+                <p className="mt-4 max-w-3xl text-sm leading-relaxed text-foreground/65">
                   {snippet.description}
                 </p>
 

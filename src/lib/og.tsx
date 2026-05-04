@@ -2,15 +2,22 @@ import { ImageResponse } from "next/og";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-const logoSrc = `data:image/png;base64,${readFileSync(
-  join(process.cwd(), "public", "logos", "Entros.png")
-).toString("base64")}`;
-
 export const ogAlt = "Entros Protocol—Proof of Personhood on Solana";
 export const ogSize = { width: 1200, height: 630 };
 export const ogContentType = "image/png";
 
+let cachedLogoSrc: string | null = null;
+function getLogoSrc(): string {
+  if (cachedLogoSrc) return cachedLogoSrc;
+  const bytes = readFileSync(
+    join(process.cwd(), "public", "logos", "Entros.png"),
+  );
+  cachedLogoSrc = `data:image/png;base64,${bytes.toString("base64")}`;
+  return cachedLogoSrc;
+}
+
 export function generateOGImage() {
+  const logoSrc = getLogoSrc();
   return new ImageResponse(
     (
       <div

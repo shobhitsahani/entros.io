@@ -33,7 +33,7 @@ export function PopupSuccess({
 
   return (
     <div className="text-center space-y-4">
-      <CheckCircle className="mx-auto h-12 w-12 text-solana-green" />
+      <CheckCircle className="mx-auto h-12 w-12 text-cyan" />
       <p className="font-mono text-sm text-foreground">Verified.</p>
       <p className="text-xs text-foreground/55">
         Returning you to the integrator...

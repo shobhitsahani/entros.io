@@ -224,17 +224,17 @@ export function AgentsContent() {
       {/* For integrators—split with code block */}
       <section className="border-t border-border">
         <div className="mx-auto max-w-7xl px-6 py-24 md:py-32">
-          <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
-            // FOR INTEGRATORS
-          </span>
-
-          <h2 className="mt-6 max-w-3xl font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
-            One function call<span className="text-cyan">.</span>
-          </h2>
-
-          <div className="mt-12 grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-16">
+          <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-16">
             <div className="lg:col-span-5">
-              <p className="text-base leading-relaxed text-foreground/70 md:text-lg">
+              <span className="font-mono text-xs uppercase tracking-[0.2em] text-foreground/40">
+                // FOR INTEGRATORS
+              </span>
+
+              <h2 className="mt-6 font-display text-3xl font-medium tracking-tight text-foreground md:text-5xl md:leading-[1.05]">
+                One function call<span className="text-cyan">.</span>
+              </h2>
+
+              <p className="mt-8 text-base leading-relaxed text-foreground/70 md:text-lg">
                 Check if any agent has a verified human operator. Returns
                 the operator's Trust Score, verification timestamp, and
                 wallet address. Works on devnet and mainnet.

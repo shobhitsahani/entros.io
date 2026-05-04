@@ -11,7 +11,7 @@ export const protocolComponents: ProtocolComponent[] = [
       "Browser and React Native support",
       "Audio, IMU, and touch capture in parallel",
       "On-device Groth16 proof generation",
-      "Walletless mode (relayer) and wallet-connected mode",
+      "Wallet-adapter integration for one-call verification",
     ],
     links: [
       { label: "GitHub", href: "https://github.com/entros-protocol/pulse-sdk" },
@@ -55,12 +55,12 @@ export const protocolComponents: ProtocolComponent[] = [
     title: "Executor Node",
     subtitle: "Off-chain relay and challenge service",
     description:
-      "A Rust service that generates signed challenges, relays attestations, and manages walletless transaction submission. The public protocol layer—open source for trust and auditability.",
+      "A Rust service that generates signed challenges and issues SAS attestations against verified wallets. The public protocol layer—open source for trust and auditability.",
     highlights: [
       "Server-generated signed challenges (anti-bot)",
       "SAS attestation issuance",
-      "Walletless relayer for liveness-check tier",
-      "Configurable CORS and rate limiting",
+      "Per-integrator API-key rate limiting",
+      "Configurable CORS and per-IP throttles",
     ],
     links: [
       { label: "GitHub", href: "https://github.com/entros-protocol/executor-node" },
