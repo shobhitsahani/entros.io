@@ -1,6 +1,22 @@
 # Entros Protocol — Security & Quality Audit Tracker
 
-Last updated: 2026-05-02
+Last updated: 2026-05-03
+
+**Recent activity (2026-05-03, late):** Cross-wallet Sybil registry
+retention extended to 30 days. The registry is the real-time short-window
+detection layer of the Sybil defense; long-term Sybil resistance is
+provided by the permanent on-chain `IdentityState` account (every verified
+wallet's record is persisted forever in Solana state), the per-verification
+protocol fee, and the age-weighted Trust Score that integrators gate on.
+The retention extension is operationally cheap (Postgres rows, low daily
+verification volume) and meaningfully widens the rapid-Sybil detection
+window without changing the architecture.
+
+**Recent activity (2026-05-03):** Added a per-source request-rate cap on
+verification endpoints, layering on top of the existing per-account limits
+to bound throughput from a single network origin. Verify-flow UI updated
+to route the new cap's response to the existing cooldown surface so users
+who hit it see a clear retry message rather than a generic failure page.
 
 **Recent activity (2026-05-02):** Cross-stack dependency cleanup pass.
 Dependabot advisories closed across pulse-sdk, protocol-core, and circuits
@@ -29,6 +45,18 @@ production mode without it; the prior soft-config silently fell back to
 in-memory storage that was wiped on every service restart. Wire format
 byte-identical to the previous deployment — no SDK bump, no executor change,
 no on-chain impact.
+
+**Layered Sybil defense (clarification).** The SimHash registry is the
+real-time cross-wallet biological-similarity detection layer. It catches
+rapid same-biology-different-wallet attempts within the configured
+retention window. Long-term Sybil resistance is structurally separate:
+every verified wallet creates a permanent `IdentityState` account on
+Solana that never expires, the per-verification protocol fee imposes
+real bot-farm cost, and the Trust Score's age-weighted scoring means
+fresh wallets visibly differ from long-tenured ones to integrators
+gating downstream access. The registry retention is an operational
+parameter (currently 30 days; env-tunable per deployment), not the sole
+Sybil barrier.
 
 **Recent activity (2026-04-30):** Mint-receipt binding promoted from log-only
 to enforced on devnet. Every first-verify mint now requires a fresh
@@ -189,6 +217,7 @@ not fix these in isolation.
 - [x] **`CorsLayer::permissive()` allows all origins** — CORS now configurable via `CORS_ORIGINS` env var. Permissive fallback when not configured (development). Fixed 2026-03-25.
 - [x] **Rate limiter never evicts old entries** — Added timestamp-based eviction after 5 minutes of inactivity. Fixed 2026-03-23.
 - [x] **`remaining_quota` in response is stale after refund** — Added `get_remaining()` method, response uses fresh value. Fixed 2026-03-23.
+- [x] **No per-source request-rate cap on verification endpoints** — Added a per-source request-rate cap layered on top of the existing per-account limits. Checked before authentication and quota deduction so a single source cannot sustain unbounded throughput by rotating identities. Returns the standard rate-limit response with a wait hint; the existing verify-flow UI already routes it to the cooldown surface. Fixed 2026-05-03.
 
 ### Medium
 
